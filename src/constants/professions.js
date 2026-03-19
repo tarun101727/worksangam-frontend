@@ -1,0 +1,271 @@
+
+export const professions = [
+  {
+    title: "🏠 Core Home Services",
+    items: [
+      "Electrician",
+      "Plumber",
+      "Carpenter",
+      "Painter",
+      "Welder",
+      "Mason",
+      "Tile / Flooring Worker",
+      "Interior Helper",
+      "Home Maintenance Worker",
+      "Furniture Assembler",
+      "Curtain / Blinds Installer",
+    ],
+  },
+
+  {
+    title: "🔧 Repair & Installation",
+    items: [
+      "AC Technician",
+      "Refrigerator Technician",
+      "Washing Machine Technician",
+      "Microwave Technician",
+      "TV / Electronics Repair",
+      "Mobile Repair Technician",
+      "Laptop / Computer Repair",
+      "RO / Water Purifier Technician",
+      "Gas Stove Technician",
+      "Geyser Technician",
+      "Water Heater Technician",
+    ],
+  },
+
+  {
+    title: "⚙️ Advanced Technical Trades",
+    items: [
+      "CCTV Technician",
+      "Solar Panel Technician",
+      "Inverter / Battery Technician",
+      "Generator Technician",
+      "Lift / Elevator Technician",
+      "Fire Safety Technician",
+      "Home Automation Technician",
+      "Network / Wi-Fi Installer",
+      "Smart Home Installer",
+      "Electrical Panel Technician",
+    ],
+  },
+
+  {
+    title: "🚗 Automobile & Transport",
+    items: [
+      "Car Mechanic",
+      "Bike Mechanic",
+      "Auto Electrician",
+      "Tyre Repair Technician",
+      "Vehicle Washing Service",
+      "Tow Truck Driver",
+      "Driving Instructor",
+      "Car Driver",
+      "Personal Driver",
+      "Truck Driver",
+      "Taxi Driver",
+      "Auto Rickshaw Driver",
+    ],
+  },
+
+  {
+    title: "🚚 Delivery & Logistics",
+    items: [
+      "Delivery Boy",
+      "Parcel Delivery",
+      "Food Delivery",
+      "Courier Service",
+      "Pickup & Drop Service",
+      "Tempo Driver",
+      "Loader / Unloader",
+      "Packers & Movers",
+      "Warehouse Worker",
+      "Logistics Assistant",
+    ],
+  },
+
+  {
+    title: "🧹 Cleaning, Security & Support",
+    items: [
+      "Housekeeper",
+      "Cleaner",
+      "Deep Cleaning Service",
+      "Office Cleaner",
+      "Security Guard",
+      "Night Watchman",
+      "Bouncer",
+      "Caretaker",
+      "Elderly Care Assistant",
+      "Babysitter / Nanny",
+      "House Maid",
+      "Janitor",
+    ],
+  },
+
+  {
+    title: "🌳 Outdoor & Maintenance",
+    items: [
+      "Gardener",
+      "Pest Control Technician",
+      "Water Tank Cleaner",
+      "Septic Tank Cleaner",
+      "Drainage Cleaner",
+      "Swimming Pool Cleaner",
+      "Garbage Collection Worker",
+      "Landscape Worker",
+    ],
+  },
+
+  {
+    title: "🍳 Food & Kitchen Services",
+    items: [
+      "Cook",
+      "Home Cook",
+      "Chef",
+      "Catering Service",
+      "Tiffin Service",
+      "Baker",
+      "Sweet Maker",
+      "Juice / Beverage Maker",
+      "Kitchen Helper",
+      "Restaurant Worker",
+    ],
+  },
+
+  {
+    title: "🎓 Education & Training",
+    items: [
+      "Private Tutor",
+      "Home Tuition Teacher",
+      "School Teacher",
+      "College Lecturer",
+      "Online Tutor",
+      "Language Trainer",
+      "Spoken English Trainer",
+      "Music Teacher",
+      "Dance Instructor",
+      "Art / Drawing Teacher",
+      "Yoga Instructor",
+      "Fitness Trainer",
+      "Sports Coach",
+    ],
+  },
+
+  {
+    title: "💻 IT, Online & Remote",
+    items: [
+      "Software Developer",
+      "Web Developer",
+      "Frontend Developer",
+      "Backend Developer",
+      "Full Stack Developer",
+      "Mobile App Developer",
+      "UI/UX Designer",
+      "Graphic Designer",
+      "Digital Marketer",
+      "SEO Specialist",
+      "Content Writer",
+      "Video Editor",
+      "Photo Editor",
+      "Data Entry Operator",
+    ],
+  },
+
+  {
+    title: "📊 Business & Professional",
+    items: [
+      "Accountant",
+      "Bookkeeper",
+      "Tax Consultant",
+      "GST Consultant",
+      "Business Consultant",
+      "HR Consultant",
+      "Recruiter",
+      "Office Administrator",
+      "Customer Support Executive",
+      "Virtual Assistant",
+    ],
+  },
+
+  {
+    title: "🏥 Health & Wellness",
+    items: [
+      "Nurse",
+      "Home Care Nurse",
+      "Physiotherapist",
+      "Psychologist",
+      "Counselor",
+      "Dietitian",
+      "Nutritionist",
+      "Massage Therapist",
+      "Medical Assistant",
+      "Caregiver",
+    ],
+  },
+
+  {
+    title: "🎉 Events, Media & Fashion",
+    items: [
+      "Event Planner",
+      "Wedding Planner",
+      "DJ",
+      "Anchor / Host",
+      "Makeup Artist",
+      "Hair Stylist",
+      "Mehndi Artist",
+      "Tailor",
+      "Fashion Designer",
+      "Photographer",
+      "Videographer",
+      "Drone Operator",
+    ],
+  },
+
+  {
+    title: "🏗️ Construction & Real Estate",
+    items: [
+      "Civil Engineer",
+      "Site Supervisor",
+      "Architect",
+      "Interior Designer",
+      "Surveyor",
+      "Real Estate Agent",
+      "Property Manager",
+      "Construction Worker",
+      "Building Contractor",
+    ],
+  },
+
+  {
+    title: "🐶 Pet Services",
+    items: [
+      "Pet Groomer",
+      "Pet Trainer",
+      "Dog Walker",
+      "Pet Sitter",
+      "Veterinary Assistant",
+    ],
+  },
+
+  {
+    title: "🧰 General Helpers",
+    items: [
+      "Daily Wage Worker",
+      "Helper / Assistant",
+      "Moving Helper",
+      "Construction Helper",
+      "General Laborer",
+    ],
+  },
+
+  {
+    title: "🛍 Retail & Shop Jobs",
+    items: [
+      "Shop Assistant",
+      "Sales Executive",
+      "Store Manager",
+      "Cashier",
+      "Retail Salesperson",
+    ],
+  },
+]; 

@@ -1,0 +1,505 @@
+
+import React, { useState, Fragment, useCallback, useEffect } from "react";
+import axios from "axios";
+import { BASE_URL } from "../config";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../useAuth";
+import { Listbox, Transition } from "@headlessui/react";
+import { indianLanguages } from "../constants/languages";
+
+/* =======================
+   VALIDATION REGEX
+======================= */
+const NAME_REGEX = /^[A-Za-z]{2,30}$/;
+const SKILLS_REGEX = /^[A-Za-z ,.-]{3,}$/;
+
+/* =======================
+   OPTIONS
+======================= */
+const genders = [
+  { id: "Male", name: "Male" },
+  { id: "Female", name: "Female" },
+  { id: "Other", name: "Other" },
+];
+
+const EmployeeSignup = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { setIsAuthenticated, setUser } = useAuth();
+
+  const profileImage = location.state?.profileImage || null;
+  const profileFile = location.state?.file || null;
+
+  /* =======================
+     STATE
+  ======================= */
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    age: "",
+    gender: "",
+    profession: "",
+    professionType: "",
+    skills: "",
+    experience: "",
+    languages: [],
+    bio: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [professions, setProfessions] = useState([]);
+  const [professionSearch, setProfessionSearch] = useState("");
+  const [filteredProfessions, setFilteredProfessions] = useState([]);
+
+  /* =======================
+     HELPERS
+  ======================= */
+  const updateForm = useCallback((key, value) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  }, []);
+
+  const handleProfessionChange = useCallback((professionName) => {
+  const selected = professions.find(
+    (p) => p.name.toLowerCase() === professionName.toLowerCase()
+  );
+
+  setForm((prev) => ({
+    ...prev,
+    profession: professionName,
+    professionType: selected ? selected.type : "offline", // fallback to offline
+  }));
+}, [professions]);
+
+  /* =======================
+     STYLES
+  ======================= */
+  const inputBase =
+    "w-full px-4 py-3 rounded-xl bg-[#111827] text-white placeholder-white/50 border border-white/10 focus:outline-none focus:ring-2 focus:ring-[#6366F1]/50";
+
+  const listboxPanel =
+    "absolute z-50 mt-2 w-full max-h-72 overflow-auto rounded-xl bg-[#0F172A] border border-white/10 shadow-xl";
+
+  const listboxOption = (active) =>
+    `px-4 py-2 cursor-pointer text-white ${
+      active ? "bg-[#1F2937]" : ""
+    }`;
+
+  const buttonPrimary =
+    "w-full py-3 rounded-xl font-semibold text-white bg-[#6366F1] shadow-lg shadow-[#6366F1]/30 transition-all duration-300 hover:bg-[#4F46E5] hover:shadow-xl active:scale-95 disabled:opacity-50";
+
+  const isFormComplete =
+    form.firstName &&
+    form.lastName &&
+    form.age &&
+    form.gender &&
+    form.profession &&
+    form.skills &&
+    form.experience &&
+    form.languages.length > 0;
+
+  /* =======================
+     VALIDATION
+  ======================= */
+  const validateForm = () => {
+    if (!NAME_REGEX.test(form.firstName))
+      return "Please enter a valid first name";
+
+    if (!NAME_REGEX.test(form.lastName))
+      return "Please enter a valid last name";
+
+    const age = Number(form.age);
+    if (!Number.isInteger(age) || age < 18 || age > 100)
+      return "Age must be between 18 and 100";
+
+    if (!form.gender) return "Please select your gender";
+    if (!form.profession) return "Please select your profession";
+
+    if (!SKILLS_REGEX.test(form.skills))
+      return "Enter valid skills (comma separated)";
+
+    const exp = Number(form.experience);
+    if (!Number.isInteger(exp) || exp < 0 || exp > 60)
+      return "Please enter valid years of experience";
+
+    if (form.languages.length === 0)
+      return "Please select at least one language";
+
+    return null;
+  };
+
+
+  useEffect(() => {
+
+  if (!professionSearch) {
+    setFilteredProfessions([]);
+    return;
+  }
+
+  const filtered = professions.filter((p) =>
+    p.name.toLowerCase().includes(professionSearch.toLowerCase())
+  );
+
+  setFilteredProfessions(filtered);
+
+}, [professionSearch, professions]);
+
+  /* =======================
+     SUBMIT
+  ======================= */
+const createEmployeeAccount = async () => {
+  const validationError = validateForm();
+  if (validationError) {
+    setError(validationError);
+    return;
+  }
+
+  try {
+    setLoading(true);
+    setError("");
+
+    // -----------------------------
+    // Step 1: Check and create profession
+    // -----------------------------
+    let professionName = form.profession; // assuming form.profession holds the selected/typed profession
+    if (professionName) {
+      try {
+        const res = await axios.post(
+          `${BASE_URL}/api/professions/create`,
+          { name: professionName, type: "offline" } // default offline
+        );
+
+        // Update form & UI
+        professionName = res.data.profession.name;
+        handleProfessionChange(professionName);
+        setProfessionSearch(professionName);
+        setProfessions((prev) => [...prev, res.data.profession]);
+      } catch (err) {
+        console.error("Failed to save profession", err);
+        // Optional: you can choose to continue or abort
+      }
+    }
+
+    // -----------------------------
+    // Step 2: Create Employee Account
+    // -----------------------------
+    const formData = new FormData();
+
+    Object.entries(form).forEach(([key, value]) => {
+      if (key === "languages") {
+        formData.append("languages", value.join(","));
+      } else if (key === "profession") {
+        formData.append("profession", professionName); // use updated profession name
+      } else {
+        formData.append(key, value);
+      }
+    });
+
+    if (profileFile) {
+      formData.append("profileImage", profileFile);
+    }
+
+    const res = await axios.post(
+      `${BASE_URL}/api/auth/create-employee-account`,
+      formData,
+      {
+        withCredentials: true,
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+
+    setIsAuthenticated(true);
+    setUser(res.data.user);
+    navigate("/home", { replace: true });
+  } catch (err) {
+    setError(err.response?.data?.msg || "Something went wrong. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+  useEffect(() => {
+
+  const fetchProfessions = async () => {
+
+    try {
+
+      const res = await axios.get(
+        `${BASE_URL}/api/professions`
+      );
+
+      setProfessions(res.data.professions);
+
+    } catch (err) {
+      console.error("Failed to load professions" , err );
+    }
+
+  };
+
+  fetchProfessions();
+
+}, []);
+
+  /* =======================
+     JSX
+  ======================= */
+  return (
+    <div className="min-h-screen flex justify-center items-start sm:items-center px-4 py-6 sm:py-12">
+      <div className="
+  w-full max-w-lg
+  p-4 sm:p-8
+  rounded-none sm:rounded-3xl
+  bg-transparent sm:bg-[#0F172A]/90
+  backdrop-blur-0 sm:backdrop-blur-2xl
+  border-0 sm:border sm:border-white/10
+  shadow-none sm:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)]
+">
+
+        
+        <h2 className="text-3xl font-bold text-white text-center">
+          Create Your Employee Profile
+        </h2>
+        <p className="text-white/60 text-center text-sm mt-2 mb-6">
+          Help employers know who you are and what you do
+        </p>
+
+        {/* PROFILE IMAGE */}
+<div
+  onClick={() => navigate("/profile-image/employee")}
+  className="
+    w-24 h-24 mx-auto rounded-full
+    p-[3px]
+    bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500
+    cursor-pointer mb-2
+  "
+>
+  <div className="w-full h-full rounded-full bg-[#0F172A] flex items-center justify-center overflow-hidden">
+    {profileImage ? (
+      <img
+        src={profileImage}
+        alt="Profile"
+        className="w-full h-full object-cover rounded-full"
+      />
+    ) : (
+      <span className="text-white/60 text-sm">Add Photo</span>
+    )}
+  </div>
+</div>
+
+
+
+
+        <p className="text-center text-xs text-white/40 mb-6">
+          Recommended: clear face photo
+        </p>
+
+        {error && (
+          <p className="text-red-400 text-center text-sm mb-4">
+            ⚠️ {error}
+          </p>
+        )}
+
+        <div className="space-y-4">
+          <input
+            className={inputBase}
+            placeholder="First name (e.g. Rahul)"
+            value={form.firstName}
+            onChange={(e) => updateForm("firstName", e.target.value)}
+          />
+
+          <input
+            className={inputBase}
+            placeholder="Last name (e.g. Sharma)"
+            value={form.lastName}
+            onChange={(e) => updateForm("lastName", e.target.value)}
+          />
+
+          <input
+            className={inputBase}
+            type="number"
+            placeholder="Your age"
+            value={form.age}
+            onChange={(e) => updateForm("age", e.target.value)}
+             onWheel={(e) => e.target.blur()}
+          />
+
+          {/* GENDER */}
+          <Listbox value={form.gender} onChange={(v) => updateForm("gender", v)}>
+            <div className="relative">
+              <Listbox.Button className={inputBase}>
+                {form.gender || "Select your gender"}
+              </Listbox.Button>
+              <Transition as={Fragment}>
+                <Listbox.Options className={listboxPanel}>
+                  {genders.map((g) => (
+                    <Listbox.Option
+                      key={g.id}
+                      value={g.name}
+                      className={({ active }) => listboxOption(active)}
+                    >
+                      {g.name}
+                    </Listbox.Option>
+                  ))}
+                </Listbox.Options>
+              </Transition>
+            </div>
+          </Listbox>
+
+          {/* PROFESSION */}
+          {/* PROFESSION SEARCH */}
+<label className="block text-sm text-white/70">
+  What do you do?
+</label>
+
+<input
+  className={inputBase}
+  placeholder="Search your profession (e.g. Electrician)"
+  value={professionSearch}
+  onChange={(e) => {
+    setProfessionSearch(e.target.value);
+    updateForm("profession", e.target.value);
+  }}
+/>
+
+
+{/* PROFESSION RESULTS */}
+{professionSearch && (
+  <div className="mt-2 rounded-xl bg-[#0F172A] border border-white/10 max-h-60 overflow-y-auto">
+
+    {filteredProfessions.length > 0 ? (
+
+      filteredProfessions.map((p) => (
+        <div
+          key={p._id}
+          onClick={() => {
+            handleProfessionChange(p.name);
+            setProfessionSearch(p.name);
+          }}
+          className="px-4 py-2 text-white hover:bg-[#1F2937] cursor-pointer"
+        >
+          {p.name}
+        </div>
+      ))
+
+    ) : (
+
+      <div className="px-4 py-3 text-yellow-400">
+        Profession not found. Save new profession.
+      </div>
+
+    )}
+  </div>
+)}
+
+{/* SAVE NEW PROFESSION BUTTON */}
+{professionSearch &&
+  filteredProfessions.length === 0 && (
+    <button
+      type="button"
+      onClick={async () => {
+
+        try {
+
+          const res = await axios.post(
+             `${BASE_URL}/api/professions/create`,
+            { name: professionSearch }
+          );
+
+          handleProfessionChange(res.data.profession.name);
+
+          setProfessionSearch(res.data.profession.name);
+
+          setProfessions((prev) => [
+            ...prev,
+            res.data.profession
+          ]);
+
+        } catch (err) {
+
+          console.error("Failed to save profession", err);
+
+        }
+
+      }}
+      className="mt-2 w-full py-2 rounded-xl bg-[#22C55E] text-white font-semibold hover:bg-[#16A34A]"
+    >
+      Save "{professionSearch}" Profession
+    </button>
+)}
+
+
+          {/* LANGUAGES */}
+          <div>
+            <label className="block text-sm text-white/70 mb-1">
+              Languages you can communicate in
+            </label>
+            <p className="text-xs text-white/40 mb-3">
+              Select all that apply
+            </p>
+
+            <div className="flex flex-wrap gap-2">
+              {indianLanguages.map((lang) => {
+                const selected = form.languages.includes(lang);
+
+                return (
+                  <button
+                    key={lang}
+                    type="button"
+                    onClick={() =>
+                      updateForm(
+                        "languages",
+                        selected
+                          ? form.languages.filter((l) => l !== lang)
+                          : [...form.languages, lang]
+                      )
+                    }
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${
+                      selected
+                        ? "bg-[#6366F1] text-white shadow-md"
+                        : "bg-[#1F2937] text-white/80 hover:bg-[#374151]"
+                    }`}
+                  >
+                    {lang}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <input
+            className={inputBase}
+            placeholder="Your skills (e.g. Excel, React, Accounting)"
+            value={form.skills}
+            onChange={(e) => updateForm("skills", e.target.value)}
+          />
+
+          <input
+            className={inputBase}
+            type="number"
+            placeholder="Total work experience (in years)"
+            value={form.experience}
+            onChange={(e) => updateForm("experience", e.target.value)}
+            onWheel={(e) => e.target.blur()}
+          />
+
+          <textarea
+            className={`${inputBase} h-24`}
+            placeholder="Write a short introduction about yourself (2–3 lines)"
+            value={form.bio}
+            onChange={(e) => updateForm("bio", e.target.value)}
+          />
+
+          <button
+            onClick={createEmployeeAccount}
+            disabled={!isFormComplete || loading}
+            className={buttonPrimary}
+          >
+            {loading ? "Setting up your profile..." : "Complete Profile"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default EmployeeSignup;

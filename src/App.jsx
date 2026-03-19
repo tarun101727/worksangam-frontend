@@ -312,18 +312,7 @@ const openNotifications = async () => {
         "/profile-preview/hirer",
       ].includes(location.pathname));
 
-  if (
-    isAuthenticated &&
-    user?.isGuest &&
-    user.onboardingStep !== "completed" &&
-    !isOnCorrectOnboardingRoute
-  ) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-white">
-        Resuming signup...
-      </div>
-    );
-  }
+  
 
   return (
     <div className="fixed h-screen w-full overflow-y-auto bg-gradient-to-br from-[#020617] via-[#020617] to-[#020617]

@@ -92,33 +92,38 @@ const SignupEmail = () => {
   /* =======================
      SEND OTP
   ======================= */
-  const sendOtp = async () => {
-    if (!form.email || !form.password || !form.confirmPassword) {
-      return setError("Please fill all fields");
-    }
+ const sendOtp = async () => {
+  if (!form.email || !form.password || !form.confirmPassword) {
+    return setError("Please fill all fields");
+  }
 
-    if (!isValidEmail(form.email)) {
-      return setError("Enter a valid email address");
-    }
+  if (!isValidEmail(form.email)) {
+    return setError("Enter a valid email address");
+  }
 
-    if (form.password !== form.confirmPassword) {
-      return setError("Passwords do not match");
-    }
+  if (form.password !== form.confirmPassword) {
+    return setError("Passwords do not match");
+  }
 
-    try {
-      setLoading(true);
-      setError("");
-      await axios.post(`${BASE_URL}/api/auth/send-otp`, {
-        email: form.email,
-      });
-      setStep(2);
-      setMessage("OTP sent to your email");
-    } catch (err) {
-      setError(err.response?.data?.msg || "Failed to send OTP");
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+    setError("");
+
+    const response = await axios.post(`${BASE_URL}/api/auth/send-otp`, {
+      email: form.email,
+    });
+
+    console.log("📩 OTP Response Debug:", response.data.debug);
+
+    setStep(2);
+    setMessage("OTP sent to your email");
+  } catch (err) {
+    console.error("❌ Send OTP Error:", err.response?.data || err);
+    setError(err.response?.data?.msg || "Failed to send OTP");
+  } finally {
+    setLoading(false);
+  }
+};
 
   /* =======================
      VERIFY OTP

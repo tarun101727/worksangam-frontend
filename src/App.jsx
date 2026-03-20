@@ -253,13 +253,17 @@ useEffect(() => {
 const subscribeUser = async () => {
   const reg = await navigator.serviceWorker.ready;
 
+  // 1️⃣ Fetch public key from backend
+  const res = await fetch(`${BASE_URL}/api/push/public-key`);
+  const { publicKey } = await res.json();
+
+  // 2️⃣ Subscribe using fetched key
   const sub = await reg.pushManager.subscribe({
     userVisibleOnly: true,
-    applicationServerKey: urlBase64ToUint8Array(
-      "APLytbGSteRQxVbtoPaBTIa9BE7BjgKHbQRniG4BAjU1BrdKOa1qXBWmSihcpFSEykMrPjnNtrrOMDKdWQ5GGXI"
-    ),
+    applicationServerKey: urlBase64ToUint8Array(publicKey),
   });
 
+  // 3️⃣ Send subscription to backend
   await fetch(`${BASE_URL}/api/push/subscribe`, {
     method: "POST",
     body: JSON.stringify(sub),

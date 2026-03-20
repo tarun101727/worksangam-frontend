@@ -89,10 +89,7 @@ const SignupEmail = () => {
     "hover:bg-[#4F46E5] hover:shadow-xl hover:shadow-[#6366F1]/40 " +
     "active:scale-95 disabled:opacity-50";
 
-  /* =======================
-     SEND OTP
-  ======================= */
- const sendOtp = async () => {
+  const sendOtp = async () => {
   if (!form.email || !form.password || !form.confirmPassword) {
     return setError("Please fill all fields");
   }
@@ -109,14 +106,17 @@ const SignupEmail = () => {
     setLoading(true);
     setError("");
 
-   await axios.post(
-  `${BASE_URL}/api/auth/send-otp`,
-  { email: form.email },
-  { withCredentials: true } // ✅ ADD THIS
-);
+    // ✅ Store the response
+    const response = await axios.post(
+      `${BASE_URL}/api/auth/send-otp`,
+      { email: form.email },
+      { withCredentials: true }
+    );
 
-    console.log("📩 OTP Response Debug:", response.data.debug);
+    // ✅ Log the actual response message
+    console.log("📩 OTP Response Debug:", response.data.msg);
 
+    // ✅ Move to step 2
     setStep(2);
     setMessage("OTP sent to your email");
   } catch (err) {

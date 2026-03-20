@@ -62,6 +62,7 @@ import UrgentPreview from "./UrgentPreview";
 import HirerOnlineUrgentPost from "./PROFILE/HirerOnlineUrgentPost";
 import OnlineWorkerUrgentPosts from "./OnlineWorkerUrgentPosts";
 import BuyCredits from "./BuyCredits";
+import { urlBase64ToUint8Array } from "./utils/push";
 
 
 
@@ -254,15 +255,15 @@ const subscribeUser = async () => {
 
   const sub = await reg.pushManager.subscribe({
     userVisibleOnly: true,
-    applicationServerKey: "APLytbGSteRQxVbtoPaBTIa9BE7BjgKHbQRniG4BAjU1BrdKOa1qXBWmSihcpFSEykMrPjnNtrrOMDKdWQ5GGXI",
+    applicationServerKey: urlBase64ToUint8Array(
+      "APLytbGSteRQxVbtoPaBTIa9BE7BjgKHbQRniG4BAjU1BrdKOa1qXBWmSihcpFSEykMrPjnNtrrOMDKdWQ5GGXI"
+    ),
   });
 
   await fetch(`${BASE_URL}/api/push/subscribe`, {
     method: "POST",
     body: JSON.stringify(sub),
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
   });
 };
 
@@ -312,7 +313,18 @@ const openNotifications = async () => {
         "/profile-preview/hirer",
       ].includes(location.pathname));
 
-  
+  if (
+    isAuthenticated &&
+    user?.isGuest &&
+    user.onboardingStep !== "completed" &&
+    !isOnCorrectOnboardingRoute
+  ) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white">
+        Resuming signup...
+      </div>
+    );
+  }
 
   return (
     <div className="fixed h-screen w-full overflow-y-auto bg-gradient-to-br from-[#020617] via-[#020617] to-[#020617]

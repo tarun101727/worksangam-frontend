@@ -109,9 +109,11 @@ const SignupEmail = () => {
     setLoading(true);
     setError("");
 
-    const response = await axios.post(`${BASE_URL}/api/auth/send-otp`, {
-      email: form.email,
-    });
+   await axios.post(
+  `${BASE_URL}/api/auth/send-otp`,
+  { email: form.email },
+  { withCredentials: true } // ✅ ADD THIS
+);
 
     console.log("📩 OTP Response Debug:", response.data.debug);
 

@@ -244,38 +244,41 @@ useEffect(() => {
   }
 }, []);
 
-useEffect(() => {
-  if ("Notification" in window && Notification.permission !== "granted") {
-    Notification.requestPermission();
+const enableNotifications = async () => {
+  if (!("Notification" in window) || !("serviceWorker" in navigator)) {
+    alert("Push notifications are not supported in your browser");
+    return;
   }
-}, []);
 
-const subscribeUser = async () => {
+  const permission = await Notification.requestPermission();
+  if (permission !== "granted") {
+    alert("You denied notifications");
+    return;
+  }
+
+  // Wait for SW to be ready
   const reg = await navigator.serviceWorker.ready;
 
-  // 1️⃣ Fetch public key from backend
+  // Fetch public key
   const res = await fetch(`${BASE_URL}/api/push/public-key`);
   const { publicKey } = await res.json();
 
-  // 2️⃣ Subscribe using fetched key
+  // Subscribe user
   const sub = await reg.pushManager.subscribe({
     userVisibleOnly: true,
     applicationServerKey: urlBase64ToUint8Array(publicKey),
   });
 
-  // 3️⃣ Send subscription to backend
+  // Send subscription to backend
   await fetch(`${BASE_URL}/api/push/subscribe`, {
     method: "POST",
     body: JSON.stringify(sub),
     headers: { "Content-Type": "application/json" },
   });
+
+  alert("Notifications enabled!");
 };
 
-useEffect(() => {
-  if (isAuthenticated) {
-    subscribeUser();
-  }
-}, [isAuthenticated]);
 
 const openNotifications = async () => {
   setShowNotifications(!showNotifications);
@@ -333,6 +336,13 @@ const openNotifications = async () => {
   return (
     <div className="fixed h-screen w-full overflow-y-auto bg-gradient-to-br from-[#020617] via-[#020617] to-[#020617]
  overflow-x-hidden z-10 text-white ">
+   
+   <button
+  onClick={enableNotifications}
+  className="bg-blue-600 text-white px-4 py-2 rounded"
+>
+  Enable Notifications
+</button>
 
       {/* 🔝 HEADER */}
       {!shouldHideHeader && (

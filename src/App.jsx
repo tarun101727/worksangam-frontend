@@ -471,30 +471,8 @@ d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03
       {/* ROUTES */}
 <div>
       <Routes>
-        <Route path="/" element={<Navigate to="/signup" replace />} />
+        <Route path="/" element={<Navigate to="/home" replace />} />
 
-        <Route
-          path="/signup"
-          element={
-            isAuthenticated && user?.isGuest === false && !isSwitchMode
-              ? <Navigate to="/home" replace />
-              : <SignupOptions />
-          }
-        />
-
-        <Route path="/signup/email" element={<SignupEmail />} />
-        <Route path="/signup/role" element={<SignupRole />} />
-        <Route path="/signup/hirer" element={<HirerSignup />} />
-        <Route path="/signup/employee" element={<EmployeeSignup />} />
-
-        <Route
-          path="/home"
-          element={
-            isAuthenticated && user?.isGuest === false
-              ? <Home />
-              : <Navigate to="/signup" replace />
-          }
-        />
 
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />

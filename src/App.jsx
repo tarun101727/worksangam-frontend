@@ -293,15 +293,6 @@ const openNotifications = async () => {
   }
 };
 
-  /* 🔒 WAIT FOR AUTH CHECK */
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-white">
-        Checking authentication...
-      </div>
-    );
-  }
-
   /* 🧠 ALLOW VALID ONBOARDING ROUTES */
   const isOnCorrectOnboardingRoute =
     (user?.onboardingStep === "employee_profile" &&

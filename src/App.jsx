@@ -245,30 +245,43 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
-  if ("Notification" in window && Notification.permission !== "granted") {
-    Notification.requestPermission();
+  if ("Notification" in window) {
+    if (Notification.permission === "default") {
+      Notification.requestPermission().then(permission => {
+        console.log("Notification permission:", permission);
+      }).catch(err => console.error("Notification permission error:", err));
+    }
   }
 }, []);
 
 const subscribeUser = async () => {
-  const reg = await navigator.serviceWorker.ready;
+  if (Notification.permission !== "granted") {
+    console.log("Push subscription skipped: permission not granted");
+    return; // DO NOT SUBSCRIBE if denied or default
+  }
 
-  // 1️⃣ Fetch public key from backend
-  const res = await fetch(`${BASE_URL}/api/push/public-key`);
-  const { publicKey } = await res.json();
+  try {
+    const reg = await navigator.serviceWorker.ready;
 
-  // 2️⃣ Subscribe using fetched key
-  const sub = await reg.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: urlBase64ToUint8Array(publicKey),
-  });
+    // 1️⃣ Fetch public key from backend
+    const res = await fetch(`${BASE_URL}/api/push/public-key`);
+    const { publicKey } = await res.json();
 
-  // 3️⃣ Send subscription to backend
-  await fetch(`${BASE_URL}/api/push/subscribe`, {
-    method: "POST",
-    body: JSON.stringify(sub),
-    headers: { "Content-Type": "application/json" },
-  });
+    // 2️⃣ Subscribe using fetched key
+    const sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicKey),
+    });
+
+    // 3️⃣ Send subscription to backend
+    await fetch(`${BASE_URL}/api/push/subscribe`, {
+      method: "POST",
+      body: JSON.stringify(sub),
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (err) {
+    console.error("Push subscription failed:", err);
+  }
 };
 
 useEffect(() => {
@@ -293,6 +306,15 @@ const openNotifications = async () => {
   }
 };
 
+  /* 🔒 WAIT FOR AUTH CHECK */
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white">
+        Checking authentication...
+      </div>
+    );
+  }
+
   /* 🧠 ALLOW VALID ONBOARDING ROUTES */
   const isOnCorrectOnboardingRoute =
     (user?.onboardingStep === "employee_profile" &&
@@ -308,6 +330,18 @@ const openNotifications = async () => {
         "/profile-preview/hirer",
       ].includes(location.pathname));
 
+  if (
+    isAuthenticated &&
+    user?.isGuest &&
+    user.onboardingStep !== "completed" &&
+    !isOnCorrectOnboardingRoute
+  ) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white">
+        Resuming signup...
+      </div>
+    );
+  }
 
   return (
     <div className="fixed h-screen w-full overflow-y-auto bg-gradient-to-br from-[#020617] via-[#020617] to-[#020617]
@@ -479,13 +513,13 @@ d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03
         <Route path="/signup/employee" element={<EmployeeSignup />} />
 
         <Route
-          path="/home"
-          element={
-            isAuthenticated && user?.isGuest === false
-              ? <Home />
-              : <Navigate to="/signup" replace />
-          }
-        />
+  path="/home"
+  element={
+    isAuthenticated
+      ? <Home />
+      : <Navigate to="/signup" replace />
+  }
+/>
 
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />

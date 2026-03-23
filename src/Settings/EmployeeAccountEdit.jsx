@@ -66,7 +66,11 @@ export default function EmployeeAccountEdit({ user }) {
     setProfessionSearch(user.profession || "");
 
     if (user.profileImage) {
-      setPreview(`${BASE_URL}${user.profileImage}`);
+      setPreview(
+  user.profileImage.startsWith("http")
+    ? user.profileImage
+    : `${BASE_URL}${user.profileImage}`
+);
     }
 
     setLoaded(true);

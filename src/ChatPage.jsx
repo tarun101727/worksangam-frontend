@@ -319,7 +319,7 @@ View
 <div className="flex items-end gap-2 flex-row-reverse">
 
 <img
-src={`${BASE_URL}${m.sender?.profileImage}`}
+src={getImageUrl(m.sender?.profileImage)}
 className="w-8 h-8 rounded-full object-cover"
 />
 

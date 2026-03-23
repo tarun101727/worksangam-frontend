@@ -3,6 +3,16 @@ import axios from "axios";
 import { BASE_URL } from "./config";
 import { useNavigate } from "react-router-dom";
 
+const getImageUrl = (img) => {
+  if (!img) return null;
+
+  const clean = img.trim();
+
+  if (clean.startsWith("http")) return clean;
+
+  return `${BASE_URL}${clean}`;
+};
+
 export default function Chats(){
 
 const [chats,setChats] = useState([]);
@@ -58,7 +68,8 @@ className="flex items-center gap-3 p-3 border-b cursor-pointer hover:bg-white/5 
 >
 
 <img
-src={`${BASE_URL}${other.profileImage}`}
+src={getImageUrl(other.profileImage)}
+
 className="w-10 h-10 rounded-full object-cover"
 />
 

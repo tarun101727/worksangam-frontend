@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef ,useLayoutEffect  } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -6,6 +5,17 @@ import { socket } from "./utils/socket";
 import { BASE_URL } from "./config";
 import { useNavigate } from "react-router-dom";
 
+
+
+const getImageUrl = (img) => {
+  if (!img) return null;
+
+  const clean = img.trim();
+
+  if (clean.startsWith("http")) return clean;
+
+  return `${BASE_URL}${clean}`;
+};
 export default function ChatPage() {
 
 const { chatId } = useParams();
@@ -236,7 +246,7 @@ className={`flex mb-4 ${isSender ? "justify-end" : "justify-start"}`}
 <div className="flex items-end gap-2">
 
 <img
-src={`${BASE_URL}${m.sender?.profileImage}`}
+src={getImageUrl(m.sender?.profileImage)}
 className="w-8 h-8 rounded-full object-cover"
 />
 

@@ -64,7 +64,15 @@ import OnlineWorkerUrgentPosts from "./OnlineWorkerUrgentPosts";
 import BuyCredits from "./BuyCredits";
 import { urlBase64ToUint8Array } from "./utils/push";
 
+const getImageUrl = (img) => {
+  if (!img) return "";
 
+  // Cloudinary or external URL
+  if (img.startsWith("http")) return img;
+
+  // Local image fallback
+  return `${BASE_URL}${img}`;
+};
 
 export default function App() {
   const { isAuthenticated, loading, user } = useContext(AuthContext);
@@ -437,7 +445,7 @@ d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03
         >
           {n.sender?.profileImage ? (
             <img
-              src={`${BASE_URL}${n.sender.profileImage}`}
+              src={getImageUrl(n.sender.profileImage)}
               className="w-10 h-10 rounded-full object-cover"
             />
           ) : (
@@ -476,7 +484,7 @@ d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03
     >
       {user.profileImage ? (
         <img
-          src={`${BASE_URL}${user.profileImage}`}
+         src={getImageUrl(user.profileImage)}
           alt="Profile"
           className="w-full h-full object-cover rounded-full"
         />

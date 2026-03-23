@@ -255,13 +255,13 @@ className="w-8 h-8 rounded-full object-cover"
 {m.image && (
 <div
 className="relative mb-1 max-w-xs cursor-pointer group"
-onClick={()=>setPreviewMedia(`${BASE_URL}/uploads/${m.image}`)}
+onClick={()=>setPreviewMedia(m.image)}
 >
 
 {m.image.match(/\.(mp4|webm|ogg)$/i) ? (
 
 <video
-src={`${BASE_URL}/uploads/${m.image}`}
+src={m.image}
 className="rounded-lg max-w-xs"
 controls
 />
@@ -269,7 +269,7 @@ controls
 ) : (
 
 <img
-src={`${BASE_URL}/uploads/${m.image}`}
+src={m.image}
 className="rounded-lg max-w-xs"
 />
 

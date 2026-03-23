@@ -212,7 +212,6 @@ return(
 src={getImageUrl(receiver.profileImage)}
 className="w-14 h-14 rounded-full object-cover mb-2"
 />
-
 <p className="text-gray-400 text-sm">
 This is the beginning of your conversation with
 </p>

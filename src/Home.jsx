@@ -323,7 +323,11 @@ export default function Home() {
               <div className="flex items-center space-x-4">
                 {emp.profileImage ? (
                   <img
-                    src={`${BASE_URL}${emp.profileImage}`}
+                   src={
+  emp.profileImage?.startsWith("http")
+    ? emp.profileImage
+    : `${BASE_URL}${emp.profileImage}`
+}
                     alt={emp.firstName}
                     className="w-12 h-12 rounded-full object-cover"
                   />
@@ -432,7 +436,11 @@ export default function Home() {
               <div className="flex items-center space-x-3 mb-3">
                 {job.hirer?.profileImage ? (
                   <img
-                    src={`${BASE_URL}${job.hirer.profileImage}`}
+                   src={
+  job.hirer.profileImage?.startsWith("http")
+    ? job.hirer.profileImage
+    : `${BASE_URL}${job.hirer.profileImage}`
+}
                     alt={job.hirer.firstName}
                     className="w-10 h-10 rounded-full object-cover"
                   />

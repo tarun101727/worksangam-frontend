@@ -251,7 +251,11 @@ const Profile = () => {
           onClick={() => setShowImage(false)}
         >
           <img
-            src={`${BASE_URL}${profileUser.profileImage}`}
+            src={
+  profileUser.profileImage?.startsWith("http")
+    ? profileUser.profileImage
+    : `${BASE_URL}${profileUser.profileImage}`
+}
             alt="Profile Enlarged"
             className="max-w-[90%] max-h-[90%] rounded-2xl shadow-2xl"
             onClick={(e) => e.stopPropagation()}

@@ -4,6 +4,16 @@ import axios from "axios";
 import { BASE_URL } from "./config";
 import { socket } from "./utils/socket";
 
+const getImageUrl = (img) => {
+  if (!img) return null;
+
+  const clean = img.trim();
+
+  if (clean.startsWith("http")) return clean;
+
+  return `${BASE_URL}${clean}`;
+};
+
 export default function Home() {
   const navigate = useNavigate();
 
@@ -323,11 +333,7 @@ export default function Home() {
               <div className="flex items-center space-x-4">
                 {emp.profileImage ? (
                   <img
-                   src={
-  emp.profileImage?.startsWith("http")
-    ? emp.profileImage
-    : `${BASE_URL}${emp.profileImage}`
-}
+                  src={getImageUrl(emp.profileImage)}
                     alt={emp.firstName}
                     className="w-12 h-12 rounded-full object-cover"
                   />
@@ -436,11 +442,7 @@ export default function Home() {
               <div className="flex items-center space-x-3 mb-3">
                 {job.hirer?.profileImage ? (
                   <img
-                   src={
-  job.hirer.profileImage?.startsWith("http")
-    ? job.hirer.profileImage
-    : `${BASE_URL}${job.hirer.profileImage}`
-}
+                   src={getImageUrl(job.hirer?.profileImage)}
                     alt={job.hirer.firstName}
                     className="w-10 h-10 rounded-full object-cover"
                   />

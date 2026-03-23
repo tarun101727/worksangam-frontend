@@ -209,7 +209,7 @@ return(
 <div className="flex flex-col items-center mb-6">
 
 <img
-src={`${BASE_URL}${receiver.profileImage}`}
+src={getImageUrl(receiver.profileImage)}
 className="w-14 h-14 rounded-full object-cover mb-2"
 />
 

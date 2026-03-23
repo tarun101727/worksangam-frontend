@@ -187,7 +187,11 @@ const Profile = () => {
           {/* PROFILE IMAGE */}
           {profileUser.profileImage ? (
             <img
-              src={`${BASE_URL}${profileUser.profileImage}`}
+              src={
+  profileUser.profileImage?.startsWith("http")
+    ? profileUser.profileImage
+    : `${BASE_URL}${profileUser.profileImage}`
+}
               alt="Profile"
               onClick={() => setShowImage(true)}
               className="w-24 h-24 rounded-full object-cover cursor-pointer hover:opacity-80 transition"

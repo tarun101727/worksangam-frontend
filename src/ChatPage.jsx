@@ -62,7 +62,7 @@ withCredentials:true
 setMessages(res.data.messages);
 
 const otherUser = res.data.participants.find(
-  p => p._id.toString() !== userId.toString()
+p => p._id !== userId
 );
 
 setReceiver(otherUser);
@@ -229,7 +229,8 @@ This is the beginning of your conversation with
 
 {messages.map((m,i)=>{
 
-const isSender = m.sender?._id?.toString() === userId.toString();
+const isSender = m.sender?._id === userId;
+
 return(
 
 <div

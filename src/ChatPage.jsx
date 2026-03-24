@@ -31,10 +31,16 @@ const messagesEndRef = useRef(null);
 const [receiver,setReceiver] = useState(null);
 const { user } = useContext(AuthContext);
 const userId = user?._id;
-
+const [selectedMedia, setSelectedMedia] = useState(null);
 const messagesContainerRef = useRef(null);
 
+const openMedia = (mediaUrl) => {
+  setSelectedMedia(mediaUrl);
+};
 
+const closeMedia = () => {
+  setSelectedMedia(null);
+};
 
 /* AUTO SCROLL */
 useLayoutEffect(() => {
@@ -247,6 +253,7 @@ className="w-8 h-8 rounded-full object-cover"
 {m.image && (
 <div
 className="relative mb-1 max-w-xs cursor-pointer group"
+onClick={() => openMedia(m.image)}
 >
 
 {m.image.match(/\.(mp4|webm|ogg)$/i) ? (
@@ -254,7 +261,6 @@ className="relative mb-1 max-w-xs cursor-pointer group"
 <video
 src={m.image}
 className="rounded-lg max-w-xs"
-controls
 />
 
 ) : (
@@ -319,14 +325,14 @@ className="w-8 h-8 rounded-full object-cover"
 {m.image && (
   <div
     className="relative mb-1 max-w-xs cursor-pointer group"
-   
+   onClick={() => openMedia(m.image)}
   >
 
     {m.image.match(/\.(mp4|webm|ogg)$/i) ? (
       <video
          src={m.image}
         className="rounded-lg max-w-xs"
-        controls
+        
       />
     ) : (
       <img
@@ -519,7 +525,37 @@ Send
 </button> 
 
 </div>
+{selectedMedia && (
+  <div
+    className="fixed inset-0 bg-black/90 flex items-center justify-center z-50"
+    onClick={closeMedia}
+  >
+    {/* CLOSE BUTTON */}
+    <button
+      className="absolute top-4 right-4 text-white text-3xl font-bold"
+      onClick={closeMedia}
+    >
+      ✕
+    </button>
 
+    {/* MEDIA */}
+    {selectedMedia.match(/\.(mp4|webm|ogg)$/i) ? (
+      <video
+        src={selectedMedia}
+        controls
+        autoPlay
+        className="max-h-[90vh] max-w-[95vw] rounded-lg"
+        onClick={(e) => e.stopPropagation()}
+      />
+    ) : (
+      <img
+        src={selectedMedia}
+        className="max-h-[90vh] max-w-[95vw] rounded-lg"
+        onClick={(e) => e.stopPropagation()}
+      />
+    )}
+  </div>
+)}
 
 </div>
 

@@ -24,7 +24,6 @@ const navigate = useNavigate();
 const [messages,setMessages] = useState([]);
 const [text,setText] = useState("");
 const [showMediaBox,setShowMediaBox] = useState(false);
-const [previewMedia, setPreviewMedia] = useState(null);
 const galleryInputRef = useRef(null);
 const cameraInputRef = useRef(null);
 const textareaRef = useRef(null);
@@ -248,7 +247,6 @@ className="w-8 h-8 rounded-full object-cover"
 {m.image && (
 <div
 className="relative mb-1 max-w-xs cursor-pointer group"
-onClick={()=>setPreviewMedia(m.image)}
 >
 
 {m.image.match(/\.(mp4|webm|ogg)$/i) ? (
@@ -321,7 +319,7 @@ className="w-8 h-8 rounded-full object-cover"
 {m.image && (
   <div
     className="relative mb-1 max-w-xs cursor-pointer group"
-    onClick={() => setPreviewMedia(m.image)}
+   
   >
 
     {m.image.match(/\.(mp4|webm|ogg)$/i) ? (
@@ -522,36 +520,7 @@ Send
 
 </div>
 
-{/* MEDIA PREVIEW */}
 
-{previewMedia && (
-
-<div
-className="fixed inset-0 bg-black/90 flex items-center justify-center z-50"
-onClick={()=>setPreviewMedia(null)}
->
-
-{previewMedia.match(/\.(mp4|webm|ogg)$/i) ? (
-
-<video
-src={previewMedia}
-controls
-autoPlay
-className="max-h-[90%] max-w-[90%] rounded-lg"
-/>
-
-) : (
-
-<img
-src={previewMedia}
-className="max-h-[90%] max-w-[90%] rounded-lg"
-/>
-
-)}
-
-</div>
-
-)}
 </div>
 
 );

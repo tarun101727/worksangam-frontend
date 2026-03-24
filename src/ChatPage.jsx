@@ -252,35 +252,26 @@ className="w-8 h-8 rounded-full object-cover"
 {/* IMAGE / VIDEO (NO BACKGROUND) */}
 {m.image && (
 <div
-className="relative mb-1 max-w-xs cursor-pointer group"
-onClick={() => openMedia(m.image)}
+  className="relative mb-1 max-w-xs cursor-pointer group"
+  onClick={() => openMedia(getImageUrl(m.image))}
 >
+  {m.image.match(/\.(mp4|webm|ogg)$/i) ? (
+    <video
+      src={getImageUrl(m.image)}
+      className="rounded-lg max-w-xs"
+    />
+  ) : (
+    <img
+      src={getImageUrl(m.image)}
+      className="rounded-lg max-w-xs"
+    />
+  )}
 
-{m.image.match(/\.(mp4|webm|ogg)$/i) ? (
-
-<video
-src={m.image}
-className="rounded-lg max-w-xs"
-/>
-
-) : (
-
-<img
-src={m.image}
-className="rounded-lg max-w-xs"
-/>
-
-)}
-
-{/* HOVER VIEW TEXT */}
-<div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition rounded-lg">
-
-<span className="text-white text-sm font-semibold">
-View
-</span>
-
-</div>
-
+  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition rounded-lg pointer-events-none">
+    <span className="text-white text-sm font-semibold">
+      View
+    </span>
+  </div>
 </div>
 )}
 
@@ -324,30 +315,27 @@ className="w-8 h-8 rounded-full object-cover"
 {/* IMAGE / VIDEO (NO BACKGROUND) */}
 {m.image && (
   <div
-    className="relative mb-1 max-w-xs cursor-pointer group"
-   onClick={() => openMedia(m.image)}
-  >
+  className="relative mb-1 max-w-xs cursor-pointer group"
+  onClick={() => openMedia(getImageUrl(m.image))}
+>
+  {m.image.match(/\.(mp4|webm|ogg)$/i) ? (
+    <video
+      src={getImageUrl(m.image)}
+      className="rounded-lg max-w-xs"
+    />
+  ) : (
+    <img
+      src={getImageUrl(m.image)}
+      className="rounded-lg max-w-xs"
+    />
+  )}
 
-    {m.image.match(/\.(mp4|webm|ogg)$/i) ? (
-      <video
-         src={m.image}
-        className="rounded-lg max-w-xs"
-        
-      />
-    ) : (
-      <img
-src={m.image}
-className="rounded-lg w-[220px] h-[220px] object-cover"
-/>
-    )}
-
-    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition rounded-lg">
-      <span className="text-white text-sm font-semibold">
-        View
-      </span>
-    </div>
-
+  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition rounded-lg pointer-events-none">
+    <span className="text-white text-sm font-semibold">
+      View
+    </span>
   </div>
+</div>
 )}
 
 {/* TEXT MESSAGE */}

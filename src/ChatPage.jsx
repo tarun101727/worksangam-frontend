@@ -106,42 +106,41 @@ return () => {
 };
 },[chatId]);
 
-const sendMessage = async () => {
+const sendMessage = () => {
   if (!text.trim()) return;
 
   const messageText = text;
 
-  // ✅ 1. Instant UI update (optimistic)
+  // ✅ instant UI
   const tempMessage = {
     _id: Date.now(),
     message: messageText,
     sender: {
       _id: userId,
       profileImage: user?.profileImage
-    },
-    pending: true
+    }
   };
 
   setMessages(prev => [...prev, tempMessage]);
 
-  // clear input immediately
   setText("");
 
-  if (textareaRef.current) {
-    textareaRef.current.style.height = "auto";
-    textareaRef.current.style.overflowY = "hidden";
-  }
+  // ✅ 🔥 SEND VIA SOCKET (INSTANT)
+  socket.emit("send-message", {
+    chatId,
+    message: messageText,
+    sender: {
+      _id: userId,
+      profileImage: user?.profileImage
+    }
+  });
 
-  try {
-    // ✅ 2. Send to backend (no waiting for UI)
-    await axios.post(
-      `${BASE_URL}/api/chat/send/${chatId}`,
-      { message: messageText },
-      { withCredentials: true }
-    );
-  } catch (err) {
-    console.error(err);
-  }
+  // ✅ ALSO SAVE TO DB (background, no delay impact)
+  axios.post(
+    `${BASE_URL}/api/chat/send/${chatId}`,
+    { message: messageText },
+    { withCredentials: true }
+  ).catch(console.error);
 };
 
 const openGallery = () => {

@@ -34,7 +34,7 @@ const userId = user?._id;
 const [selectedMedia, setSelectedMedia] = useState(null);
 const messagesContainerRef = useRef(null);
 const [isTyping, setIsTyping] = useState(false);
-const typingTimeoutRef = useRef(null);
+
 
 
 
@@ -111,7 +111,6 @@ const sendMessage = () => {
 
   const messageText = text;
 
-  // ✅ instant UI
   const tempMessage = {
     _id: Date.now(),
     message: messageText,
@@ -125,7 +124,9 @@ const sendMessage = () => {
 
   setText("");
 
-  // ✅ 🔥 SEND VIA SOCKET (INSTANT)
+  // ✅ STOP TYPING WHEN SENT
+  socket.emit("stop-typing", { chatId, userId });
+
   socket.emit("send-message", {
     chatId,
     message: messageText,
@@ -135,7 +136,6 @@ const sendMessage = () => {
     }
   });
 
-  // ✅ ALSO SAVE TO DB (background, no delay impact)
   axios.post(
     `${BASE_URL}/api/chat/send/${chatId}`,
     { message: messageText },
@@ -170,22 +170,17 @@ const handleFile = (e) => {
 
 
 const handleTextChange = (e) => {
-  setText(e.target.value);
+  const value = e.target.value;
+  setText(value);
 
-  // ✅ EMIT TYPING EVENT
-  socket.emit("typing", { chatId, userId });
-
-  // clear old timeout
-  if (typingTimeoutRef.current) {
-    clearTimeout(typingTimeoutRef.current);
+  // ✅ MAIN LOGIC (IMPORTANT)
+  if (value.trim().length > 0) {
+    socket.emit("typing", { chatId, userId });
+  } else {
+    socket.emit("stop-typing", { chatId, userId });
   }
 
-  // stop typing after 1 second
-  typingTimeoutRef.current = setTimeout(() => {
-    socket.emit("stop-typing", { chatId, userId });
-  }, 1000);
-
-  // ⬇️ YOUR EXISTING TEXTAREA LOGIC (keep same)
+  // textarea resize (same as before)
   const textarea = textareaRef.current;
 
   textarea.style.height = "auto";

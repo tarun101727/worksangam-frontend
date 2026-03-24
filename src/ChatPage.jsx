@@ -247,6 +247,17 @@ const sendLocation = () => {
   );
 };
 
+const handleKeyDown = (e) => {
+  // MOBILE → always allow new line
+  if (window.innerWidth < 768) return;
+
+  // DESKTOP
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault(); // stop new line
+    sendMessage();
+  }
+};
+
 return(
 
 <div className="flex flex-col h-[100dvh]">
@@ -562,6 +573,7 @@ ref={textareaRef}
 rows={1}
 value={text}
 onChange={handleTextChange}
+ onKeyDown={handleKeyDown}
 placeholder="Type a message..."
 className="flex-1 p-2 bg-gradient-to-br from-[#020617] via-[#020617] to-[#020617] border border-white/20 rounded outline-none resize-none leading-6 scrollbar-dark "
 />

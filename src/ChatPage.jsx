@@ -34,7 +34,7 @@ const userId = user?._id;
 const [selectedMedia, setSelectedMedia] = useState(null);
 const messagesContainerRef = useRef(null);
 const [isTyping, setIsTyping] = useState(false);
-
+const isTypingRef = useRef(false);
 
 
 
@@ -87,13 +87,13 @@ socket.off("receive-message").on("receive-message", (msg) => {
   });
 });
 
-socket.on("user-typing", ({ userId: typingUserId }) => {
+socket.off("user-typing").on("user-typing", ({ userId: typingUserId }) => {
   if (typingUserId !== userId) {
     setIsTyping(true);
   }
 });
 
-socket.on("user-stop-typing", ({ userId: typingUserId }) => {
+socket.off("user-stop-typing").on("user-stop-typing", ({ userId: typingUserId }) => {
   if (typingUserId !== userId) {
     setIsTyping(false);
   }
@@ -123,7 +123,7 @@ const sendMessage = () => {
   setMessages(prev => [...prev, tempMessage]);
 
   setText("");
-
+  isTypingRef.current = false;
   // ✅ STOP TYPING WHEN SENT
   socket.emit("stop-typing", { chatId, userId });
 
@@ -173,14 +173,19 @@ const handleTextChange = (e) => {
   const value = e.target.value;
   setText(value);
 
-  // ✅ MAIN LOGIC (IMPORTANT)
-  if (value.trim().length > 0) {
+  // ✅ START TYPING (ONLY ONCE)
+  if (value.trim().length > 0 && !isTypingRef.current) {
     socket.emit("typing", { chatId, userId });
-  } else {
-    socket.emit("stop-typing", { chatId, userId });
+    isTypingRef.current = true;
   }
 
-  // textarea resize (same as before)
+  // ✅ STOP TYPING (ONLY WHEN EMPTY)
+  if (value.trim().length === 0 && isTypingRef.current) {
+    socket.emit("stop-typing", { chatId, userId });
+    isTypingRef.current = false;
+  }
+
+  // textarea resize (same)
   const textarea = textareaRef.current;
 
   textarea.style.height = "auto";

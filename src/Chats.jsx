@@ -13,82 +13,75 @@ const getImageUrl = (img) => {
   return `${BASE_URL}${clean}`;
 };
 
-export default function Chats(){
+export default function Chats() {
+  const [chats, setChats] = useState([]);
+  const navigate = useNavigate();
 
-const [chats,setChats] = useState([]);
-const navigate = useNavigate();
+  /* GET COOKIE FUNCTION */
+  const getCookie = (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+  };
 
-/* GET COOKIE FUNCTION */
-const getCookie = (name) => {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(";").shift();
-};
+  const userId = getCookie("userId");
 
-const userId = getCookie("userId");
+  useEffect(() => {
+    axios
+      .get(`${BASE_URL}/api/chat`, {
+        withCredentials: true,
+      })
+      .then((res) => setChats(res.data))
+      .catch((err) => console.error(err));
+  }, []);
 
-useEffect(()=>{
+  return (
+    <div className="max-w-xl mx-auto p-6">
+      <h2 className="text-xl mb-4">Messages</h2>
 
-axios.get(`${BASE_URL}/api/chat`,{
-withCredentials:true
-})
-.then(res=>setChats(res.data));
+      {/* EMPTY CHAT MESSAGE */}
+      {chats.length === 0 && (
+        <div className="text-center text-gray-400 py-10">
+          No conversations yet.
+          <br />
+          Once you start chatting with a hirer or employee, your messages will appear here.
+        </div>
+      )}
 
-},[]);
+      {chats.map((chat) => {
+        /* 🚨 IMPORTANT FIX: convert both to string */
+        const other = chat.participants.find(
+          (p) => p._id?.toString() !== userId?.toString()
+        );
 
-return(
+        /* SAFETY CHECK */
+        if (!other) return null;
 
-<div className="max-w-xl mx-auto p-6">
+        return (
+          <div
+            key={chat._id}
+            onClick={() => navigate(`/chat/${chat._id}`)}
+            className="flex items-center gap-3 p-3 border-b cursor-pointer hover:bg-white/5 transition"
+          >
+            {/* PROFILE IMAGE */}
+            <img
+              src={
+                getImageUrl(other.profileImage) ||
+                `https://ui-avatars.com/api/?name=${other.firstName}+${other.lastName}`
+              }
+              alt="profile"
+              className="w-10 h-10 rounded-full object-cover"
+            />
 
-<h2 className="text-xl mb-4">Messages</h2>
-
-{/* EMPTY CHAT MESSAGE */}
-{chats.length === 0 && (
-  <div className="text-center text-gray-400 py-10">
-    No conversations yet.  
-    Once you start chatting with a hirer or employee, your messages will appear here.
-  </div>
-)}
-
-{chats.map(chat=>{
-
-/* FIND OTHER USER (NOT LOGGED IN USER) */
-const other = chat.participants.find(
-(p)=> p._id !== userId
-);
-
-if(!other) return null;
-
-return(
-
-<div
-key={chat._id}
-onClick={()=>navigate(`/chat/${chat._id}`)}
-className="flex items-center gap-3 p-3 border-b cursor-pointer hover:bg-white/5 transition"
->
-
-<img
-src={getImageUrl(other.profileImage)}
-
-className="w-10 h-10 rounded-full object-cover"
-/>
-
-<div>
-
-<p className="font-medium">
-{other.firstName} {other.lastName}
-</p>
-
-</div>
-
-</div>
-
-)
-
-})}
-
-</div>
-
-)
-
+            {/* NAME */}
+            <div>
+              <p className="font-medium">
+                {other.firstName} {other.lastName}
+              </p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
 }

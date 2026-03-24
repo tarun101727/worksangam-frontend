@@ -326,13 +326,13 @@ className="w-8 h-8 rounded-full object-cover"
 
     {m.image.match(/\.(mp4|webm|ogg)$/i) ? (
       <video
-        src={`${BASE_URL}/uploads/${m.image}`}
+         src={m.image}
         className="rounded-lg max-w-xs"
         controls
       />
     ) : (
       <img
-src={`${BASE_URL}/uploads/${m.image}`}
+src={m.image}
 className="rounded-lg w-[220px] h-[220px] object-cover"
 />
     )}

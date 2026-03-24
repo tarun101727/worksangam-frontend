@@ -4,7 +4,8 @@ import axios from "axios";
 import { socket } from "./utils/socket";
 import { BASE_URL } from "./config";
 import { useNavigate } from "react-router-dom";
-
+import { useContext } from "react";
+import { AuthContext } from "./AuthContext";
 
 
 const getImageUrl = (img) => {
@@ -29,15 +30,8 @@ const cameraInputRef = useRef(null);
 const textareaRef = useRef(null);
 const messagesEndRef = useRef(null);
 const [receiver,setReceiver] = useState(null);
-
-/* GET COOKIE FUNCTION */
-const getCookie = (name) => {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(";").shift();
-};
-
-const userId = getCookie("userId");
+const { user } = useContext(AuthContext);
+const userId = user?._id;
 
 const messagesContainerRef = useRef(null);
 
@@ -62,7 +56,7 @@ withCredentials:true
 setMessages(res.data.messages);
 
 const otherUser = res.data.participants.find(
-p => p._id !== userId
+  (p) => p._id.toString() !== userId?.toString()
 );
 
 setReceiver(otherUser);
@@ -229,8 +223,7 @@ This is the beginning of your conversation with
 
 {messages.map((m,i)=>{
 
-const isSender = m.sender?._id === userId;
-
+const isSender = m.sender?._id?.toString() === userId?.toString();
 return(
 
 <div

@@ -33,6 +33,10 @@ const { user } = useContext(AuthContext);
 const userId = user?._id;
 const [selectedMedia, setSelectedMedia] = useState(null);
 const messagesContainerRef = useRef(null);
+const [isTyping, setIsTyping] = useState(false);
+const typingTimeoutRef = useRef(null);
+
+
 
 const openMedia = (mediaUrl) => {
   setSelectedMedia(mediaUrl);
@@ -83,8 +87,23 @@ socket.off("receive-message").on("receive-message", (msg) => {
   });
 });
 
-return ()=>socket.off("receive-message");
+socket.on("user-typing", ({ userId: typingUserId }) => {
+  if (typingUserId !== userId) {
+    setIsTyping(true);
+  }
+});
 
+socket.on("user-stop-typing", ({ userId: typingUserId }) => {
+  if (typingUserId !== userId) {
+    setIsTyping(false);
+  }
+});
+
+return () => {
+  socket.off("receive-message");
+  socket.off("user-typing");
+  socket.off("user-stop-typing");
+};
 },[chatId]);
 
 const sendMessage = async () => {
@@ -152,15 +171,27 @@ const handleFile = (e) => {
 
 
 const handleTextChange = (e) => {
-
   setText(e.target.value);
 
+  // ✅ EMIT TYPING EVENT
+  socket.emit("typing", { chatId, userId });
+
+  // clear old timeout
+  if (typingTimeoutRef.current) {
+    clearTimeout(typingTimeoutRef.current);
+  }
+
+  // stop typing after 1 second
+  typingTimeoutRef.current = setTimeout(() => {
+    socket.emit("stop-typing", { chatId, userId });
+  }, 1000);
+
+  // ⬇️ YOUR EXISTING TEXTAREA LOGIC (keep same)
   const textarea = textareaRef.current;
 
   textarea.style.height = "auto";
 
-  const maxHeight = 24 * 3 + 16; 
-  // lineHeight(24px) * 3 rows + padding
+  const maxHeight = 24 * 3 + 16;
 
   if (textarea.scrollHeight > maxHeight) {
     textarea.style.height = maxHeight + "px";
@@ -169,7 +200,6 @@ const handleTextChange = (e) => {
     textarea.style.height = textarea.scrollHeight + "px";
     textarea.style.overflowY = "hidden";
   }
-
 };
 
 const sendLocation = () => {
@@ -395,7 +425,11 @@ className="w-8 h-8 rounded-full object-cover"
 )
 
 })}
-
+{isTyping && (
+  <div className="text-gray-400 text-sm px-2 mb-2">
+    Typing . . .
+  </div>
+)}
 <div ref={messagesEndRef}></div>
 
 </div>

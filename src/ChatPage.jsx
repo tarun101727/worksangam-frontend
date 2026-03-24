@@ -37,7 +37,7 @@ const getCookie = (name) => {
   if (parts.length === 2) return parts.pop().split(";").shift();
 };
 
-const userId = getCookie("userId");
+const userId = getCookie("userId")?.toString();
 
 const messagesContainerRef = useRef(null);
 
@@ -229,7 +229,7 @@ This is the beginning of your conversation with
 
 {messages.map((m,i)=>{
 
-const isSender = m.sender?._id?.toString() === userId.toString();
+const isSender = String(m.sender?._id) === String(userId);
 return(
 
 <div
@@ -244,7 +244,7 @@ className={`flex mb-4 ${isSender ? "justify-end" : "justify-start"}`}
 <div className="flex items-end gap-2">
 
 <img
-src={getImageUrl(m.sender?.profileImage)}
+  src={getImageUrl(receiver?.profileImage)}
 className="w-8 h-8 rounded-full object-cover"
 />
 

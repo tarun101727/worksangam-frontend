@@ -90,6 +90,59 @@ const originalBox = useRef(box);
 const [textBoxes, setTextBoxes] = useState([]); // stores all text boxes
 const [currentBoxId, setCurrentBoxId] = useState(null); // current editing box
 const [toolbarVisible, setToolbarVisible] = useState(false);
+const [undoStack, setUndoStack] = useState([]);
+const [redoStack, setRedoStack] = useState([]);
+
+const saveState = () => {
+  setUndoStack(prev => [
+    ...prev,
+    {
+      textBoxes: JSON.parse(JSON.stringify(textBoxes)),
+      paths: JSON.parse(JSON.stringify(paths))
+    }
+  ]);
+
+  // Clear redo on new action
+  setRedoStack([]);
+};
+
+const handleUndo = () => {
+  if (undoStack.length === 0) return;
+
+  const lastState = undoStack[undoStack.length - 1];
+
+  setRedoStack(prev => [
+    ...prev,
+    {
+      textBoxes: JSON.parse(JSON.stringify(textBoxes)),
+      paths: JSON.parse(JSON.stringify(paths))
+    }
+  ]);
+
+  setTextBoxes(lastState.textBoxes);
+  setPaths(lastState.paths);
+
+  setUndoStack(prev => prev.slice(0, -1));
+};
+
+const handleRedo = () => {
+  if (redoStack.length === 0) return;
+
+  const nextState = redoStack[redoStack.length - 1];
+
+  setUndoStack(prev => [
+    ...prev,
+    {
+      textBoxes: JSON.parse(JSON.stringify(textBoxes)),
+      paths: JSON.parse(JSON.stringify(paths))
+    }
+  ]);
+
+  setTextBoxes(nextState.textBoxes);
+  setPaths(nextState.paths);
+
+  setRedoStack(prev => prev.slice(0, -1));
+};
 
 useEffect(() => {
   const handleClickOutside = (e) => {
@@ -116,6 +169,7 @@ useEffect(() => {
 }, [textActive, textBoxes]);
 
 const addText = () => {
+  saveState();
   const container = containerRef.current;
   if (!container) return;
 
@@ -149,6 +203,7 @@ const addText = () => {
 
 
 const startDrag = (e, boxItem) => {
+  saveState();
   if (!editMode || !isEditingText || resizeRef.current) return;
 
   e.preventDefault();
@@ -175,7 +230,7 @@ const stopAll = () => {
 /* RESIZE */
 
 const startResize = (dir,e)=>{
-
+saveState();
 e.preventDefault();
 e.stopPropagation();
 
@@ -310,6 +365,7 @@ if (resizeRef.current && currentBoxId !== null) {
 
 // UPDATE BOX DURING TYPING
 const handleTextChange = (e) => {
+  saveState();
   const el = e.target;
   const container = containerRef.current;
   const img = imgRef.current;
@@ -590,7 +646,7 @@ setCurrentImageUrl(newUrl);
 
 const endDrawing = () => {
   if (currentPath.current.length === 0) return;
-
+  saveState();
   const newPath = {
     points: currentPath.current.map(p => ({ ...p })),
     type: currentPathType.current
@@ -752,6 +808,22 @@ Cancel
   Edit
 </button>
 )}
+
+<div className="flex gap-2">
+  <button
+    onClick={handleUndo}
+    className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
+  >
+    ←
+  </button>
+
+  <button
+    onClick={handleRedo}
+    className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
+  >
+    →
+  </button>
+</div>
 
 </div>
 

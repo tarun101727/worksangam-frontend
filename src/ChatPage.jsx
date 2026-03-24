@@ -68,33 +68,61 @@ setReceiver(otherUser);
 
 });
 
-/* SOCKET LISTENER */
-socket.off("receive-message").on("receive-message",(msg)=>{
-setMessages(prev=>[...prev,msg]);
+socket.off("receive-message").on("receive-message", (msg) => {
+  setMessages(prev => {
+    // ❌ prevent duplicate (important)
+    const exists = prev.some(
+      m =>
+        m.message === msg.message &&
+        m.sender?._id === msg.sender?._id
+    );
+
+    if (exists) return prev;
+
+    return [...prev, msg];
+  });
 });
 
 return ()=>socket.off("receive-message");
 
 },[chatId]);
 
-/* SEND MESSAGE */
-const sendMessage = async ()=>{
+const sendMessage = async () => {
+  if (!text.trim()) return;
 
-if(!text.trim()) return;
+  const messageText = text;
 
-await axios.post(
-`${BASE_URL}/api/chat/send/${chatId}`,
-{ message:text },
-{ withCredentials:true }
-);
+  // ✅ 1. Instant UI update (optimistic)
+  const tempMessage = {
+    _id: Date.now(),
+    message: messageText,
+    sender: {
+      _id: userId,
+      profileImage: user?.profileImage
+    },
+    pending: true
+  };
 
-setText("");
+  setMessages(prev => [...prev, tempMessage]);
 
-if (textareaRef.current) {
-  textareaRef.current.style.height = "auto";
-  textareaRef.current.style.overflowY = "hidden";
-}
+  // clear input immediately
+  setText("");
 
+  if (textareaRef.current) {
+    textareaRef.current.style.height = "auto";
+    textareaRef.current.style.overflowY = "hidden";
+  }
+
+  try {
+    // ✅ 2. Send to backend (no waiting for UI)
+    await axios.post(
+      `${BASE_URL}/api/chat/send/${chatId}`,
+      { message: messageText },
+      { withCredentials: true }
+    );
+  } catch (err) {
+    console.error(err);
+  }
 };
 
 const openGallery = () => {

@@ -12,6 +12,9 @@ const ProfilePreviewforhirer = () => {
   const [dragging, setDragging] = useState(false);
   const [start, setStart] = useState({ x: 0, y: 0 });
 
+  const [scale, setScale] = useState(1); // ✅ zoom state
+  const lastDistance = useRef(null);
+
   if (!state?.profileImage) return null;
 
   /* =======================
@@ -24,10 +27,17 @@ const ProfilePreviewforhirer = () => {
     return { x: e.clientX, y: e.clientY };
   };
 
+  const getTouchDistance = (touches) => {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
   /* =======================
      DRAG START
   ======================= */
   const startDrag = (e) => {
+    if (e.touches?.length === 2) return; // pinch ignore
     e.preventDefault();
     const point = getPoint(e);
     setDragging(true);
@@ -38,12 +48,29 @@ const ProfilePreviewforhirer = () => {
   };
 
   /* =======================
-     DRAG MOVE
+     DRAG MOVE + PINCH
   ======================= */
   const onDrag = (e) => {
+    if (e.touches && e.touches.length === 2) {
+      // ✅ PINCH ZOOM
+      const dist = getTouchDistance(e.touches);
+
+      if (lastDistance.current) {
+        const diff = dist - lastDistance.current;
+        setScale((prev) =>
+          Math.min(3, Math.max(0.5, prev + diff * 0.005))
+        );
+      }
+
+      lastDistance.current = dist;
+      return;
+    }
+
     if (!dragging) return;
+
     e.preventDefault();
     const point = getPoint(e);
+
     setPos({
       x: point.x - start.x,
       y: point.y - start.y,
@@ -53,7 +80,22 @@ const ProfilePreviewforhirer = () => {
   /* =======================
      DRAG END
   ======================= */
-  const stopDrag = () => setDragging(false);
+  const stopDrag = () => {
+    setDragging(false);
+    lastDistance.current = null;
+  };
+
+  /* =======================
+     MOUSE WHEEL ZOOM
+  ======================= */
+  const handleWheel = (e) => {
+    e.preventDefault();
+
+    const zoomSpeed = 0.001;
+    setScale((prev) =>
+      Math.min(3, Math.max(0.5, prev - e.deltaY * zoomSpeed))
+    );
+  };
 
   /* =======================
      CROP & SAVE
@@ -113,6 +155,7 @@ const ProfilePreviewforhirer = () => {
       onMouseLeave={stopDrag}
       onTouchMove={onDrag}
       onTouchEnd={stopDrag}
+      onWheel={handleWheel} // ✅ desktop zoom
     >
       <div className="relative w-full max-w-md h-[420px] overflow-hidden">
 
@@ -123,7 +166,7 @@ const ProfilePreviewforhirer = () => {
           className="absolute inset-0 w-full h-full object-cover blur-2xl scale-110"
         />
 
-        {/* DRAGGABLE IMAGE */}
+        {/* DRAG + ZOOM IMAGE */}
         <img
           ref={imgRef}
           src={state.profileImage}
@@ -135,13 +178,17 @@ const ProfilePreviewforhirer = () => {
           style={{
             top: "50%",
             left: "50%",
-            transform: `translate(${pos.x}px, ${pos.y}px) translate(-50%, -50%)`,
+            transform: `
+              translate(${pos.x}px, ${pos.y}px)
+              translate(-50%, -50%)
+              scale(${scale})
+            `,
             maxWidth: "100%",
             maxHeight: "100%",
           }}
         />
 
-        {/* FIXED CROP CIRCLE */}
+        {/* CIRCLE */}
         <div
           className="absolute top-1/2 left-1/2 rounded-full pointer-events-none"
           style={{

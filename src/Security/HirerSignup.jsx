@@ -13,17 +13,6 @@ const NAME_REGEX = /^[A-Za-z]{2,30}$/;
 const MIN_AGE = 18;
 const MAX_AGE = 100;
 
-
-const getImageUrl = (img) => {
-  if (!img) return "";
-
-  // Cloudinary or external URL
-  if (img.startsWith("http")) return img;
-
-  // Local image fallback
-  return `${BASE_URL}${img}`;
-};
-
 const HirerSignup = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -154,7 +143,7 @@ const HirerSignup = () => {
           <div className="w-full h-full rounded-full bg-[#0F172A] flex items-center justify-center">
             {profileImage ? (
               <img
-              src={getImageUrl(profileImage)}
+                src={profileImage}
                 alt="Profile"
                 className="w-full h-full object-cover rounded-full"
               />

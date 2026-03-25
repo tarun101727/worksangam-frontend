@@ -1,12 +1,9 @@
 import { useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
-import { useNavigate } from "react-router-dom";
+
 
 export default function HirerDelete(){
-
-const navigate = useNavigate();
-
 const [reason,setReason] = useState("");
 const [description,setDescription] = useState("");
 const [loading,setLoading] = useState(false);
@@ -36,7 +33,8 @@ description
 
 alert("Account deleted");
 
-navigate("/");
+// FULL REFRESH
+window.location.href = "/";
 
 }catch(err){
 

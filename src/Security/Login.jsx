@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../config";
 import { useAuth } from "../useAuth";
 
@@ -51,7 +50,6 @@ const EyeIcon = ({ open }) =>
 
 const Login = () => {
   const { setIsAuthenticated, setUser } = useAuth();
-  const navigate = useNavigate();
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
@@ -97,20 +95,27 @@ const Login = () => {
 
       const user = res.data.user;
 
+      // Update auth state (optional but good)
       setIsAuthenticated(true);
       setUser(user);
 
+      /* =======================
+         FULL PAGE REFRESH LOGIC
+      ======================= */
+
       if (user.onboardingStep === "employee_profile") {
-        navigate("/signup/employee", { replace: true });
+        window.location.href = "/signup/employee";
         return;
       }
 
       if (user.onboardingStep === "hirer_profile") {
-        navigate("/signup/hirer", { replace: true });
+        window.location.href = "/signup/hirer";
         return;
       }
 
-      navigate("/home", { replace: true });
+      // Default redirect
+      window.location.href = "/home";
+
     } catch (err) {
       setError(err.response?.data?.msg || "Login failed");
     } finally {
@@ -137,7 +142,7 @@ const Login = () => {
           /* MOBILE */
           bg-transparent shadow-none border-none backdrop-blur-0 mt-4
 
-          /* DESKTOP (UNCHANGED) */
+          /* DESKTOP */
           sm:bg-[#0F172A]/90
           sm:backdrop-blur-2xl
           sm:border sm:border-white/10

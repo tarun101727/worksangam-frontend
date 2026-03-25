@@ -1,120 +1,209 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
+import { useAuth } from "../useAuth";
 
+/* =======================
+   Eye Icon
+======================= */
+const EyeIcon = ({ open }) =>
+  open ? (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-5 w-5 text-white/70"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={1.8}
+    >
+      <circle cx="12" cy="12" r="3" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M2.458 12C3.732 7.943 7.523 5 12 5
+           c4.477 0 8.268 2.943 9.542 7
+           -1.274 4.057-5.065 7-9.542 7
+           -4.477 0-8.268-2.943-9.542-7z"
+      />
+    </svg>
+  ) : (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-5 w-5 text-white/70"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={1.8}
+    >
+      <circle cx="12" cy="12" r="3" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M2.458 12C3.732 7.943 7.523 5 12 5
+           c4.477 0 8.268 2.943 9.542 7
+           -1.274 4.057-5.065 7-9.542 7
+           -4.477 0-8.268-2.943-9.542-7z"
+      />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 3l18 18" />
+    </svg>
+  );
 
-export default function HirerDelete(){
-const [reason,setReason] = useState("");
-const [description,setDescription] = useState("");
-const [loading,setLoading] = useState(false);
+const Login = () => {
+  const { setIsAuthenticated, setUser } = useAuth();
 
-const deleteAccount = async () => {
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
-if(!reason){
-alert("Please select a reason");
-return;
-}
+  /* =======================
+     STYLES
+  ======================= */
+  const inputBase =
+    "w-full px-4 py-3 rounded-xl bg-[#111827] text-white " +
+    "placeholder-white/50 border border-white/10 " +
+    "focus:outline-none focus:ring-2 focus:ring-[#6366F1]/50";
 
-if(!window.confirm("Are you sure you want to permanently delete your account?")){
-return;
-}
+  const buttonPrimary =
+    "w-full py-3 rounded-xl font-semibold text-white " +
+    "bg-[#6366F1] shadow-lg shadow-[#6366F1]/30 " +
+    "transition-all duration-300 " +
+    "hover:bg-[#4F46E5] hover:shadow-xl hover:shadow-[#6366F1]/40 " +
+    "active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed";
 
-try{
+  const handleInputChange = (e) => {
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
 
-setLoading(true);
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
-await axios.delete(`${BASE_URL}/api/auth/delete-account`,{
-withCredentials:true,
-data:{
-reason,
-description
-}
-});
+    try {
+      const res = await axios.post(
+        `${BASE_URL}/api/auth/login`,
+        {
+          email: form.email.toLowerCase(),
+          password: form.password,
+        },
+        { withCredentials: true }
+      );
 
-alert("Account deleted");
+      const user = res.data.user;
 
-// FULL REFRESH
-window.location.href = "/";
+      // Update auth state (optional but good)
+      setIsAuthenticated(true);
+      setUser(user);
 
-}catch(err){
+      /* =======================
+         FULL PAGE REFRESH LOGIC
+      ======================= */
 
-alert(err?.response?.data?.msg || "Error deleting account");
+      if (user.onboardingStep === "employee_profile") {
+        window.location.href = "/signup/employee";
+        return;
+      }
 
-}finally{
-setLoading(false);
-}
+      if (user.onboardingStep === "hirer_profile") {
+        window.location.href = "/signup/hirer";
+        return;
+      }
 
+      // Default redirect
+      window.location.href = "/home";
+
+    } catch (err) {
+      setError(err.response?.data?.msg || "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div
+      className="
+        min-h-screen px-4
+        flex flex-col justify-start
+        sm:flex sm:items-center sm:justify-center
+      "
+    >
+      {/* Card */}
+      <div
+        className="
+          w-full max-w-md mx-auto
+          rounded-3xl
+          p-4 sm:p-8
+          transition-all duration-500
+
+          /* MOBILE */
+          bg-transparent shadow-none border-none backdrop-blur-0 mt-4
+
+          /* DESKTOP */
+          sm:bg-[#0F172A]/90
+          sm:backdrop-blur-2xl
+          sm:border sm:border-white/10
+          sm:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)]
+        "
+      >
+        <h2 className="text-3xl font-extrabold text-center text-white mb-6">
+          Welcome Back
+        </h2>
+
+        {error && (
+          <p className="text-red-400 text-center mb-4">{error}</p>
+        )}
+
+        <input
+          type="email"
+          name="email"
+          value={form.email}
+          onChange={handleInputChange}
+          placeholder="Email"
+          className={inputBase}
+        />
+
+        <div className="relative mt-4">
+          <input
+            type={showPassword ? "text" : "password"}
+            name="password"
+            value={form.password}
+            onChange={handleInputChange}
+            placeholder="Password"
+            className={`${inputBase} pr-12`}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-4 top-1/2 -translate-y-1/2"
+          >
+            <EyeIcon open={showPassword} />
+          </button>
+        </div>
+
+        <button
+          onClick={handleLogin}
+          disabled={loading}
+          className={`${buttonPrimary} mt-6`}
+        >
+          {loading ? "Logging in..." : "Login"}
+        </button>
+
+        <div className="text-center mt-4 text-white/60">
+          <span className="mr-1">Having trouble?</span>
+          <a
+            href="/forgot-password"
+            className="text-[#818CF8] hover:underline"
+          >
+            Forgot Password?
+          </a>
+        </div>
+      </div>
+    </div>
+  );
 };
 
-return(
-
-<div className="min-h-screen text-white px-4 py-6 max-w-3xl mx-auto">
-
-<h1 className="text-2xl font-bold mb-4 text-red-400">
-Delete Your Account
-</h1>
-
-<p className="text-gray-300 mb-6">
-Deleting your account will permanently remove your profile, media, ratings,
-and all related data from our platform. This action cannot be undone.
-</p>
-
-<div className="bg-red-900/20 border border-red-500/30 rounded-xl p-4 mb-6">
-
-<h2 className="font-semibold mb-2">Warning</h2>
-
-<ul className="text-sm text-gray-300 space-y-1 list-disc ml-4">
-
-<li>Your account will be permanently deleted.</li>
-
-<li>Your uploaded content and profile data will be removed.</li>
-
-<li>Your ratings and reviews will disappear.</li>
-
-<li>You cannot recover your account after deletion.</li>
-
-<li>You must create a new account to use the platform again.</li>
-
-</ul>
-
-</div>
-
-<h2 className="font-semibold mb-2">Why are you deleting your account?</h2>
-
-<select
-value={reason}
-onChange={(e)=>setReason(e.target.value)}
-className="w-full p-3 bg-[#111827] rounded-xl border border-white/10 mb-4"
->
-
-<option value="">Select reason</option>
-<option value="privacy">Privacy concerns</option>
-<option value="not_useful">Service not useful</option>
-<option value="found_better">Found better platform</option>
-<option value="temporary_leave">Temporary break</option>
-<option value="technical_problem">Technical problems</option>
-<option value="other">Other</option>
-
-</select>
-
-<textarea
-placeholder="Optional feedback (helps us improve)"
-value={description}
-onChange={(e)=>setDescription(e.target.value)}
-className="w-full p-3 bg-[#111827] rounded-xl border border-white/10 mb-6 h-28"
-/>
-
-<button
-onClick={deleteAccount}
-disabled={loading}
-className="w-full bg-red-600 hover:bg-red-700 p-3 rounded-xl font-semibold"
->
-
-{loading ? "Deleting..." : "Delete My Account"}
-
-</button>
-
-</div>
-
-);
-}
+export default Login;

@@ -2,11 +2,12 @@ import { useState, useContext } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../AuthContext";
+import { AuthContext } from "../AuthContext"; // ✅ IMPORT
 
 export default function HirerDelete() {
   const navigate = useNavigate();
 
+  // ✅ GET AUTH CONTEXT
   const { setIsAuthenticated, setUser } = useContext(AuthContext);
 
   const [reason, setReason] = useState("");
@@ -38,21 +39,13 @@ export default function HirerDelete() {
         },
       });
 
-      // ✅ CLEAR AUTH STATE (VERY IMPORTANT)
+      alert("Account deleted");
+
+      // ✅ 🔥 IMPORTANT FIX
       setIsAuthenticated(false);
       setUser(null);
 
-      // ✅ CLEAR STORAGE (optional but recommended)
-      localStorage.clear();
-      sessionStorage.clear();
-
-      // ✅ OPTIONAL: clear cookie manually (fallback safety)
-      document.cookie =
-        "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
-      alert("Account deleted successfully");
-
-      // ✅ REDIRECT PROPERLY
+      // ✅ Redirect properly
       navigate("/signup", { replace: true });
 
     } catch (err) {
@@ -70,7 +63,8 @@ export default function HirerDelete() {
 
       <p className="text-gray-300 mb-6">
         Deleting your account will permanently remove your profile, media,
-        ratings, and all related data from our platform. This action cannot be undone.
+        ratings, and all related data from our platform. This action cannot be
+        undone.
       </p>
 
       <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-4 mb-6">

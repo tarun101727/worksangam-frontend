@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
@@ -90,10 +89,7 @@ const SignupEmail = () => {
     "hover:bg-[#4F46E5] hover:shadow-xl hover:shadow-[#6366F1]/40 " +
     "active:scale-95 disabled:opacity-50";
 
-  /* =======================
-     SEND OTP
-  ======================= */
- const sendOtp = async () => {
+  const sendOtp = async () => {
   if (!form.email || !form.password || !form.confirmPassword) {
     return setError("Please fill all fields");
   }
@@ -110,19 +106,22 @@ const SignupEmail = () => {
     setLoading(true);
     setError("");
 
-   await axios.post(
-  `${BASE_URL}/api/auth/send-otp`,
-  { email: form.email },
-  { withCredentials: true } // ✅ ADD THIS
-);
+    const response = await axios.post(`${BASE_URL}/api/auth/send-otp`, {
+      email: form.email,
+    });
 
-    console.log("📩 OTP Response Debug:", response.data.debug);
+    console.log("OTP Response:", response.data); // ✅ debug
 
     setStep(2);
-    setMessage("OTP sent to your email");
+    setMessage(response.data?.msg || "OTP sent successfully");
   } catch (err) {
-    console.error("❌ Send OTP Error:", err.response?.data || err);
-    setError(err.response?.data?.msg || "Failed to send OTP");
+    console.error("Send OTP Error:", err); // ✅ IMPORTANT
+
+    setError(
+      err?.response?.data?.msg || 
+      err.message || 
+      "Failed to send OTP"
+    );
   } finally {
     setLoading(false);
   }

@@ -29,26 +29,26 @@ const [preview,setPreview] = useState("");
 
 const [loading,setLoading] = useState(false);
 
-/* =======================
-   LOAD USER DATA
-======================= */
-useEffect(()=>{
+useEffect(() => {
 
-if(!user) return;
+  if (!user) return;
 
-/* keep existing form values if already filled */
-setForm(prev => ({
-firstName: prev.firstName || user.firstName || "",
-lastName: prev.lastName || user.lastName || "",
-age: prev.age || user.age || "",
-gender: prev.gender || user.gender || ""
-}));
+  setForm({
+    firstName: user.firstName || "",
+    lastName: user.lastName || "",
+    age: user.age || "",
+    gender: user.gender || ""
+  });
 
-if(!preview && user.profileImage){
-setPreview(`${BASE_URL}${user.profileImage}`);
-}
+  if (user.profileImage) {
+    setPreview(
+      user.profileImage.startsWith("http")
+        ? user.profileImage
+        : `${BASE_URL}${user.profileImage}`
+    );
+  }
 
-},[user]);
+}, [user]);
 
 
 /* =======================

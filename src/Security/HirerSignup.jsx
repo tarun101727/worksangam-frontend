@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment } from "react";
+import React, { useState, Fragment } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -25,21 +25,10 @@ const HirerSignup = () => {
     gender: "",
   });
 
-  const [profileImage, setProfileImage] = useState(null);
-  const [profileFile, setProfileFile] = useState(null);
+  const profileImage = location.state?.profileImage || null;
+const profileFile = location.state?.file || null;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  /* =======================
-     RECEIVE IMAGE
-  ======================= */
-  useEffect(() => {
-    if (location.state?.profileImage && location.state?.file) {
-      setProfileImage(location.state.profileImage);
-      setProfileFile(location.state.file);
-      navigate(location.pathname, { replace: true });
-    }
-  }, [location, navigate]);
 
   /* =======================
      VALIDATION

@@ -2,7 +2,7 @@ import axios from "axios";
 import { BASE_URL } from "../config";
 import { useNavigate } from "react-router-dom";
 import { useState, useContext } from "react";
-import { AuthContext } from "../AuthContext"; // ✅ IMPORT ADDED
+import { AuthContext } from "../AuthContext";
 
 export default function Logout() {
   const navigate = useNavigate();
@@ -25,13 +25,13 @@ export default function Logout() {
         { withCredentials: true }
       );
 
-      // ✅ CRITICAL FIX (THIS WAS MISSING)
+      alert("Logged out successfully");
+
+      // 🔥 IMPORTANT: CLEAR FRONTEND AUTH STATE
       setIsAuthenticated(false);
       setUser(null);
 
-      alert("Logged out successfully");
-
-      // ✅ DIRECT NAVIGATION (avoid "/" redirect confusion)
+      // ✅ REDIRECT TO SIGNUP OPTIONS
       navigate("/signup", { replace: true });
 
     } catch (err) {
@@ -75,6 +75,12 @@ export default function Logout() {
           {loading ? "Logging out..." : "Logout"}
         </button>
 
+        <button
+          onClick={() => navigate("/settings")}
+          className="flex-1 bg-[#111827] border border-white/10 p-3 rounded-xl"
+        >
+          More
+        </button>
       </div>
     </div>
   );

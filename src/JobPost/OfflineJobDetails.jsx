@@ -3,6 +3,13 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BASE_URL } from "../config";
 
+const getImageUrl = (img) => {
+  if (!img) return "";
+  if (img.startsWith("http")) return img;
+  return `${BASE_URL}${img}`;
+};
+
+
 export default function OfflineJobDetails() {
   const { jobId } = useParams();
   const navigate = useNavigate();
@@ -43,7 +50,7 @@ export default function OfflineJobDetails() {
       {/* Header */}
       <div className="flex items-center gap-5 pb-6 border-b border-white/10 mb-8">
         {job.hirer?.profileImage ? (
-          <img src={`${BASE_URL}${job.hirer.profileImage}`} alt={job.hirer.firstName} className="w-16 h-16 rounded-full object-cover ring-2 ring-white/10" />
+          <img src={getImageUrl(job.hirer.profileImage)} alt={job.hirer.firstName} className="w-16 h-16 rounded-full object-cover ring-2 ring-white/10" />
         ) : (
           <div className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold" style={{ backgroundColor: job.hirer?.avatarColor || "#334155" }}>
             {job.hirer?.avatarInitial || "H"}

@@ -145,7 +145,9 @@ const HirerOfflinePost = () => {
   const openNativePicker = (e) => {
     try {
       e.target.showPicker?.();
-    } catch {}
+    } catch {
+      /* error */
+    }
   };
 
   const standardPriceOptions = [
@@ -200,7 +202,7 @@ const HirerOfflinePost = () => {
       <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/90 border border-slate-700/50 shadow-xl space-y-6">
 
       <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-  🧰 Create OFFLINE Worker Post
+  🧰 Create Offline Worker Post
 </h1>
 
 <p className="text-sm text-slate-400">

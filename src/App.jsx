@@ -166,7 +166,8 @@ useEffect(() => {
     "/urgent-matches/",
     "/Hirer/Urgent",
     "/hirer-online-urgent-post",
-    "/online-worker-urgent-posts"
+    "/online-worker-urgent-posts",
+    "/profile-preview/Employee-edit"
   ];
 
   const shouldHideHeader = hideHeaderOnRoutes.some((route) =>

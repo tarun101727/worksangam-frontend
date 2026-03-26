@@ -1,1 +1,1 @@
-export const BASE_URL = "https://api.worksangam.com";
+export const BASE_URL = "https://worksangam-backend.onrender.com";

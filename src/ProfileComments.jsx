@@ -5,7 +5,15 @@ import { socket } from "./utils/socket";
 import { countComments } from "../utils/countComment";
 
 
+const getImageUrl = (img) => {
+  if (!img) return "";
 
+  // Cloudinary or external URL
+  if (img.startsWith("http")) return img;
+
+  // Local image fallback
+  return `${BASE_URL}${img}`;
+};
 
 function timeAgo(dateString) {
   const now = new Date();
@@ -30,7 +38,6 @@ function timeAgo(dateString) {
 
   return "Just now";
 }
-/* ---------------- FORMAT LIKE COUNT ---------------- */
 
 function formatLikes(num) {
   if (!num) return "";
@@ -94,7 +101,8 @@ const CommentItem = React.memo(function CommentItem({
         <div className="flex gap-3 flex-1">
           {comment.user?.profileImage ? (
             <img
-              src={`${BASE_URL}${comment.user.profileImage}`}
+            src={getImageUrl(comment.user.profileImage)}
+            
               alt="profile"
               className="w-10 h-10 rounded-full object-cover"
             />
@@ -263,8 +271,6 @@ const CommentItem = React.memo(function CommentItem({
     </div>
   );
 });
-
-/* ---------------- MAIN COMPONENT ---------------- */
 
 export default function ProfileComments({ profileId }) {
 

@@ -149,7 +149,7 @@ const ProfilePreviewforEmployeeEdit = () => {
   ======================= */
   return (
     <div
-      className="min-h-screen flex items-center justify-center bg-black touch-none"
+      className="min-h-screen flex items-center justify-center touch-none"
       onMouseMove={onDrag}
       onMouseUp={stopDrag}
       onMouseLeave={stopDrag}

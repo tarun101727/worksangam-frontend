@@ -163,7 +163,6 @@ useEffect(() => {
     "/settings",
     "/onlinejob/",
     "/offlinejob/",
-    "/job/",
     "/urgent-matches/",
     "/Hirer/Urgent",
     "/hirer-online-urgent-post",
@@ -580,10 +579,6 @@ d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03
 <Route path="/offlinejob/:jobId" element={<OfflineJobDetails/>}/>
 <Route
   path="/job-application/:notificationId"
-  element={<JobApplicationDetails />}
-/>
-<Route
-  path="/job/:jobId"
   element={<JobApplicationDetails />}
 />
 <Route path="/chats" element={<Chats />} />

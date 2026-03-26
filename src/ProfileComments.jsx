@@ -4,14 +4,13 @@ import { BASE_URL } from "./config";
 import { socket } from "./utils/socket";
 import { countComments } from "../utils/countComment";
 
-
 const getImageUrl = (img) => {
   if (!img) return "";
 
-  // Cloudinary or external URL
+  // If already full URL (Cloudinary, etc.)
   if (img.startsWith("http")) return img;
 
-  // Local image fallback
+  // Local image from backend
   return `${BASE_URL}${img}`;
 };
 
@@ -102,7 +101,6 @@ const CommentItem = React.memo(function CommentItem({
           {comment.user?.profileImage ? (
             <img
             src={getImageUrl(comment.user.profileImage)}
-            
               alt="profile"
               className="w-10 h-10 rounded-full object-cover"
             />

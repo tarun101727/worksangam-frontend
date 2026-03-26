@@ -139,7 +139,7 @@ const ProfilePreviewforEmployee = () => {
     const croppedURL = URL.createObjectURL(blob);
     const file = new File([blob], "profile.jpg", { type: "image/jpeg" });
 
-    navigate("/signup/hirer", {
+    navigate("/signup/employee", {
       state: { profileImage: croppedURL, file },
     });
   };

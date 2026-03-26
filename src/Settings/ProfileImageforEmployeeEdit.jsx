@@ -16,6 +16,7 @@ const location = useLocation();
     file,
     form: location.state?.form   // ✅ keep form data
   },
+  replace: true,
 });
   };
 

@@ -163,6 +163,7 @@ useEffect(() => {
     "/settings",
     "/onlinejob/",
     "/offlinejob/",
+    "/job/",
     "/urgent-matches/",
     "/Hirer/Urgent",
     "/hirer-online-urgent-post",

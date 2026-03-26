@@ -192,7 +192,7 @@ export default function EmployeeAccountEdit({ user }) {
       });
 
       alert("Profile updated");
-      window.location.reload();
+       navigate(`/profile/${user._id}`);
     } catch (err) {
       setError(err.response?.data?.msg || "Something went wrong");
     } finally {

@@ -5,6 +5,14 @@ import axios from "axios";
 import L from "leaflet";
 import { BASE_URL } from "./config";
 
+const getImageUrl = (img) => {
+  if (!img) return "";
+
+  if (img.startsWith("http")) return img; // Cloudinary / external
+
+  return `${BASE_URL}${img}`; // local
+};
+
 const HirerOfflineUrgentMatches = () => {
   const { postId } = useParams();
 
@@ -207,7 +215,7 @@ useEffect(() => {
     {/* Profile */}
     <div className="flex items-center gap-4">
       <img
-        src={hirerPost.profileImage ? `${BASE_URL}${hirerPost.profileImage}` : "/default-avatar.png"}
+          src={hirerPost.profileImage ? getImageUrl(hirerPost.profileImage) : "/default-avatar.png"}
         alt={`${hirerPost.firstName} ${hirerPost.lastName}`}
         className="w-16 h-16 rounded-full object-cover border-2 border-indigo-500"
       />
@@ -247,13 +255,13 @@ useEffect(() => {
           <div key={idx} className="relative rounded-lg overflow-hidden border border-slate-700">
             {m.type === "image" ? (
               <img
-                src={`${BASE_URL}${m.url}`}
+                src={getImageUrl(m.url)}
                 alt="media"
                 className="w-full h-24 object-cover"
               />
             ) : (
               <video
-                src={`${BASE_URL}${m.url}`}
+                src={getImageUrl(m.url)}
                 className="w-full h-24 object-cover"
                 controls
               />
@@ -332,7 +340,7 @@ useEffect(() => {
             {employees.map((e) => (
               <div key={e._id} className="p-4 bg-slate-800 rounded-xl flex items-center gap-3">
                 <img
-                  src={e.profileImage ? `${BASE_URL}${e.profileImage}` : "/default-avatar.png"}
+                  src={e.profileImage ? getImageUrl(e.profileImage) : "/default-avatar.png"}
                   alt={e.name}
                   className="w-12 h-12 rounded-full object-cover"
                 />

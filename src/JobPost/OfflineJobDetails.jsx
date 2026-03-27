@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -95,7 +96,7 @@ export default function OfflineJobDetails() {
                 m.type === "image" ? (
                   <img
                     key={i}
-                    src={getImageUrl(m.url)}
+                    src={`${BASE_URL}${m.url}`}
                     alt="job"
                     onClick={() => setSelectedMedia(m)}
                     className="h-28 w-full object-cover rounded-xl cursor-pointer hover:opacity-80"
@@ -106,7 +107,7 @@ export default function OfflineJobDetails() {
                     onClick={() => setSelectedMedia(m)}
                     className="h-28 w-full object-cover rounded-xl cursor-pointer"
                   >
-                    <source src={getImageUrl(m.url)} />
+                    <source src={`${BASE_URL}${m.url}`} />
                   </video>
                 )
               )}
@@ -177,10 +178,10 @@ export default function OfflineJobDetails() {
           <div className="relative max-w-4xl max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
             <button onClick={() => setSelectedMedia(null)} className="absolute -top-10 right-0 text-white text-2xl">✕</button>
             {selectedMedia.type === "image" ? (
-              <img src={getImageUrl(selectedMedia.url)} alt="full" className="max-h-[90vh] rounded-lg" />
+              <img src={`${BASE_URL}${selectedMedia.url}`} alt="full" className="max-h-[90vh] rounded-lg" />
             ) : (
               <video controls className="max-h-[90vh] rounded-lg">
-                <source src={getImageUrl(selectedMedia.url)} />
+                <source src={`${BASE_URL}${selectedMedia.url}`} />
               </video>
             )}
           </div>

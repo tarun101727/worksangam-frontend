@@ -96,7 +96,7 @@ export default function OfflineJobDetails() {
                 m.type === "image" ? (
                   <img
                     key={i}
-                    src={`${BASE_URL}${m.url}`}
+                    src={getImageUrl(m.url)}
                     alt="job"
                     onClick={() => setSelectedMedia(m)}
                     className="h-28 w-full object-cover rounded-xl cursor-pointer hover:opacity-80"
@@ -107,7 +107,7 @@ export default function OfflineJobDetails() {
                     onClick={() => setSelectedMedia(m)}
                     className="h-28 w-full object-cover rounded-xl cursor-pointer"
                   >
-                    <source src={`${BASE_URL}${m.url}`} />
+                    <source src={getImageUrl(m.url)} />
                   </video>
                 )
               )}
@@ -178,10 +178,10 @@ export default function OfflineJobDetails() {
           <div className="relative max-w-4xl max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
             <button onClick={() => setSelectedMedia(null)} className="absolute -top-10 right-0 text-white text-2xl">✕</button>
             {selectedMedia.type === "image" ? (
-              <img src={`${BASE_URL}${selectedMedia.url}`} alt="full" className="max-h-[90vh] rounded-lg" />
+              <img src={getImageUrl(selectedMedia.url)} alt="full" className="max-h-[90vh] rounded-lg" />
             ) : (
               <video controls className="max-h-[90vh] rounded-lg">
-                <source src={`${BASE_URL}${selectedMedia.url}`} />
+                <source src={getImageUrl(selectedMedia.url)} />
               </video>
             )}
           </div>

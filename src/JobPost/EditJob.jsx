@@ -41,38 +41,38 @@ export default function EditJob() {
   const inputBase =
     "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700";
 
-  /* ================= FETCH JOB ================= */
-  useEffect(() => {
-    const fetchJob = async () => {
-      try {
-        const res = await axios.get(`${BASE_URL}/api/jobs/${jobId}`, {
-          withCredentials: true,
-        });
+ useEffect(() => {
+  const fetchJob = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/api/jobs/${jobId}`, {
+        withCredentials: true,
+      });
+      const job = res.data.job;
 
-        const job = res.data.job;
+      // Safely populate form fields with fallbacks
+      setForm({
+        profession: job.profession || "",
+        description: job.description || "",
+        priceType: job.price?.type || null,
+        expectedPrice: job.price?.value || "",
+        minPrice: job.price?.min || "",
+        maxPrice: job.price?.max || "",
+        currency: job.price?.currency || "INR",
+        preferredTime: job.preferredTime || null,
+        addressDetails: job.addressDetails || "",
+        safetyWarnings: job.safetyWarnings || emptyForm.safetyWarnings,
+        location: job.location || emptyForm.location,
+      });
+    } catch (err) {
+      console.error("Failed to fetch job:", err);
+      alert("Failed to load job data");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        setForm({
-          profession: job.profession || "",
-          description: job.description || "",
-          priceType: job.price?.type || null,
-          expectedPrice: job.price?.value || "",
-          minPrice: job.price?.min || "",
-          maxPrice: job.price?.max || "",
-          currency: job.price?.currency || "INR",
-          preferredTime: job.preferredTime || null,
-          addressDetails: job.addressDetails || "",
-          safetyWarnings: job.safetyWarnings || emptyForm.safetyWarnings,
-          location: job.location || emptyForm.location,
-        });
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchJob();
-  }, [jobId]);
+  fetchJob();
+}, [jobId]);
 
   useEffect(() => {
   if (!mapRef.current || !form.location?.coordinates?.length) return;

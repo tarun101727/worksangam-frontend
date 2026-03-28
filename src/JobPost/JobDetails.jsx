@@ -104,6 +104,16 @@ export default function JobDetails() {
         </p>
       )}
 
+       {/* Address */}
+        {job.addressDetails && (
+          <p className="text-white/60"><span className="font-semibold">Address / Landmark: </span>{job.addressDetails}</p>
+        )}
+
+        {/* Current Location */}
+        {job.location?.address && (
+          <p className="text-white/60"><span className="font-semibold">Current Location: </span>{job.location.address}</p>
+        )}
+
       {job.location?.address && (
         <p className="text-white/60 mb-4">
           Address: {job.location.address}

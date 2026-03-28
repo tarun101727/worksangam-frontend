@@ -64,6 +64,7 @@ import OnlineWorkerUrgentPosts from "./OnlineWorkerUrgentPosts";
 import BuyCredits from "./BuyCredits";
 import { urlBase64ToUint8Array } from "./utils/push";
 import JobDetails from "./JobPost/JobDetails";
+import EditJob from "./JobPost/EditJob";
 
 const getImageUrl = (img) => {
   if (!img) return "";
@@ -625,6 +626,7 @@ element={<ProfilePreviewforhirerEdit/>}
         element={<OnlineWorkerUrgentPosts />}
       />
       <Route path="/job/:jobId" element={<JobDetails />} />
+      <Route path="/edit-job/:jobId" element={<EditJob />} />
    <Route path="/buy-credits" element={<BuyCredits/>}/>
         <Route path="*" element={<Navigate to="/signup" replace />} />
       </Routes>

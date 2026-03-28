@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { BASE_URL } from "./config";
+import { BASE_URL } from "../config"; 
 
 const getImageUrl = (img) => {
   if (!img) return null;

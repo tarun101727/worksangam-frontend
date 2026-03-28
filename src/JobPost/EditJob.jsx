@@ -75,6 +75,19 @@ export default function EditJob() {
   }, [jobId]);
 
   useEffect(() => {
+  if (!mapRef.current || !form.location?.coordinates?.length) return;
+
+  const [lng, lat] = form.location.coordinates;
+
+  markerRef.current?.remove();
+  markerRef.current = L.marker([lat, lng]).addTo(mapRef.current);
+
+  mapRef.current.setView([lat, lng], 13);
+}, [form.location]);
+
+  useEffect(() => {
+  if (loading) return; // 🔥 VERY IMPORTANT
+
   const mapContainer = document.getElementById("map");
   if (!mapContainer || mapRef.current) return;
 
@@ -90,7 +103,7 @@ export default function EditJob() {
     mapRef.current?.remove();
     mapRef.current = null;
   };
-}, []);
+}, [loading]); // 🔥 add dependency
 
   /* ================= HANDLE CHANGE ================= */
   const handleChange = (key, value) => {
@@ -98,6 +111,10 @@ export default function EditJob() {
   };
 
   const getLocation = () => {
+     if (!mapRef.current) {
+    alert("Map not loaded yet");
+    return;
+  }
   if (!navigator.geolocation) {
     alert("Geolocation not supported");
     return;

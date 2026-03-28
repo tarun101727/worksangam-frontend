@@ -114,11 +114,6 @@ export default function JobDetails() {
           <p className="text-white/60"><span className="font-semibold">Current Location: </span>{job.location.address}</p>
         )}
 
-      {job.location?.address && (
-        <p className="text-white/60 mb-4">
-          Address: {job.location.address}
-        </p>
-      )}
 
       {/* 🔥 ACTION BUTTONS */}
       <div className="flex gap-3 mt-6">

@@ -2,6 +2,11 @@ import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+
+// ✅ FIX marker not showing in production
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
 import { BASE_URL } from "./config";
 import CreateOfflineWorkerPostPage from "./PROFILE/CreateOfflineWorkerPostPage";
@@ -48,6 +53,15 @@ const HirerOfflineUrgentPost = () => {
 
   const inputBase =
     "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700/60 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition";
+
+
+     // ✅ Fix Leaflet marker icon issue (Vercel production fix)
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
 
   /* ================= MAP INIT ================= */
   useEffect(() => {

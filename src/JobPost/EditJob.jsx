@@ -53,19 +53,24 @@ const fileInputRef = useRef(null);
       const job = res.data.job;
 
       setForm({
-        profession: job.profession || "",
-        description: job.description || "",
-        priceType: job.price?.type || null,
-        expectedPrice: job.price?.value || "",
-        minPrice: job.price?.min || "",
-        maxPrice: job.price?.max || "",
-        currency: job.price?.currency || "INR",
-        preferredTime: job.preferredTime || null,
-        addressDetails: job.addressDetails || "",
-        safetyWarnings: job.safetyWarnings || emptyForm.safetyWarnings,
-        location: job.location || emptyForm.location,
-        media: job.media || [],
-      });
+  profession: job.profession || "",
+  description: job.description || "",
+  priceType: job.price?.type || null,
+  expectedPrice: job.price?.value || "",
+  minPrice: job.price?.min || "",
+  maxPrice: job.price?.max || "",
+  currency: job.price?.currency || "INR",
+  preferredTime: job.preferredTime || { type: null }, // ✅ make sure it exists
+  addressDetails: job.addressDetails || "",
+  safetyWarnings: job.safetyWarnings || {
+    pets: false,
+    elderly: false,
+    children: false,
+    safetyConcerns: false,
+  },
+  location: job.location || { type: "Point", coordinates: [], address: "" },
+  media: job.media || [],
+});
 
       // convert media to previews
       const previews = (job.media || []).map((url) => ({

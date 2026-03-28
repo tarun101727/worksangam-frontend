@@ -101,7 +101,7 @@ const HirerOfflineUrgentPost = () => {
         location: {
           type: "Point",
           coordinates: [longitude, latitude],
-          address: "",
+          address: `Detecting location…`,
         },
       }));
 
@@ -256,10 +256,11 @@ Floor, gate, lift, access notes`}
           readOnly
           onClick={getLocation}
           value={
-  locationLoading
-    ? "Detecting location…"
-    : form.location.address || "Tap to auto-detect your current location"
-}
+            form.location.address ||
+            (locationLoading
+              ? "Detecting location…"
+              : "Tap to auto-detect your current location")
+          }
         />
 
         <div className="overflow-hidden rounded-xl border border-slate-700">

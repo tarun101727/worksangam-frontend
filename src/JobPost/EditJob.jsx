@@ -1,9 +1,12 @@
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BASE_URL } from "../config";
 import CreateOfflineWorkerPostPage from "../PROFILE/CreateOfflineWorkerPostPage";
+import L from "leaflet";
+import { useRef } from "react";
+
+
 
 const emptyForm = {
   profession: "",
@@ -31,6 +34,9 @@ export default function EditJob() {
   const [form, setForm] = useState(emptyForm);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const mapRef = useRef(null);
+  const markerRef = useRef(null);
+  const [locationLoading, setLocationLoading] = useState(false);
 
   const inputBase =
     "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700";
@@ -68,10 +74,76 @@ export default function EditJob() {
     fetchJob();
   }, [jobId]);
 
+  useEffect(() => {
+  const mapContainer = document.getElementById("map");
+  if (!mapContainer || mapRef.current) return;
+
+  mapRef.current = L.map(mapContainer, {
+    attributionControl: false,
+  }).setView([20.5937, 78.9629], 5);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png")
+    .addTo(mapRef.current);
+
+  return () => {
+    markerRef.current?.remove();
+    mapRef.current?.remove();
+    mapRef.current = null;
+  };
+}, []);
+
   /* ================= HANDLE CHANGE ================= */
   const handleChange = (key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
+
+  const getLocation = () => {
+  if (!navigator.geolocation) {
+    alert("Geolocation not supported");
+    return;
+  }
+
+  setLocationLoading(true);
+
+  navigator.geolocation.getCurrentPosition(
+    ({ coords }) => {
+      const { latitude, longitude } = coords;
+
+      setForm((prev) => ({
+        ...prev,
+        location: {
+          type: "Point",
+          coordinates: [longitude, latitude],
+          address: "Detecting location…",
+        },
+      }));
+
+      markerRef.current?.remove();
+      markerRef.current = L.marker([latitude, longitude]).addTo(mapRef.current);
+      mapRef.current.setView([latitude, longitude], 13);
+
+      axios
+        .get(`${BASE_URL}/api/hirer-post/geocode?lat=${latitude}&lng=${longitude}`, {
+          withCredentials: true,
+        })
+        .then((res) => {
+          setForm((prev) => ({
+            ...prev,
+            location: {
+              ...prev.location,
+              address: res.data?.address || "Address not found",
+            },
+          }));
+        })
+        .catch(() => alert("Failed to fetch address"))
+        .finally(() => setLocationLoading(false));
+    },
+    () => {
+      alert("Location permission denied");
+      setLocationLoading(false);
+    }
+  );
+};
 
   /* ================= UPDATE ================= */
   const handleUpdate = async () => {
@@ -94,44 +166,6 @@ export default function EditJob() {
     }
   };
 
-  const handleLocationPick = async () => {
-  if (!navigator.geolocation) {
-    alert("Geolocation not supported");
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(
-    async (pos) => {
-      const lat = pos.coords.latitude;
-      const lng = pos.coords.longitude;
-
-      try {
-        const res = await axios.get(
-          `${BASE_URL}/api/jobs/geocode?lat=${lat}&lng=${lng}`,
-          { withCredentials: true }
-        );
-
-        const address = res.data.address;
-
-        setForm((prev) => ({
-          ...prev,
-          location: {
-            type: "Point",
-            coordinates: [lng, lat],
-            address,
-          },
-        }));
-      } catch (err) {
-        console.error("Geocode error:", err);
-        alert("Failed to fetch address");
-      }
-    },
-    () => {
-      alert("Location permission denied");
-    }
-  );
-};
-
   if (loading) return <p className="text-center mt-10">Loading...</p>;
 
   return (
@@ -149,7 +183,7 @@ export default function EditJob() {
           setActiveMedia={() => {}}
           fileInputRef={{ current: null }}
           getTodayDate={() => new Date().toISOString().split("T")[0]}
-          openNativePicker={handleLocationPick}
+          openNativePicker={() => {}}
           standardPriceOptions={[
             { label: "No Budget", value: null },
             { label: "Fixed Price", value: "fixed" },
@@ -168,6 +202,24 @@ export default function EditJob() {
             handleChange("addressDetails", e.target.value)
           }
         />
+
+        {/* LOCATION INPUT */}
+<input
+  className={inputBase}
+  readOnly
+  onClick={getLocation}
+  value={
+    form.location.address ||
+    (locationLoading
+      ? "Detecting location…"
+      : "Tap to auto-detect your current location")
+  }
+/>
+
+{/* MAP */}
+<div className="overflow-hidden rounded-xl border border-slate-700">
+  <div id="map" style={{ height: 280 }} />
+</div>
 
         {/* SUBMIT */}
         <button

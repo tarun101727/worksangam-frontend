@@ -82,7 +82,10 @@ export default function JobDetails() {
         </h1>
 
         {/* Description */}
-        <p className="text-white/70">{job.description}</p>
+        <p className="text-white/70">
+          <span className="font-semibold">Description: </span>
+          {job.description}
+        </p>
 
         {/* Preferred Time & Date */}
         {job.preferredTime && (

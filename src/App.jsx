@@ -84,33 +84,12 @@ export default function App() {
 const [notifications, setNotifications] = useState([]); // job notifications
 const [chatNotifications, setChatNotifications] = useState([]); // chat notifications
 
-
-/* ---------------- WEGLot Integration ---------------- */
   useEffect(() => {
-    // 1️⃣ Create a script element
-    const script = document.createElement("script");
-    script.src = "https://cdn.weglot.com/weglot.min.js";
-    script.async = true;
-
-    // 2️⃣ When script loads, initialize Weglot
-    script.onload = () => {
-      if (window.Weglot) {
-        window.Weglot.initialize({
-          api_key: "wg_458091568a353aac24b94996156c65163",
-        });
-      } else {
-        console.error("Weglot failed to load");
-      }
-    };
-
-    // 3️⃣ Append script to body
-    document.body.appendChild(script);
-
-    // 4️⃣ Cleanup on unmount
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
+    // Whenever route changes, re-run Weglot detection
+    if (window.Weglot) {
+      window.Weglot.detect();
+    }
+  }, [location.pathname]);
 
 // Combined unread count for the bell
 const unreadCount =

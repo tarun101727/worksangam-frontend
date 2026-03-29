@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BASE_URL } from "../config";
 import { useAuth } from "../useAuth.js";
-import { useEffect } from "react";
+
 
 
 
@@ -10,11 +10,6 @@ const SignupOptions = () => {
   const navigate = useNavigate();
   const { setIsAuthenticated, setUser } = useAuth();
 
-  useEffect(() => {
-    if (window.Weglot) {
-      window.Weglot.refresh(); // Scan the DOM for new text
-    }
-  });
 
   const continueAsGuest = async () => {
     const res = await axios.post(

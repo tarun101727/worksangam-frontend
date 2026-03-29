@@ -10,6 +10,12 @@ const SignupOptions = () => {
   const navigate = useNavigate();
   const { setIsAuthenticated, setUser } = useAuth();
 
+  useEffect(() => {
+    if (window.Weglot) {
+      window.Weglot.refresh(); // Scan the DOM for new text
+    }
+  });
+
   const continueAsGuest = async () => {
     const res = await axios.post(
       `${BASE_URL}/api/auth/guest`,
@@ -20,12 +26,6 @@ const SignupOptions = () => {
     setUser({ ...res.data.user, isGuest: true });
     navigate("/home");
   };
-
-  useEffect(() => {
-    if (window.Weglot) {
-      window.Weglot.refresh(); // Scan the DOM for new text
-    }
-  });
 
   /* 🔥 THEME — CHARCOAL + INDIGO */
 

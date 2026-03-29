@@ -84,13 +84,6 @@ export default function App() {
 const [notifications, setNotifications] = useState([]); // job notifications
 const [chatNotifications, setChatNotifications] = useState([]); // chat notifications
 
-  useEffect(() => {
-    // Whenever route changes, re-run Weglot detection
-    if (window.Weglot) {
-      window.Weglot.detect();
-    }
-  }, [location.pathname]);
-
 // Combined unread count for the bell
 const unreadCount =
   notifications.filter(n => !n.isRead).length +

@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BASE_URL } from "../config";
 import { useAuth } from "../useAuth.js";
-import { useEffect } from "react";
 
 const SignupOptions = () => {
   const navigate = useNavigate();
@@ -19,29 +18,8 @@ const SignupOptions = () => {
     navigate("/home");
   };
 
-  /* Weglot Initialization */
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://cdn.weglot.com/weglot.min.js";
-    script.async = true;
-    script.onload = () => {
-      if (window.Weglot) {
-        window.Weglot.initialize({
-          api_key: "wg_458091568a353aac24b94996156c65163",
-          originalLanguage: "en",
-          destinationLanguages: ["hi", "te", "fr", "es"],
-        });
-      }
-    };
-    document.body.appendChild(script);
-    
-    // Optional cleanup if component unmounts
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
-
   /* 🔥 THEME — CHARCOAL + INDIGO */
+
   const buttonPrimary =
     "w-full py-4 sm:py-3 rounded-xl font-semibold text-white " +
     "bg-[#6366F1] shadow-lg shadow-[#6366F1]/30 " +
@@ -66,21 +44,64 @@ const SignupOptions = () => {
     "active:scale-95";
 
   return (
-    <div className="min-h-screen flex items-start lg:items-center justify-center pt-8 sm:pt-12 lg:pt-0 px-4 sm:px-6 bg-gradient-to-br from-[#020617] via-[#020617] to-[#020617] lg:bg-none">
-      <div className="w-full max-w-sm md:max-w-md text-center flex flex-col min-h-screen lg:min-h-0 lg:rounded-3xl lg:bg-[#0F172A]/90 lg:backdrop-blur-2xl lg:border lg:border-white/10 lg:p-8 p-0 lg:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] transition-all duration-500">
-        <h1 className="text-4xl font-bold tracking-wide text-white mb-3 mt-8 lg:mt-0">
-          GUILDS
-        </h1>
+    <div
+      className="
+        min-h-screen flex
+        items-start lg:items-center
+        justify-center
+        pt-8 sm:pt-12 lg:pt-0
+        px-4 sm:px-6
+
+        /* 📱 Mobile / Tablet background */
+        bg-gradient-to-br from-[#020617] via-[#020617] to-[#020617]
+
+        /* 💻 Desktop clears background */
+        lg:bg-none
+      "
+    >
+      {/* Mobile & Tablet = fullscreen | Desktop = glass card */}
+      <div
+        className="
+          w-full
+          max-w-sm md:max-w-md
+          text-center
+          flex flex-col
+          min-h-screen lg:min-h-0
+
+          /* Glass card ONLY on lg+ */
+          lg:rounded-3xl
+          lg:bg-[#0F172A]/90 lg:backdrop-blur-2xl
+          lg:border lg:border-white/10
+          lg:p-8 p-0
+          lg:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)]
+
+          transition-all duration-500
+        "
+      >
+           {/* Title */}
+<h1
+  className="text-4xl font-bold tracking-wide text-white mb-3 mt-8 lg:mt-0"
+>
+  GUILDS
+</h1>
+
         <p className="text-sm text-white/70 mb-10 leading-relaxed px-2 lg:px-0">
           Get started in seconds — create an account or explore as a guest.
         </p>
 
+        {/* Actions */}
         <div className="flex flex-col gap-6 px-2 lg:px-0">
-          <button onClick={() => navigate("/signup/role")} className={buttonPrimary}>
+          <button
+            onClick={() => navigate("/signup/role")}
+            className={buttonPrimary}
+          >
             Sign up
           </button>
 
-          <button onClick={continueAsGuest} className={buttonSecondary}>
+          <button
+            onClick={continueAsGuest}
+            className={buttonSecondary}
+          >
             Continue as Guest
           </button>
 
@@ -92,11 +113,15 @@ const SignupOptions = () => {
             <div className="flex-1 h-px bg-white/10" />
           </div>
 
-          <button onClick={() => navigate("/login")} className={buttonOutline}>
+          <button
+            onClick={() => navigate("/login")}
+            className={buttonOutline}
+          >
             Login
           </button>
         </div>
 
+        {/* Terms */}
         <p className="mt-10 text-[11px] text-white/50 leading-relaxed px-3 lg:px-0">
           By continuing, you agree to our{" "}
           <button

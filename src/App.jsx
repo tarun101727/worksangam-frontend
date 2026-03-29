@@ -84,13 +84,6 @@ export default function App() {
 const [notifications, setNotifications] = useState([]); // job notifications
 const [chatNotifications, setChatNotifications] = useState([]); // chat notifications
 
-
-useEffect(() => {
-  if (window.Weglot) {
-    window.Weglot.refresh();
-  }
-}, [location.pathname]);
-
 // Combined unread count for the bell
 const unreadCount =
   notifications.filter(n => !n.isRead).length +

@@ -27,7 +27,7 @@ const SignupOptions = () => {
     script.onload = () => {
       if (window.Weglot) {
         window.Weglot.initialize({
-          api_key: "wg_458091468a353aac24b94996166c65169",
+          api_key: "wg_458091568a353aac24b94996156c65163",
           originalLanguage: "en",
           destinationLanguages: ["hi", "te", "fr", "es"],
         });

@@ -3,25 +3,12 @@ import axios from "axios";
 import { BASE_URL } from "../config";
 import { useAuth } from "../useAuth.js";
 import Weglot from 'weglot';
-import { useEffect } from "react";
+
 
 
 const SignupOptions = () => {
   const navigate = useNavigate();
   const { setIsAuthenticated, setUser } = useAuth();
-
-    useEffect(() => {
-    // Translate static text manually
-    const title = document.querySelector("#guild-title");
-    if (title) title.innerText = Weglot.translate("GUILD");
-
-    const signupBtn = document.querySelector("#signup-button");
-    if (signupBtn) signupBtn.innerText = Weglot.translate("Sign up");
-
-    const guestBtn = document.querySelector("#guest-button");
-    if (guestBtn) guestBtn.innerText = Weglot.translate("Continue as Guest");
-
-  }, []);
 
   const continueAsGuest = async () => {
     const res = await axios.post(
@@ -97,7 +84,6 @@ const SignupOptions = () => {
            {/* Title */}
 <h1
   className="text-4xl font-bold tracking-wide text-white mb-3 mt-8 lg:mt-0"
-  id="guild-title"
 >
   GUILDS
 </h1>

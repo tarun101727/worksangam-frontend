@@ -78,10 +78,13 @@ const SignupOptions = () => {
           transition-all duration-500
         "
       >
-        {/* Title */}
-        <h1 className="text-4xl font-bold tracking-wide text-white mb-3 mt-8 lg:mt-0">
-          GUILD
-        </h1>
+       {/* Title */}
+<h1
+  className="text-4xl font-bold tracking-wide text-white mb-3 mt-8 lg:mt-0"
+  data-wg-key="signup_button"
+>
+  GUILD
+</h1>
 
         <p className="text-sm text-white/70 mb-10 leading-relaxed px-2 lg:px-0">
           Get started in seconds — create an account or explore as a guest.

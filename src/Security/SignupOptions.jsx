@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BASE_URL } from "../config";
 import { useAuth } from "../useAuth.js";
+import Weglot from 'weglot';
+
 
 const SignupOptions = () => {
   const navigate = useNavigate();
@@ -78,12 +80,11 @@ const SignupOptions = () => {
           transition-all duration-500
         "
       >
-       {/* Title */}
+        {/* Title */}
 <h1
   className="text-4xl font-bold tracking-wide text-white mb-3 mt-8 lg:mt-0"
-  data-wg-key="signup_button"
 >
-  GUILD
+  {Weglot.translate("GUILD")}
 </h1>
 
         <p className="text-sm text-white/70 mb-10 leading-relaxed px-2 lg:px-0">

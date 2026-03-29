@@ -99,7 +99,7 @@ const SignupOptions = () => {
   className="text-4xl font-bold tracking-wide text-white mb-3 mt-8 lg:mt-0"
   id="guild-title"
 >
-  GUILD 
+  GUILDS
 </h1>
 
         <p className="text-sm text-white/70 mb-10 leading-relaxed px-2 lg:px-0">

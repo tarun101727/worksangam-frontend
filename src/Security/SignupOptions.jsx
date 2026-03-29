@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BASE_URL } from "../config";
 import { useAuth } from "../useAuth.js";
+import { useEffect } from "react";
 
 
 
@@ -19,6 +20,12 @@ const SignupOptions = () => {
     setUser({ ...res.data.user, isGuest: true });
     navigate("/home");
   };
+
+  useEffect(() => {
+    if (window.Weglot) {
+      window.Weglot.refresh(); // Scan the DOM for new text
+    }
+  });
 
   /* 🔥 THEME — CHARCOAL + INDIGO */
 
@@ -84,7 +91,7 @@ const SignupOptions = () => {
 <h1
   className="text-4xl font-bold tracking-wide text-white mb-3 mt-8 lg:mt-0"
 >
-  GUILD
+  GUILDS
 </h1>
 
         <p className="text-sm text-white/70 mb-10 leading-relaxed px-2 lg:px-0">

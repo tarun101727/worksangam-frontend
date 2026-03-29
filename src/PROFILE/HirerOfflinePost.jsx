@@ -160,40 +160,67 @@ const HirerOfflinePost = () => {
 
   /* ================= SUBMIT ================= */
   const submit = async () => {
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const formData = new FormData();
+    const formData = new FormData();
 
-      Object.keys(form).forEach((key) => {
-        if (key === "media") return;
-        if (typeof form[key] === "object") {
-          formData.append(key, JSON.stringify(form[key]));
-        } else {
-          formData.append(key, form[key]);
-        }
-      });
-
-      form.media.forEach((file) =>
-        formData.append("media", file)
-      );
-
-      const res = await axios.post(
-        `${BASE_URL}/api/hirer-post/create`,
-        formData,
-        {
-          withCredentials: true,
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
-
-      navigate(`/job/${res.data.job._id}`);
-    } catch {
-      setError("Failed to create post");
-    } finally {
-      setLoading(false);
+    // 🔥 Construct price object properly
+    let priceObj = null;
+    if (form.priceType) {
+      if (form.priceType === "fixed" || form.priceType === "hourly") {
+        priceObj = {
+          type: form.priceType,
+          value: Number(form.expectedPrice),
+          currency: form.currency,
+        };
+      } else if (form.priceType === "negotiable") {
+        priceObj = {
+          type: "negotiable",
+          min: Number(form.minPrice),
+          max: Number(form.maxPrice),
+          currency: form.currency,
+        };
+      } else if (form.priceType === "inspect_quote") {
+        priceObj = { type: "inspect_quote", currency: form.currency };
+      }
     }
-  };
+
+    // 🔥 Construct payload including price
+    const payload = {
+      ...form,
+      price: priceObj,
+    };
+
+    Object.keys(payload).forEach((key) => {
+      if (key === "media") return;
+      if (typeof payload[key] === "object") {
+        formData.append(key, JSON.stringify(payload[key]));
+      } else {
+        formData.append(key, payload[key]);
+      }
+    });
+
+    form.media.forEach((file) =>
+      formData.append("media", file)
+    );
+
+    const res = await axios.post(
+      `${BASE_URL}/api/hirer-post/create`,
+      formData,
+      {
+        withCredentials: true,
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+
+    navigate(`/job/${res.data.job._id}`);
+  } catch {
+    setError("Failed to create post");
+  } finally {
+    setLoading(false);
+  }
+};
 
   /* ================= RENDER ================= */
   return (

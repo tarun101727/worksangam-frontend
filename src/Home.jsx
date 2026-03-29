@@ -34,14 +34,16 @@ export default function Home() {
   const lastCoordsRef = useRef(null);
 
   const formatPrice = (price) => {
-    if (!price) return "Contact for pricing";
-    if (price.type === "fixed") return `${price.currency} ${price.value}`;
-    if (price.type === "hourly") return `${price.currency} ${price.value}/hr`;
-    if (price.type === "negotiable")
-      return `${price.currency} ${price.min} – ${price.max}`;
-    if (price.type === "inspect_quote") return "Inspect & Quote";
-    return "Not disclosed";
-  };
+  if (!price) return "Contact for pricing";
+
+  if (price.type === "fixed" && price.value != null) return `${price.currency} ${price.value}`;
+  if (price.type === "hourly" && price.value != null) return `${price.currency} ${price.value}/hr`;
+  if (price.type === "negotiable" && price.min != null && price.max != null)
+    return `${price.currency} ${price.min} – ${price.max}`;
+  if (price.type === "inspect_quote") return "Inspect & Quote";
+
+  return "Not disclosed";
+};
 
   // ======================= USER =======================
   const checkUser = async () => {

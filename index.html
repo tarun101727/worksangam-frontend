@@ -5,6 +5,21 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>frontend</title>
+
+    <script>
+  (function(w,d,s,u){
+    var t=w.Weglot=w.Weglot||[];
+    t.push({
+      init: function() {
+        Weglot.initialize({
+          api_key: 'wg_458091568a353aac24b94996156c65163', // <-- put your actual API key here
+          onLanguageChange: function(lang) { console.log('Language changed to', lang); }
+        })
+      }
+    });
+    var e=d.createElement(s);e.async=true;e.src=u;d.head.appendChild(e);
+  })(window,document,'script','https://cdn.weglot.com/weglot.min.js');
+</script>
   </head>
   <body>
     <div id="root"></div>

@@ -84,6 +84,29 @@ export default function App() {
 const [notifications, setNotifications] = useState([]); // job notifications
 const [chatNotifications, setChatNotifications] = useState([]); // chat notifications
 
+useEffect(() => {
+  const interval = setInterval(() => {
+    if (window.Localize && window.Localize.translatePage) {
+      window.Localize.translatePage();
+      clearInterval(interval); // stop once done
+    }
+  }, 500);
+
+  return () => clearInterval(interval);
+}, []);
+
+useEffect(() => {
+  const interval = setInterval(() => {
+    if (window.Localize && window.Localize.translatePage) {
+      window.Localize.translatePage();
+      clearInterval(interval);
+    }
+  }, 300);
+
+  return () => clearInterval(interval);
+}, [location.pathname]);
+
+
 // Combined unread count for the bell
 const unreadCount =
   notifications.filter(n => !n.isRead).length +

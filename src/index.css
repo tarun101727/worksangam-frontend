@@ -7,6 +7,11 @@ html, body {
   overscroll-behavior: none;
 }
 
+body {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
 /* Ensure any nested scrollable content behaves as expected */
 .scrollable-content {
   overflow-y: auto;

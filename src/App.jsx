@@ -84,6 +84,28 @@ export default function App() {
 const [notifications, setNotifications] = useState([]); // job notifications
 const [chatNotifications, setChatNotifications] = useState([]); // chat notifications
 
+useEffect(() => {
+  const lang = localStorage.getItem("gtranslate_lang");
+
+  if (lang && window.doGTranslate) {
+    window.doGTranslate(`en|${lang}`);
+  }
+}, [location.pathname]);
+
+useEffect(() => {
+  const interval = setInterval(() => {
+    const select = document.querySelector(".goog-te-combo");
+
+    if (select) {
+      select.addEventListener("change", (e) => {
+        localStorage.setItem("gtranslate_lang", e.target.value);
+      });
+      clearInterval(interval);
+    }
+  }, 500);
+
+  return () => clearInterval(interval);
+}, []);
 
 // Combined unread count for the bell
 const unreadCount =

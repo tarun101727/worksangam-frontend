@@ -2,17 +2,26 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <div class="gtranslate_wrapper"></div>
-<script>window.gtranslateSettings = {"default_language":"en","languages":["en","fr","it","es","te","nl","hi"],"wrapper_selector":".gtranslate_wrapper"}</script>
-<script src="https://cdn.gtranslate.net/widgets/latest/float.js" defer></script>
+    <!-- ✅ GTranslate SETTINGS -->
+    <script>
+      window.gtranslateSettings = {
+        default_language: "en",
+        languages: ["en","fr","it","es","te","nl","hi"]
+      };
+    </script>
+
+    <!-- ✅ GTranslate SCRIPT -->
+    <script src="https://cdn.gtranslate.net/widgets/latest/float.js"></script>
 
     <title>frontend</title>
   </head>
 
   <body>
+    <!-- ✅ MOVE THIS HERE -->
+    <div class="gtranslate_wrapper"></div>
+
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

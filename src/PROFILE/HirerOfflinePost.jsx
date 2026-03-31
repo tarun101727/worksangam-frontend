@@ -48,7 +48,11 @@ const HirerOfflinePost = () => {
 
   const inputBase =
     "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700/60 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition";
-
+useEffect(() => {
+  if (window.Localize) {
+    window.Localize.translate();
+  }
+}, [locationLoading, form.location.address]);
   /* ================= MAP INIT ================= */
   useEffect(() => {
     const mapContainer = document.getElementById("map");

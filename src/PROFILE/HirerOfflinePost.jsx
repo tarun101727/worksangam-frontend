@@ -284,16 +284,16 @@ Floor, gate, lift, access notes`}
         </div>
 
         <input
-  className={`${inputBase} cursor-pointer`}
-  readOnly
-  onClick={getLocation}
-  placeholder={
-    locationLoading
-      ? "Detecting location…"
-      : "Tap to auto-detect your current location"
-  }
-  value={form.location.address}
-/>
+          className={`${inputBase} cursor-pointer`}
+          readOnly
+          onClick={getLocation}
+          value={
+            form.location.address ||
+            (locationLoading
+              ? "Detecting location…"
+              : "Tap to auto-detect your current location")
+          }
+        />
 
         <div className="overflow-hidden rounded-xl border border-slate-700">
           <div id="map" style={{ height: 280 }} />

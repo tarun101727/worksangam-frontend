@@ -99,15 +99,14 @@ useEffect(() => {
     ({ coords }) => {
       const { latitude, longitude } = coords;
 
-      // 1️⃣ Show coordinates immediately
-      setForm((prev) => ({
-        ...prev,
-        location: {
-          type: "Point",
-          coordinates: [longitude, latitude],
-          address: `Detecting location…`,
-        },
-      }));
+     setForm((prev) => ({
+  ...prev,
+  location: {
+    type: "Point",
+    coordinates: [longitude, latitude],
+    address: "", // ✅ keep empty
+  },
+}));
 
       markerRef.current?.remove();
       markerRef.current = L.marker([latitude, longitude]).addTo(mapRef.current);
@@ -288,9 +287,11 @@ Floor, gate, lift, access notes`}
         </div>
 
         <input
-  className={`${inputBase} cursor-pointer`}
+  className={`${inputBase} cursor-pointer ${
+    locationLoading ? "opacity-70 cursor-not-allowed" : ""
+  }`}
   readOnly
-  onClick={getLocation}
+  onClick={!locationLoading ? getLocation : undefined}
   value={form.location.address}
   placeholder={
     locationLoading

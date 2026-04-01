@@ -258,33 +258,33 @@ export default function Home() {
       {error && <p className="text-red-400 text-center mb-6">{error}</p>}
 
       {/* ======================= TABS ======================= */}
-<div className="grid grid-cols-2 gap-3 mb-6 max-w-md mx-auto">
-  {["online", "offline", "online-jobs", "offline-jobs"].map((tab) => (
-    <button
-      key={tab}
-      onClick={() => setSelectedTab(tab)}
-      className={`${
-        selectedTab === tab ? "bg-[#6366F1]" : "bg-[#1f2937]"
-      } py-3 px-4 rounded-xl w-full`}
-    >
-      {tab === "online" && "Online Employees"}
-      {tab === "offline" && "Offline Employees"}
-      {tab === "online-jobs" && "Online Jobs"}
-      {tab === "offline-jobs" && "Offline Jobs"}
-    </button>
-  ))}
+      <div className="flex flex-wrap justify-around gap-3 mb-6">
+        {["online", "offline", "online-jobs", "offline-jobs"].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setSelectedTab(tab)}
+            className={`${
+              selectedTab === tab ? "bg-[#6366F1]" : "bg-[#1f2937]"
+            } py-2 px-4 rounded-xl`}
+          >
+            {tab === "online" && "Online Employees"}
+            {tab === "offline" && "Offline Employees"}
+            {tab === "online-jobs" && "Online Jobs"}
+            {tab === "offline-jobs" && "Offline Jobs"}
+          </button>
+        ))}
 
-  {user?.role === "hirer" && (
-    <button
-      onClick={() => setSelectedTab("my-job-posts")}
-      className={`${
-        selectedTab === "my-job-posts" ? "bg-[#22c55e]" : "bg-[#1f2937]"
-      } py-3 px-4 rounded-xl col-span-1`}
-    >
-      My Job Posts
-    </button>
-  )}
-</div>
+        {user?.role === "hirer" && (
+          <button
+            onClick={() => setSelectedTab("my-job-posts")}
+            className={`${
+              selectedTab === "my-job-posts" ? "bg-[#22c55e]" : "bg-[#1f2937]"
+            } py-2 px-4 rounded-xl`}
+          >
+            My Job Posts
+          </button>
+        )}
+      </div>
 
       {/* ======================= SEARCH BAR ======================= */}
       {(selectedTab === "online" || selectedTab === "offline") && (

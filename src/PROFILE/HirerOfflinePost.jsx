@@ -48,11 +48,7 @@ const HirerOfflinePost = () => {
 
   const inputBase =
     "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700/60 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition";
-useEffect(() => {
-  if (window.Localize) {
-    window.Localize.translate();
-  }
-}, [locationLoading, form.location.address]);
+
   /* ================= MAP INIT ================= */
   useEffect(() => {
     const mapContainer = document.getElementById("map");
@@ -99,14 +95,15 @@ useEffect(() => {
     ({ coords }) => {
       const { latitude, longitude } = coords;
 
-     setForm((prev) => ({
-  ...prev,
-  location: {
-    type: "Point",
-    coordinates: [longitude, latitude],
-    address: "", // ✅ keep empty
-  },
-}));
+      // 1️⃣ Show coordinates immediately
+      setForm((prev) => ({
+        ...prev,
+        location: {
+          type: "Point",
+          coordinates: [longitude, latitude],
+          address: `Detecting location…`,
+        },
+      }));
 
       markerRef.current?.remove();
       markerRef.current = L.marker([latitude, longitude]).addTo(mapRef.current);
@@ -287,18 +284,16 @@ Floor, gate, lift, access notes`}
         </div>
 
         <input
-  className={`${inputBase} cursor-pointer ${
-    locationLoading ? "opacity-70 cursor-not-allowed" : ""
-  }`}
-  readOnly
-  onClick={!locationLoading ? getLocation : undefined}
-  value={form.location.address}
-  placeholder={
-    locationLoading
-      ? "Detecting location…"
-      : "Tap to auto-detect your current location"
-  }
-/>
+          className={`${inputBase} cursor-pointer`}
+          readOnly
+          onClick={getLocation}
+          value={
+            form.location.address ||
+            (locationLoading
+              ? "Detecting location…"
+              : "Tap to auto-detect your current location")
+          }
+        />
 
         <div className="overflow-hidden rounded-xl border border-slate-700">
           <div id="map" style={{ height: 280 }} />

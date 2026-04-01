@@ -2,34 +2,16 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-
-    <!-- ✅ IMPORTANT: prevent Google auto DOM changes -->
-    <meta name="google" content="notranslate" />
-
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <!-- ✅ GTranslate config -->
-    <script>
-      window.gtranslateSettings = {
-        default_language: "en",
-        languages: ["en", "fr", "it", "es", "te", "nl", "hi"],
-        wrapper_selector: ".gtranslate_wrapper"
-      };
-    </script>
-
-    <script src="https://cdn.gtranslate.net/widgets/latest/float.js" defer></script>
-
+<script>window.gtranslateSettings = {"default_language":"en","languages":["en","fr","it","es","te","nl","hi"],"wrapper_selector":".gtranslate_wrapper"}</script>
+<script src="https://cdn.gtranslate.net/widgets/latest/float.js" defer></script>
     <title>frontend</title>
   </head>
 
   <body>
-    <!-- ✅ Translator button -->
     <div class="gtranslate_wrapper"></div>
-
-    <!-- 🚨 CRITICAL FIX -->
-    <div id="root" translate="no"></div>
-
+    <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

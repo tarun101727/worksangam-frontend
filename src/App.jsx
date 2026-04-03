@@ -65,6 +65,7 @@ import BuyCredits from "./BuyCredits";
 import { urlBase64ToUint8Array } from "./utils/push";
 import JobDetails from "./JobPost/JobDetails";
 import EditJob from "./JobPost/EditJob";
+import LanguageSelect from "./LanguageSelect";
 
 const getImageUrl = (img) => {
   if (!img) return "";
@@ -508,7 +509,7 @@ d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03
       {/* ROUTES */}
 <div>
       <Routes>
-        <Route path="/" element={<Navigate to="/signup" replace />} />
+        <Route path="/" element={<LanguageSelect />} />
 
         <Route
           path="/signup"

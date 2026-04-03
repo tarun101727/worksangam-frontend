@@ -1,0 +1,38 @@
+{
+    "translation": {
+      "login": "Login",
+      "comment": "Comment",
+      "signUp": "Sign up",
+
+      "guilds": "GUILDS",
+      "getStarted": "Get started in seconds — create an account or explore as a guest.",
+
+      "continueAsGuest": "Continue as Guest",
+      "alreadyAccount": "Already have an account?",
+      "termsText": "By continuing, you agree to our Terms of Service and Privacy Policy.",
+
+      "createAccount": "Create your account",
+      "choosePlatform": "Choose how you want to use the platform",
+
+      "worker": "Worker",
+      "workerDesc": "Offer your services, set your price, get hired nearby",
+
+      "hirer": "Hirer",
+      "hirerDesc": "Find trusted, top-rated workers near you",
+
+      "welcomeBack": "Welcome Back",
+      "email": "Email",
+      "password": "Password",
+      "forgotPassword": "Having trouble? Forgot Password?",
+
+      "hireWorkers": "Hire Skilled Workers Easily",
+      "hireDesc": "Create a hirer account to post jobs and hire trusted workers.",
+
+      "confirmPassword": "Confirm Password",
+      "continueAsHirer": "Continue as Hirer",
+
+      "findWork": "Find Work & Get Hired Near You",
+      "workerDesc2": "Create a worker account to offer your skills and get hired nearby.",
+      "continueAsWorker": "Continue as Worker"
+    }
+}

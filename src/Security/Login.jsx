@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../config";
 import { useAuth } from "../useAuth";
+import { useTranslation } from "react-i18next";
+
+
 
 /* =======================
    Eye Icon
@@ -50,11 +54,13 @@ const EyeIcon = ({ open }) =>
 
 const Login = () => {
   const { setIsAuthenticated, setUser } = useAuth();
+  const navigate = useNavigate();
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const { t } = useTranslation();
 
   /* =======================
      STYLES
@@ -95,27 +101,20 @@ const Login = () => {
 
       const user = res.data.user;
 
-      // Update auth state (optional but good)
       setIsAuthenticated(true);
       setUser(user);
 
-      /* =======================
-         FULL PAGE REFRESH LOGIC
-      ======================= */
-
       if (user.onboardingStep === "employee_profile") {
-        window.location.href = "/signup/employee";
+        navigate("/signup/employee", { replace: true });
         return;
       }
 
       if (user.onboardingStep === "hirer_profile") {
-        window.location.href = "/signup/hirer";
+        navigate("/signup/hirer", { replace: true });
         return;
       }
 
-      // Default redirect
-      window.location.href = "/home";
-
+      navigate("/home", { replace: true });
     } catch (err) {
       setError(err.response?.data?.msg || "Login failed");
     } finally {
@@ -142,7 +141,7 @@ const Login = () => {
           /* MOBILE */
           bg-transparent shadow-none border-none backdrop-blur-0 mt-4
 
-          /* DESKTOP */
+          /* DESKTOP (UNCHANGED) */
           sm:bg-[#0F172A]/90
           sm:backdrop-blur-2xl
           sm:border sm:border-white/10
@@ -150,11 +149,11 @@ const Login = () => {
         "
       >
         <h2 className="text-3xl font-extrabold text-center text-white mb-6">
-          Welcome Back
+          {t("Welcome Back")}
         </h2>
 
         {error && (
-          <p className="text-red-400 text-center mb-4">{error}</p>
+          <p className="text-red-400 text-center mb-4">{t("error")}</p>
         )}
 
         <input
@@ -162,7 +161,7 @@ const Login = () => {
           name="email"
           value={form.email}
           onChange={handleInputChange}
-          placeholder="Email"
+          placeholder={t("Email")}
           className={inputBase}
         />
 
@@ -172,7 +171,7 @@ const Login = () => {
             name="password"
             value={form.password}
             onChange={handleInputChange}
-            placeholder="Password"
+            placeholder={t("Password")}
             className={`${inputBase} pr-12`}
           />
           <button
@@ -189,16 +188,16 @@ const Login = () => {
           disabled={loading}
           className={`${buttonPrimary} mt-6`}
         >
-          {loading ? "Logging in..." : "Login"}
+          {loading ? t("Logging in...") : t("Login")}
         </button>
 
         <div className="text-center mt-4 text-white/60">
-          <span className="mr-1">Having trouble?</span>
+          <span className="mr-1">{t("Having trouble?")}</span>
           <a
             href="/forgot-password"
             className="text-[#818CF8] hover:underline"
           >
-            Forgot Password?
+            {t("Forgot Password?")}
           </a>
         </div>
       </div>

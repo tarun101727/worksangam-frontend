@@ -248,7 +248,7 @@ const SignupEmail = () => {
               disabled={loading}
             >
               {loading
-                ? "Sending OTP..."
+                ? t("Sending OTP...")
                 : role === "hirer"
                 ? t("Continue as Hirer")
                 : t("Continue as Worker")}

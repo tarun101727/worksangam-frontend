@@ -195,7 +195,7 @@ const SignupEmail = () => {
           <div className="space-y-4">
             <input
               className={inputBase}
-              placeholder="Email"
+              placeholder={t("Email")}
               onChange={(e) =>
                 setForm({ ...form, email: e.target.value })
               }
@@ -205,7 +205,7 @@ const SignupEmail = () => {
               <input
                 type={showPassword ? "text" : "password"}
                 className={`${inputBase} pr-12`}
-                placeholder="Password"
+                placeholder={t("Password")}
                 onChange={(e) =>
                   setForm({ ...form, password: e.target.value })
                 }
@@ -223,7 +223,7 @@ const SignupEmail = () => {
               <input
                 type={showConfirmPassword ? "text" : "password"}
                 className={`${inputBase} pr-12`}
-                placeholder="Confirm Password"
+                placeholder={t("Confirm Password")}
                 onChange={(e) =>
                   setForm({
                     ...form,
@@ -260,7 +260,7 @@ const SignupEmail = () => {
           <div className="space-y-4">
             <input
               className={inputBase}
-              placeholder="Enter OTP"
+              placeholder={t("Enter OTP")}
               onChange={(e) =>
                 setForm({ ...form, otp: e.target.value })
               }

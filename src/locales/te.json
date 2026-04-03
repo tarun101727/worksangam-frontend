@@ -30,5 +30,16 @@
   "Having trouble?" : "ఇబ్బంది పడుతున్నారా?",
   "Forgot Password?" : "పాస్‌వర్డ్ మర్చిపోయారా?",
   "Logging in..." : "లాగిన్ అవుతోంది...",
-  "error" : "లోపం"
+  "error" : "లోపం",
+  "Forgot Password" : "పాస్‌వర్డ్ మర్చిపోయారా?",
+  "Password reset successfully" : "పాస్‌వర్డ్ విజయవంతంగా రీసెట్ చేయబడింది",
+  "OTP verified successfully" : "OTP విజయవంతంగా ధృవీకరించబడింది",
+  "OTP sent to your email" : "మీ ఇమెయిల్‌కు పంపబడిన OTP",
+  "Sending OTP..." : "OTP పంపబడుతోంది...",
+  "Send OTP" : "OTPని పంపండి",
+  "Enter OTP" : "OTPని నమోదు చేయండి",
+  "verifyOtp" : "Otpని ధృవీకరించండి",
+  "New Password" : "కొత్త పాస్‌వర్డ్",
+  "Saving Password..." : "పాస్‌వర్డ్ సేవ్ అవుతోంది...",
+  "Save Password" : "పాస్‌వర్డ్‌ను సేవ్ చేయండి"
 }

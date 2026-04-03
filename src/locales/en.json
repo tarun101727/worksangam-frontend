@@ -1,5 +1,4 @@
 {
-    "translation": {
       "login": "Login",
       "comment": "Comment",
       "signUp": "Sign up",
@@ -35,4 +34,3 @@
       "workerDesc2": "Create a worker account to offer your skills and get hired nearby.",
       "continueAsWorker": "Continue as Worker"
     }
-}

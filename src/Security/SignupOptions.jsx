@@ -2,10 +2,14 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BASE_URL } from "../config";
 import { useAuth } from "../useAuth.js";
+import { useTranslation } from "react-i18next";
+
+
 
 const SignupOptions = () => {
   const navigate = useNavigate();
   const { setIsAuthenticated, setUser } = useAuth();
+  const { t } = useTranslation();
 
   const continueAsGuest = async () => {
     const res = await axios.post(
@@ -82,7 +86,7 @@ const SignupOptions = () => {
 <h1
   className="text-4xl font-bold tracking-wide text-white mb-3 mt-8 lg:mt-0"
 >
-  GUILDS
+  {t("guilds")}
 </h1>
 
         <p className="text-sm text-white/70 mb-10 leading-relaxed px-2 lg:px-0">

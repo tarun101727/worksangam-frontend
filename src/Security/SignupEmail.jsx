@@ -74,12 +74,6 @@ const SignupEmail = () => {
   const isValidEmail = (email) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  const [translated, setTranslated] = useState({
-  email: "",
-  password: "",
-  confirmPassword: "",
-});
-
   /* =======================
      STYLES
   ======================= */
@@ -158,21 +152,6 @@ const SignupEmail = () => {
       setLoading(false);
     }
   };
-  
-  const translateInput = async (text) => {
-  try {
-    const res = await axios.post(`${BASE_URL}/api/auth/translate`, {
-      text,
-      target: "te", // Telugu (change dynamically later)
-    });
-
-    return res.data.translated;
-  } catch (err) {
-    console.error("Translate error:", err);
-    return text;
-  }
-};
-
 
   return (
     <div className="min-h-screen flex justify-start md:items-center justify-center px-4 pt-6 md:pt-0">
@@ -215,44 +194,22 @@ const SignupEmail = () => {
         {step === 1 && (
           <div className="space-y-4">
             <input
-  className={inputBase}
-  placeholder={t("Email")}
-  onChange={async (e) => {
-    const value = e.target.value;
-
-    setForm({ ...form, email: value });
-
-    const tValue = await translateInput(value);
-    setTranslated((prev) => ({ ...prev, email: tValue }));
-  }}
-/>
-
-{translated.email && (
-  <p className="text-xs text-green-400 mt-1">
-    {translated.email}
-  </p>
-)}
+              className={inputBase}
+              placeholder={t("Email")}
+              onChange={(e) =>
+                setForm({ ...form, email: e.target.value })
+              }
+            />
 
             <div className="relative">
               <input
-  type={showPassword ? "text" : "password"}
-  className={`${inputBase} pr-12`}
-  placeholder={t("Password")}
-  onChange={async (e) => {
-    const value = e.target.value;
-
-    setForm({ ...form, password: value });
-
-    const tValue = await translateInput(value);
-    setTranslated((prev) => ({ ...prev, password: tValue }));
-  }}
-/>
-
-{translated.password && (
-  <p className="text-xs text-green-400 mt-1">
-    {translated.password}
-  </p>
-)}
+                type={showPassword ? "text" : "password"}
+                className={`${inputBase} pr-12`}
+                placeholder={t("Password")}
+                onChange={(e) =>
+                  setForm({ ...form, password: e.target.value })
+                }
+              />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
@@ -264,30 +221,16 @@ const SignupEmail = () => {
 
             <div className="relative">
               <input
-  type={showConfirmPassword ? "text" : "password"}
-  className={`${inputBase} pr-12`}
-  placeholder={t("Confirm Password")}
-  onChange={async (e) => {
-    const value = e.target.value;
-
-    setForm({
-      ...form,
-      confirmPassword: value,
-    });
-
-    const tValue = await translateInput(value);
-    setTranslated((prev) => ({
-      ...prev,
-      confirmPassword: tValue,
-    }));
-  }}
-/>
-
-{translated.confirmPassword && (
-  <p className="text-xs text-green-400 mt-1">
-    {translated.confirmPassword}
-  </p>
-)}
+                type={showConfirmPassword ? "text" : "password"}
+                className={`${inputBase} pr-12`}
+                placeholder={t("Confirm Password")}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    confirmPassword: e.target.value,
+                  })
+                }
+              />
               <button
                 type="button"
                 onClick={() =>

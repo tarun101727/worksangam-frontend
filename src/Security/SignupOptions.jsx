@@ -86,11 +86,11 @@ const SignupOptions = () => {
 <h1
   className="text-4xl font-bold tracking-wide text-white mb-3 mt-8 lg:mt-0"
 >
-  {t("worksangam")}
+  {t("WORKSANGAM")}
 </h1>
 
         <p className="text-sm text-white/70 mb-10 leading-relaxed px-2 lg:px-0">
-          {t("Get started in seconds — create an account or explore as a guest.")}
+          {t("Get started in seconds")} — {t("create an account or explore as a guest")}.
         </p>
 
         {/* Actions */}

@@ -86,11 +86,11 @@ const SignupOptions = () => {
 <h1
   className="text-4xl font-bold tracking-wide text-white mb-3 mt-8 lg:mt-0"
 >
-  {t("guilds")}
+  {t("WORKSANGAM")}
 </h1>
 
         <p className="text-sm text-white/70 mb-10 leading-relaxed px-2 lg:px-0">
-          Get started in seconds — create an account or explore as a guest.
+          {t("Get started in seconds — create an account or explore as a guest.")}
         </p>
 
         {/* Actions */}
@@ -99,20 +99,20 @@ const SignupOptions = () => {
             onClick={() => navigate("/signup/role")}
             className={buttonPrimary}
           >
-            Sign up
+            {t("Sign up")}
           </button>
 
           <button
             onClick={continueAsGuest}
             className={buttonSecondary}
           >
-            Continue as Guest
+            {t("Continue as Guest")}
           </button>
 
           <div className="flex items-center gap-3">
             <div className="flex-1 h-px bg-white/10" />
             <span className="text-xs text-white/50 uppercase tracking-wider">
-              Already have an account?
+              {t("Already have an account?")}
             </span>
             <div className="flex-1 h-px bg-white/10" />
           </div>
@@ -121,25 +121,25 @@ const SignupOptions = () => {
             onClick={() => navigate("/login")}
             className={buttonOutline}
           >
-            Login
+            {t("Login")}
           </button>
         </div>
 
         {/* Terms */}
         <p className="mt-10 text-[11px] text-white/50 leading-relaxed px-3 lg:px-0">
-          By continuing, you agree to our{" "}
+          {t("By continuing, you agree to our")}{" "}
           <button
             onClick={() => navigate("/terms")}
             className="text-[#818CF8] hover:underline underline-offset-2 transition"
           >
-            Terms of Service
+            {t("Terms of Service")}
           </button>{" "}
-          and{" "}
+          {t("and")}{" "}
           <button
             onClick={() => navigate("/privacy")}
             className="text-[#818CF8] hover:underline underline-offset-2 transition"
           >
-            Privacy Policy
+            {t("Privacy Policy")}
           </button>
           .
         </p>

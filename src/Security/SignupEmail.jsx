@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
 import { useNavigate, useLocation } from "react-router-dom";
-
+import { useTranslation } from "react-i18next";
 /* =======================
    EYE ICON
 ======================= */
@@ -70,7 +70,7 @@ const SignupEmail = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+  const { t } = useTranslation();
   const isValidEmail = (email) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -168,24 +168,24 @@ const SignupEmail = () => {
         {/* ROLE BADGE */}
         <div className="flex justify-center mb-4">
           <span className="px-4 py-1 text-xs font-semibold rounded-full bg-[#6366F1]/20 text-[#818CF8]">
-            {role === "hirer" ? "FOR HIRERS" : "FOR WORKERS"}
+            {role === "hirer" ? t("FOR HIRERS") : t("FOR WORKERS")}
           </span>
         </div>
 
         <h2 className="text-2xl md:text-3xl font-extrabold text-center text-white mb-3">
           {role === "hirer"
-            ? "Hire Skilled Workers Easily"
-            : "Find Work & Get Hired Near You"}
+            ? t("Hire Skilled Workers Easily")
+            : t("Find Work & Get Hired Near You")}
         </h2>
 
         <p className="text-sm md:text-base text-white/60 text-center mb-8">
           {role === "hirer"
-            ? "Create a hirer account to post jobs and hire trusted workers."
-            : "Create a worker account to offer your skills and get hired nearby."}
+            ? t("Create a hirer account to post jobs and hire trusted workers.")
+            : t("Create a worker account to offer your skills and get hired nearby.")}
         </p>
 
         {message && (
-          <p className="text-green-400 text-center mb-3">{message}</p>
+          <p className="text-green-400 text-center mb-3">{t("message")}</p>
         )}
         {error && (
           <p className="text-red-400 text-center mb-3">{error}</p>
@@ -250,8 +250,8 @@ const SignupEmail = () => {
               {loading
                 ? "Sending OTP..."
                 : role === "hirer"
-                ? "Continue as Hirer"
-                : "Continue as Worker"}
+                ? t("Continue as Hirer")
+                : t("Continue as Worker")}
             </button>
           </div>
         )}
@@ -271,7 +271,7 @@ const SignupEmail = () => {
               className={buttonPrimary}
               disabled={loading}
             >
-              {loading ? "Verifying..." : "Verify & Continue"}
+              {loading ? t("Verifying...") : t("Verify & Continue")}
             </button>
           </div>
         )}

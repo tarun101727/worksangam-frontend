@@ -1,8 +1,10 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
 
 const SignupRole = () => {
   const navigate = useNavigate();
-
+const { t } = useTranslation();
   const roleCard =
     "w-full p-5 rounded-2xl text-left text-white " +
     "bg-[#111827] border border-white/10 " +
@@ -37,11 +39,11 @@ const SignupRole = () => {
         "
       >
         <h2 className="text-3xl font-bold text-white mb-2">
-          Create your account
+          {t("Create your account")}
         </h2>
 
         <p className="text-white/70 mb-8">
-          Choose how you want to use the platform
+          {t("Choose how you want to use the platform")}
         </p>
 
         {/* Worker */}
@@ -51,9 +53,9 @@ const SignupRole = () => {
             navigate("/signup/Email", { state: { role: "employee" } })
           }
         >
-          <h3 className="text-xl font-semibold">👷 Worker</h3>
+          <h3 className="text-xl font-semibold">{t("👷 Worker")}</h3>
           <p className="text-sm mt-1 text-white/70">
-            Offer your services, set your price, get hired nearby
+            {t("Offer your services, set your price, get hired nearby")}
           </p>
         </div>
 
@@ -64,9 +66,9 @@ const SignupRole = () => {
             navigate("/signup/Email", { state: { role: "hirer" } })
           }
         >
-          <h3 className="text-xl font-semibold">🧑‍💼 Hirer</h3>
+          <h3 className="text-xl font-semibold">🧑‍💼 {t("Hirer")}</h3>
           <p className="text-sm mt-1 text-white/70">
-            Find trusted, top-rated workers near you
+            {t("Find trusted, top-rated workers near you")}
           </p>
         </div>
       </div>

@@ -1,13 +1,22 @@
 {
-      "WORKSANGAM" : "కార్యసంఘం",
-      "Get started in seconds" : "సెకన్లలో ప్రారంభించండి",
-      "create an account or explore as a guest" : "ఖాతాను సృష్టించండి లేదా అతిథిగా అన్వేషించండి",
-      "Sign up" :"సైన్ అప్ చేయండి",
-      "Continue as Guest" :"అతిథిగా కొనసాగండి",
-      "Already have an account?" :"మీకు ఇప్పటికే ఖాతా ఉందా?",
-      "Login" :"లాగిన్ చేయండి",
-      "Terms of Service" :"సేవా నిబంధనలు",
-      "and" :"మరియు",
-      "Privacy Policy" :"గోప్యతా విధానం",
-      "By continuing, you agree to our" : "కొనసాగించడం ద్వారా, మీరు మా నిబంధనలకు అంగీకరిస్తున్నారు."
-    }
+  "WORKSANGAM": "కార్యసంఘం",
+  "Get started in seconds": "సెకన్లలో ప్రారంభించండి",
+  "create an account or explore as a guest": "ఖాతాను సృష్టించండి లేదా అతిథిగా అన్వేషించండి",
+  "Sign up": "సైన్ అప్ చేయండి",
+  "Continue as Guest": "అతిథిగా కొనసాగండి",
+  "Already have an account?": "మీకు ఇప్పటికే ఖాతా ఉందా?",
+  "Login": "లాగిన్ చేయండి",
+  "Terms of Service": "సేవా నిబంధనలు",
+  "and": "మరియు",
+  "Privacy Policy": "గోప్యతా విధానం",
+  "By continuing, you agree to our": "కొనసాగించడం ద్వారా, మీరు మా నిబంధనలకు అంగీకరిస్తున్నారు.",
+
+  "Create your account": "మీ ఖాతాను సృష్టించండి",
+  "Choose how you want to use the platform": "మీరు ప్లాట్‌ఫారమ్‌ను ఎలా ఉపయోగించాలనుకుంటున్నారు ఎంచుకోండి",
+
+  "Worker": "కార్మికుడు",
+  "Offer your services, set your price, get hired nearby": "మీ సేవలను అందించండి, మీ ధరను నిర్ణయించండి, సమీపంలో ఉద్యోగాలు పొందండి",
+
+  "Hirer": "నియామకుడు",
+  "Find trusted, top-rated workers near you": "మీ సమీపంలో నమ్మకమైన, అత్యుత్తమ రేటింగ్ కలిగిన కార్మికులను కనుగొనండి"
+}

@@ -53,7 +53,7 @@ const { t } = useTranslation();
             navigate("/signup/Email", { state: { role: "employee" } })
           }
         >
-          <h3 className="text-xl font-semibold">{t("👷 Worker")}</h3>
+          <h3 className="text-xl font-semibold">👷{t("Worker")}</h3>
           <p className="text-sm mt-1 text-white/70">
             {t("Offer your services, set your price, get hired nearby")}
           </p>

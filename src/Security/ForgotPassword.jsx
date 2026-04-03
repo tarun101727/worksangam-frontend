@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
 import { useNavigate } from "react-router-dom";
-
+import { useTranslation } from "react-i18next";
 /* =======================
    EYE ICON (MATCHED THEME)
 ======================= */
@@ -65,7 +65,7 @@ const ForgotPassword = () => {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+  const { t } = useTranslation();
   /* =======================
      STYLES (GLOBAL AUTH THEME)
   ======================= */
@@ -173,19 +173,19 @@ const ForgotPassword = () => {
                    transition-all duration-500"
       >
         <h2 className="text-3xl font-bold text-center mb-6 text-white">
-          Forgot Password
+         {t("Forgot Password")}
         </h2>
 
         {message && (
-          <p className="text-green-400 text-center mb-4">{message}</p>
+          <p className="text-green-400 text-center mb-4">{t("message")}</p>
         )}
         {error && (
-          <p className="text-red-400 text-center mb-4">{error}</p>
+          <p className="text-red-400 text-center mb-4">{t("error")}</p>
         )}
 
         <input
           type="email"
-          placeholder="Email"
+          placeholder={t("Email")}
           className={inputBase}
           value={form.email}
           onChange={(e) =>
@@ -199,14 +199,14 @@ const ForgotPassword = () => {
             disabled={loading}
             className={`${buttonPrimary} mt-5`}
           >
-            {loading ? "Sending OTP..." : "Send OTP"}
+            {loading ? t("Sending OTP...") : t("Send OTP")}
           </button>
         )}
 
         {otpSent && (
           <>
             <input
-              placeholder="Enter OTP"
+              placeholder={t("Enter OTP")}
               className={`${inputBase} mt-4`}
               value={form.otp}
               onChange={(e) =>
@@ -231,7 +231,7 @@ const ForgotPassword = () => {
             <div className="relative mt-4">
               <input
                 type={showPassword ? "text" : "password"}
-                placeholder="New Password"
+                placeholder={t("New Password")}
                 className={`${inputBase} pr-12`}
                 value={form.newPassword}
                 onChange={(e) =>
@@ -253,7 +253,7 @@ const ForgotPassword = () => {
             <div className="relative mt-3">
               <input
                 type={showConfirmPassword ? "text" : "password"}
-                placeholder="Confirm Password"
+                placeholder={t("Confirm Password")}
                 className={`${inputBase} pr-12`}
                 value={form.confirmNewPassword}
                 onChange={(e) =>
@@ -279,7 +279,7 @@ const ForgotPassword = () => {
               disabled={loading}
               className={`${buttonPrimary} mt-5`}
             >
-              {loading ? "Saving Password..." : "Save Password"}
+              {loading ? t("Saving Password...") : t("Save Password")}
             </button>
           </>
         )}

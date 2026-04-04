@@ -32,7 +32,7 @@ const profileFile = location.state?.file || null;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { t } = useTranslation();
-
+const [translated, setTranslated] = useState({});
   /* =======================
      VALIDATION
   ======================= */
@@ -105,26 +105,25 @@ const profileFile = location.state?.file || null;
   const buttonPrimary =
     "w-full py-3 rounded-xl font-semibold text-white bg-[#6366F1] disabled:opacity-50";
 
-
-    let timer;
-
 const translateInput = async (text, field) => {
   try {
-    const currentLang = i18n.language || "en"; // 🔥 dynamic
+    const currentLang = i18n.language || "en";
 
     const res = await axios.post(`${BASE_URL}/api/auth/translate`, {
       text,
       target: currentLang,
     });
 
-    setForm((prev) => ({
+    setTranslated((prev) => ({
       ...prev,
-      [field]: res.data.translated,
+      [field]: res.data.translated, // ✅ store separately
     }));
   } catch (err) {
     console.error("Translation error", err);
   }
 };
+
+let timer;
 
 const handleChange = (value, field) => {
   setForm((prev) => ({ ...prev, [field]: value }));
@@ -132,10 +131,10 @@ const handleChange = (value, field) => {
   clearTimeout(timer);
 
   timer = setTimeout(() => {
-    if (value.length >= 2) {
+    if (value.trim().length >= 3) {
       translateInput(value, field);
     }
-  }, 600); // ⏳ debounce
+  }, 1500); // ✅ increased delay
 };
 
   return (
@@ -179,12 +178,18 @@ const handleChange = (value, field) => {
           </div>
         </div>
 
-       <input
+      <input
   placeholder={t("First Name")}
   value={form.firstName}
   onChange={(e) => handleChange(e.target.value, "firstName")}
   className={inputBase}
 />
+
+{translated.firstName && (
+  <p className="text-sm text-gray-400 mt-1">
+    {translated.firstName}
+  </p>
+)}
 
        <input
   placeholder={t("Last Name")}

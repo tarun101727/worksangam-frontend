@@ -4,6 +4,8 @@ import { BASE_URL } from "../config";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../useAuth.js";
 import { Listbox, Transition } from "@headlessui/react";
+import { useTranslation } from "react-i18next";
+
 
 /* =======================
    CONSTANTS & VALIDATION
@@ -29,6 +31,7 @@ const HirerSignup = () => {
 const profileFile = location.state?.file || null;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { t } = useTranslation();
 
   /* =======================
      VALIDATION
@@ -114,7 +117,8 @@ const profileFile = location.state?.file || null;
         "
       >
         <h2 className="text-3xl font-bold text-center text-white mb-6">
-          Complete Your Profile
+          
+          {t("Complete Your Profile")}
         </h2>
 
         {error && <p className="text-red-400 text-center mb-4">{error}</p>}
@@ -137,14 +141,14 @@ const profileFile = location.state?.file || null;
                 className="w-full h-full object-cover rounded-full"
               />
             ) : (
-              <span className="text-white/60 text-sm">Add Photo</span>
+              <span className="text-white/60 text-sm">{t("Add Photo")}</span>
             )}
           </div>
         </div>
 
         {/* FIRST NAME */}
         <input
-          placeholder="First Name"
+          placeholder={t("First Name")}
           value={form.firstName}
           onChange={(e) =>
             setForm({
@@ -157,7 +161,7 @@ const profileFile = location.state?.file || null;
 
         {/* LAST NAME */}
         <input
-          placeholder="Last Name"
+          placeholder={t("Last Name")}
           value={form.lastName}
           onChange={(e) =>
             setForm({
@@ -173,7 +177,7 @@ const profileFile = location.state?.file || null;
           type="number"
           min="18"
           max="100"
-          placeholder="Age"
+          placeholder={t("Age")}
           value={form.age}
           onChange={(e) => setForm({ ...form, age: e.target.value })}
           className={`${inputBase} mt-4`}
@@ -225,7 +229,7 @@ const profileFile = location.state?.file || null;
           disabled={loading}
           className={`${buttonPrimary} mt-6`}
         >
-          {loading ? "Creating..." : "Create Account"}
+          {loading ? t("Creating...") : t("Create Account")}
         </button>
       </div>
     </div>

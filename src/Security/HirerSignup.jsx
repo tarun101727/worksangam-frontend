@@ -106,16 +106,20 @@ const profileFile = location.state?.file || null;
     "w-full py-3 rounded-xl font-semibold text-white bg-[#6366F1] disabled:opacity-50";
 
 
-    let timer;
+  let timer;
+let latestRequestId = 0; // 🔥 track latest request
 
-const translateInput = async (text, field) => {
+const translateInput = async (text, field, requestId) => {
   try {
-    const currentLang = i18n.language || "en"; // 🔥 dynamic
+    const currentLang = i18n.language || "en";
 
     const res = await axios.post(`${BASE_URL}/api/auth/translate`, {
       text,
       target: currentLang,
     });
+
+    // ❌ Ignore if this is not latest request
+    if (requestId !== latestRequestId) return;
 
     setForm((prev) => ({
       ...prev,
@@ -133,9 +137,12 @@ const handleChange = (value, field) => {
 
   timer = setTimeout(() => {
     if (value.length >= 2) {
-      translateInput(value, field);
+      latestRequestId++; // 🔥 increment request id
+      const currentId = latestRequestId;
+
+      translateInput(value, field, currentId);
     }
-  }, 600); // ⏳ debounce
+  }, 600);
 };
 
   return (

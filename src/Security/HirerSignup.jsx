@@ -11,7 +11,7 @@ import i18n from "../i18n.js";
    CONSTANTS & VALIDATION
 ======================= */
 const GENDERS = ["Male", "Female", "Other"];
-const NAME_REGEX = /^[\p{L} ]{2,30}$/u;
+const NAME_REGEX = /^[\p{L}]{2,30}$/u;
 const MIN_AGE = 18;
 const MAX_AGE = 100;
 

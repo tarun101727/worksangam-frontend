@@ -135,7 +135,7 @@ const handleChange = (value, field) => {
     if (value.length >= 2) {
       translateInput(value, field);
     }
-  }, 600); // ⏳ debounce
+  }, 6000); // ⏳ debounce
 };
 
   return (

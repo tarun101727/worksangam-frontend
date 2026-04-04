@@ -27,10 +27,6 @@ const HirerSignup = () => {
     age: "",
     gender: "",
   });
-  const [suggestions, setSuggestions] = useState({
-  firstName: [],
-  lastName: [],
-});
 
   const profileImage = location.state?.profileImage || null;
 const profileFile = location.state?.file || null;
@@ -115,18 +111,16 @@ const profileFile = location.state?.file || null;
 
 const translateInput = async (text, field) => {
   try {
-    const currentLang = i18n.language || "en";
+    const currentLang = i18n.language || "en"; // 🔥 dynamic
 
     const res = await axios.post(`${BASE_URL}/api/auth/translate`, {
       text,
       target: currentLang,
     });
 
-    // 🔥 DON'T auto replace input anymore
-    // Instead store suggestions
-    setSuggestions((prev) => ({
+    setForm((prev) => ({
       ...prev,
-      [field]: res.data.alternatives || [],
+      [field]: res.data.translated,
     }));
   } catch (err) {
     console.error("Translation error", err);
@@ -141,12 +135,9 @@ const handleChange = (value, field) => {
   timer = setTimeout(() => {
     if (value.length >= 2) {
       translateInput(value, field);
-    } else {
-      setSuggestions((prev) => ({ ...prev, [field]: [] }));
     }
-  }, 600);
+  }, 600); // ⏳ debounce
 };
-
 
   return (
     <div className="min-h-screen flex items-start md:items-center justify-center px-4 pt-6 md:pt-0">
@@ -189,55 +180,19 @@ const handleChange = (value, field) => {
           </div>
         </div>
 
-      <input
+       <input
   placeholder={t("First Name")}
   value={form.firstName}
   onChange={(e) => handleChange(e.target.value, "firstName")}
   className={inputBase}
 />
 
-{/* 🔥 Suggestions */}
-{suggestions.firstName.length > 0 && (
-  <div className="flex flex-wrap gap-2 mt-2">
-    {suggestions.firstName.map((word, i) => (
-      <button
-        key={i}
-        type="button"
-        onClick={() =>
-          setForm((prev) => ({ ...prev, firstName: word }))
-        }
-        className="px-3 py-1 text-sm bg-[#1F2937] text-white rounded-lg hover:bg-[#6366F1]"
-      >
-        {word}
-      </button>
-    ))}
-  </div>
-)}
-
-     <input
+       <input
   placeholder={t("Last Name")}
   value={form.lastName}
   onChange={(e) => handleChange(e.target.value, "lastName")}
   className={`${inputBase} mt-4`}
 />
-
-{/* 🔥 Suggestions */}
-{suggestions.lastName.length > 0 && (
-  <div className="flex flex-wrap gap-2 mt-2">
-    {suggestions.lastName.map((word, i) => (
-      <button
-        key={i}
-        type="button"
-        onClick={() =>
-          setForm((prev) => ({ ...prev, lastName: word }))
-        }
-        className="px-3 py-1 text-sm bg-[#1F2937] text-white rounded-lg hover:bg-[#6366F1]"
-      >
-        {word}
-      </button>
-    ))}
-  </div>
-)}
 
         {/* AGE */}
         <input

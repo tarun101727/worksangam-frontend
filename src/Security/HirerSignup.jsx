@@ -1,3 +1,4 @@
+
 import React, { useState, Fragment } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
@@ -32,7 +33,7 @@ const profileFile = location.state?.file || null;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { t } = useTranslation();
-const [translated, setTranslated] = useState({});
+
   /* =======================
      VALIDATION
   ======================= */
@@ -105,25 +106,26 @@ const [translated, setTranslated] = useState({});
   const buttonPrimary =
     "w-full py-3 rounded-xl font-semibold text-white bg-[#6366F1] disabled:opacity-50";
 
+
+    let timer;
+
 const translateInput = async (text, field) => {
   try {
-    const currentLang = i18n.language || "en";
+    const currentLang = i18n.language || "en"; // 🔥 dynamic
 
     const res = await axios.post(`${BASE_URL}/api/auth/translate`, {
       text,
       target: currentLang,
     });
 
-    setTranslated((prev) => ({
+    setForm((prev) => ({
       ...prev,
-      [field]: res.data.translated, // ✅ store separately
+      [field]: res.data.translated,
     }));
   } catch (err) {
     console.error("Translation error", err);
   }
 };
-
-let timer;
 
 const handleChange = (value, field) => {
   setForm((prev) => ({ ...prev, [field]: value }));
@@ -131,10 +133,10 @@ const handleChange = (value, field) => {
   clearTimeout(timer);
 
   timer = setTimeout(() => {
-    if (value.trim().length >= 3) {
+    if (value.length >= 2) {
       translateInput(value, field);
     }
-  }, 1500); // ✅ increased delay
+  }, 600); // ⏳ debounce
 };
 
   return (
@@ -178,18 +180,12 @@ const handleChange = (value, field) => {
           </div>
         </div>
 
-      <input
+       <input
   placeholder={t("First Name")}
   value={form.firstName}
   onChange={(e) => handleChange(e.target.value, "firstName")}
   className={inputBase}
 />
-
-{translated.firstName && (
-  <p className="text-sm text-gray-400 mt-1">
-    {translated.firstName}
-  </p>
-)}
 
        <input
   placeholder={t("Last Name")}

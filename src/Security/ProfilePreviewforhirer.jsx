@@ -205,7 +205,7 @@ const ProfilePreviewforhirer = () => {
         {/* BUTTON */}
         <button
           onClick={cropAndSave}
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl bg-indigo-500 text-white font-semibold"
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl bg-indigo-500 text-white font-semibold"
         >
           {t("Use This Photo")}
         </button>

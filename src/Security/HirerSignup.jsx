@@ -197,7 +197,7 @@ const profileFile = location.state?.file || null;
               `}
             >
               <Listbox.Button className={`${inputBase} mt-4 text-left`}>
-                {form.gender || "Select Gender"}
+                {form.gender || t("Select Gender")}
               </Listbox.Button>
 
               <Transition as={Fragment}>
@@ -215,7 +215,7 @@ const profileFile = location.state?.file || null;
                       value={g}
                       className="px-4 py-2 cursor-pointer hover:bg-[#6366F1]/20"
                     >
-                      {g}
+                      {t(g)}
                     </Listbox.Option>
                   ))}
                 </Listbox.Options>

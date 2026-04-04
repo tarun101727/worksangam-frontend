@@ -1,9 +1,12 @@
 import React, { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
 
 const ProfileImageforHirer = () => {
   const fileRef = useRef();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleFile = (file) => {
     if (!file) return;
@@ -51,22 +54,22 @@ const ProfileImageforHirer = () => {
         "
       >
         <h2 className="text-2xl font-bold text-white mb-2">
-          Add Profile Photo
+          {t("Add Profile Photo")}
         </h2>
 
         <p className="text-sm text-white/60 mb-8">
-          Choose a photo from gallery or use your camera
+          {t("Choose a photo from gallery or use your camera")}
         </p>
 
         <button
           onClick={() => fileRef.current.click()}
           className={`${buttonPrimary} mb-4`}
         >
-          📁 Choose from Gallery
+          📁 {t("Choose from Gallery")}
         </button>
 
         <button onClick={openCamera} className={buttonSecondary}>
-          📷 Open Camera
+          📷 {t("Open Camera")}
         </button>
 
         <input

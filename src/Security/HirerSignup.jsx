@@ -5,13 +5,13 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../useAuth.js";
 import { Listbox, Transition } from "@headlessui/react";
 import { useTranslation } from "react-i18next";
-
+import i18n from "../i18n.js";
 
 /* =======================
    CONSTANTS & VALIDATION
 ======================= */
 const GENDERS = ["Male", "Female", "Other"];
-const NAME_REGEX = /^[A-Za-z]{2,30}$/;
+const NAME_REGEX = /^[\p{L}]{2,30}$/u;
 const MIN_AGE = 18;
 const MAX_AGE = 100;
 
@@ -105,6 +105,39 @@ const profileFile = location.state?.file || null;
   const buttonPrimary =
     "w-full py-3 rounded-xl font-semibold text-white bg-[#6366F1] disabled:opacity-50";
 
+
+    let timer;
+
+const translateInput = async (text, field) => {
+  try {
+    const currentLang = i18n.language || "en"; // 🔥 dynamic
+
+    const res = await axios.post(`${BASE_URL}/api/auth/translate`, {
+      text,
+      target: currentLang,
+    });
+
+    setForm((prev) => ({
+      ...prev,
+      [field]: res.data.translated,
+    }));
+  } catch (err) {
+    console.error("Translation error", err);
+  }
+};
+
+const handleChange = (value, field) => {
+  setForm((prev) => ({ ...prev, [field]: value }));
+
+  clearTimeout(timer);
+
+  timer = setTimeout(() => {
+    if (value.length >= 2) {
+      translateInput(value, field);
+    }
+  }, 600); // ⏳ debounce
+};
+
   return (
     <div className="min-h-screen flex items-start md:items-center justify-center px-4 pt-6 md:pt-0">
       <div
@@ -146,31 +179,19 @@ const profileFile = location.state?.file || null;
           </div>
         </div>
 
-        {/* FIRST NAME */}
-        <input
-          placeholder={t("First Name")}
-          value={form.firstName}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              firstName: e.target.value.replace(/[^A-Za-z]/g, ""),
-            })
-          }
-          className={inputBase}
-        />
+       <input
+  placeholder={t("First Name")}
+  value={form.firstName}
+  onChange={(e) => handleChange(e.target.value, "firstName")}
+  className={inputBase}
+/>
 
-        {/* LAST NAME */}
-        <input
-          placeholder={t("Last Name")}
-          value={form.lastName}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              lastName: e.target.value.replace(/[^A-Za-z]/g, ""),
-            })
-          }
-          className={`${inputBase} mt-4`}
-        />
+       <input
+  placeholder={t("Last Name")}
+  value={form.lastName}
+  onChange={(e) => handleChange(e.target.value, "lastName")}
+  className={`${inputBase} mt-4`}
+/>
 
         {/* AGE */}
         <input

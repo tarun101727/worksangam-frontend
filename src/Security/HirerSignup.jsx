@@ -1,4 +1,3 @@
-
 import React, { useState, Fragment } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
@@ -106,11 +105,12 @@ const profileFile = location.state?.file || null;
   const buttonPrimary =
     "w-full py-3 rounded-xl font-semibold text-white bg-[#6366F1] disabled:opacity-50";
 
-const translateInput = async (text, field) => {
-  if (!text) return; // do nothing if empty
 
+    let timer;
+
+const translateInput = async (text, field) => {
   try {
-    const currentLang = i18n.language || "en"; // current language
+    const currentLang = i18n.language || "en"; // 🔥 dynamic
 
     const res = await axios.post(`${BASE_URL}/api/auth/translate`, {
       text,
@@ -124,6 +124,18 @@ const translateInput = async (text, field) => {
   } catch (err) {
     console.error("Translation error", err);
   }
+};
+
+const handleChange = (value, field) => {
+  setForm((prev) => ({ ...prev, [field]: value }));
+
+  clearTimeout(timer);
+
+  timer = setTimeout(() => {
+    if (value.length >= 2) {
+      translateInput(value, field);
+    }
+  }, 600); // ⏳ debounce
 };
 
   return (
@@ -167,39 +179,19 @@ const translateInput = async (text, field) => {
           </div>
         </div>
 
-      {/* First Name Input */}
-<div className="flex items-center gap-2 mt-2">
-  <input
-    placeholder={t("First Name")}
-    value={form.firstName}
-    onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-    className={inputBase}
-  />
-  <button
-    type="button"
-    onClick={() => translateInput(form.firstName, "firstName")}
-    className="px-3 py-2 bg-[#6366F1] text-white rounded-xl font-medium"
-  >
-    {t("Translate")}
-  </button>
-</div>
+       <input
+  placeholder={t("First Name")}
+  value={form.firstName}
+  onChange={(e) => handleChange(e.target.value, "firstName")}
+  className={inputBase}
+/>
 
-{/* Last Name Input */}
-<div className="flex items-center gap-2 mt-4">
-  <input
-    placeholder={t("Last Name")}
-    value={form.lastName}
-    onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-    className={inputBase}
-  />
-  <button
-    type="button"
-    onClick={() => translateInput(form.lastName, "lastName")}
-    className="px-3 py-2 bg-[#6366F1] text-white rounded-xl font-medium"
-  >
-    {t("Translate")}
-  </button>
-</div>
+       <input
+  placeholder={t("Last Name")}
+  value={form.lastName}
+  onChange={(e) => handleChange(e.target.value, "lastName")}
+  className={`${inputBase} mt-4`}
+/>
 
         {/* AGE */}
         <input

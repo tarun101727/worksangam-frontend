@@ -218,8 +218,8 @@ const handleChange = (value, field) => {
               `}
             >
               <Listbox.Button className={`${inputBase} mt-4 text-left`}>
-                {form.gender || t("Select Gender")}
-              </Listbox.Button>
+  {form.gender ? t(`gender.${form.gender}`) : t("Select Gender")}
+</Listbox.Button>
 
               <Transition as={Fragment}>
                 <Listbox.Options

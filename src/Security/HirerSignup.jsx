@@ -1,3 +1,4 @@
+
 import React, { useState, Fragment } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
@@ -106,51 +107,36 @@ const profileFile = location.state?.file || null;
     "w-full py-3 rounded-xl font-semibold text-white bg-[#6366F1] disabled:opacity-50";
 
 
-  let typingTimer = null;
-const TYPING_DELAY = 800; // ms debounce for pause
+    let timer;
 
-// Function to call backend translation API
-const translateInput = async (word, field) => {
+const translateInput = async (text, field) => {
   try {
-    const targetLang = i18n.language || "en";
+    const currentLang = i18n.language || "en"; // 🔥 dynamic
 
     const res = await axios.post(`${BASE_URL}/api/auth/translate`, {
-      text: word,
-      target: targetLang,
+      text,
+      target: currentLang,
     });
 
     setForm((prev) => ({
       ...prev,
-      [field]: prev[field].replace(/(\S+)$/, res.data.translated), // replace last word
+      [field]: res.data.translated,
     }));
   } catch (err) {
     console.error("Translation error", err);
   }
 };
 
-// Handle input changes
 const handleChange = (value, field) => {
   setForm((prev) => ({ ...prev, [field]: value }));
 
-  // Clear previous timer
-  clearTimeout(typingTimer);
+  clearTimeout(timer);
 
-  const lastChar = value.slice(-1);
-
-  // Translate on space immediately
-  if (lastChar === " ") {
-    const words = value.trim().split(" ");
-    const lastWord = words[words.length - 1];
-    if (lastWord) translateInput(lastWord, field);
-    return;
-  }
-
-  // Otherwise, wait for pause
-  typingTimer = setTimeout(() => {
-    const words = value.trim().split(" ");
-    const lastWord = words[words.length - 1];
-    if (lastWord && lastWord.length >= 2) translateInput(lastWord, field);
-  }, TYPING_DELAY);
+  timer = setTimeout(() => {
+    if (value.length >= 2) {
+      translateInput(value, field);
+    }
+  }, 600); // ⏳ debounce
 };
 
   return (

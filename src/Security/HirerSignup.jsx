@@ -106,36 +106,51 @@ const profileFile = location.state?.file || null;
     "w-full py-3 rounded-xl font-semibold text-white bg-[#6366F1] disabled:opacity-50";
 
 
-    let timer;
+  let typingTimer = null;
+const TYPING_DELAY = 800; // ms debounce for pause
 
-const translateInput = async (text, field) => {
+// Function to call backend translation API
+const translateInput = async (word, field) => {
   try {
-    const currentLang = i18n.language || "en"; // 🔥 dynamic
+    const targetLang = i18n.language || "en";
 
     const res = await axios.post(`${BASE_URL}/api/auth/translate`, {
-      text,
-      target: currentLang,
+      text: word,
+      target: targetLang,
     });
 
     setForm((prev) => ({
       ...prev,
-      [field]: res.data.translated,
+      [field]: prev[field].replace(/(\S+)$/, res.data.translated), // replace last word
     }));
   } catch (err) {
     console.error("Translation error", err);
   }
 };
 
+// Handle input changes
 const handleChange = (value, field) => {
   setForm((prev) => ({ ...prev, [field]: value }));
 
-  clearTimeout(timer);
+  // Clear previous timer
+  clearTimeout(typingTimer);
 
-  timer = setTimeout(() => {
-    if (value.length >= 2) {
-      translateInput(value, field);
-    }
-  }, 600); // ⏳ debounce
+  const lastChar = value.slice(-1);
+
+  // Translate on space immediately
+  if (lastChar === " ") {
+    const words = value.trim().split(" ");
+    const lastWord = words[words.length - 1];
+    if (lastWord) translateInput(lastWord, field);
+    return;
+  }
+
+  // Otherwise, wait for pause
+  typingTimer = setTimeout(() => {
+    const words = value.trim().split(" ");
+    const lastWord = words[words.length - 1];
+    if (lastWord && lastWord.length >= 2) translateInput(lastWord, field);
+  }, TYPING_DELAY);
 };
 
   return (

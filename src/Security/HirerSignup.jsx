@@ -111,11 +111,13 @@ const profileFile = location.state?.file || null;
 
 const translateInput = async (text, field) => {
   try {
-    const currentLang = i18n.language || "en"; // 🔥 dynamic
+    const currentLang = i18n.language || "en"; // user's selected language
+    const isTransliterate = ["te", "hi", "ta"].includes(currentLang); // apply only to script-based languages
 
     const res = await axios.post(`${BASE_URL}/api/auth/translate`, {
       text,
       target: currentLang,
+      transliterate: isTransliterate, // new param
     });
 
     setForm((prev) => ({

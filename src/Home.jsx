@@ -414,7 +414,7 @@ export default function Home() {
         onClick={() => fetchOfflineJobsByDistance(km)}
         className="px-3 py-1 rounded-xl bg-[#6366F1] text-white hover:bg-[#4f46e5]"
       >
-        {km} km
+        {km} {t("km")}
       </button>
     ))}
   </div>

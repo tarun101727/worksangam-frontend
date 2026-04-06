@@ -1,4 +1,3 @@
-// i18n.js
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import en from "./locales/en.json";
@@ -10,7 +9,9 @@ const fetchLanguage = async (lang) => {
   try {
     const res = await fetch(`${BASE_URL}/api/languages/${lang}`);
     if (!res.ok) return en;
-    return await res.json();
+
+    const translations = await res.json(); // ✅ this will now return the translations object
+    return translations;
   } catch {
     return en;
   }

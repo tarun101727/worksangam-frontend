@@ -110,7 +110,7 @@ const profileFile = location.state?.file || null;
     let timer;
     
     
-    const transliterate = async (value, field) => {
+  const transliterate = async (value, field, isFinal = false) => {
   const currentLang = i18n.language || "en";
 
   const words = value.split(" ");
@@ -127,12 +127,22 @@ const profileFile = location.state?.file || null;
 
     if (data[0] === "SUCCESS") {
       const suggestions = data[1][0][1];
-      const bestMatch = suggestions[0];
 
-      // replace ONLY last word
+      // 🔥 IMPORTANT: choose BEST suggestion intelligently
+      let bestMatch = suggestions[0];
+
+      // Prefer longer & more natural words
+      for (let s of suggestions) {
+        if (s.length >= bestMatch.length) {
+          bestMatch = s;
+        }
+      }
+
       words[words.length - 1] = bestMatch;
 
-      const finalText = words.join(" ");
+      const finalText = isFinal
+        ? words.join(" ") + " "
+        : words.join(" ");
 
       setForm((prev) => ({
         ...prev,
@@ -147,7 +157,7 @@ const profileFile = location.state?.file || null;
 const handleChange = (value, field) => {
   const currentLang = i18n.language || "en";
 
-  // show user typing instantly
+  // show typing instantly
   setForm((prev) => ({
     ...prev,
     [field]: value,
@@ -157,12 +167,14 @@ const handleChange = (value, field) => {
 
   clearTimeout(timer);
 
-  timer = setTimeout(() => {
-    // ONLY run when typing last word
-    if (!value.endsWith(" ")) {
-      transliterate(value, field);
-    }
-  }, 400);
+  // ✅ ONLY trigger when user presses SPACE
+  if (value.endsWith(" ")) {
+    const trimmed = value.trim();
+
+    timer = setTimeout(() => {
+      transliterate(trimmed, field, true);
+    }, 200);
+  }
 };
 
   return (

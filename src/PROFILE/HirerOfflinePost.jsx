@@ -2,11 +2,23 @@ import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import L from "leaflet";
+
+import "leaflet/dist/leaflet.css";
+
+// 🔥 FIX: Leaflet marker icon issue
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+});
+
+
 import { useTranslation } from "react-i18next";
 import { BASE_URL } from "../config";
 import CreateOfflineWorkerPostPage from "./CreateOfflineWorkerPostPage";
 import i18n from "../i18n.js";
-
 
 /* ================= EMPTY FORM ================= */
 const emptyForm = () => ({

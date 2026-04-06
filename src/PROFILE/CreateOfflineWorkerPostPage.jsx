@@ -353,102 +353,107 @@ const filteredProfessions = onlineProfessions.filter((p) =>
         ))}
       </div>
 
-      {/* ================= PRICE ================= */}
-<div className="space-y-3">
-  <p className="text-sm text-slate-400">
-    {t("price_optional")}
-  </p>
-
-  <div className="grid grid-cols-3 gap-3">
-    {standardPriceOptions.map((opt) => (
-      <button
-        key={opt.value ?? t("no-budget")}
-        onClick={() => handleChange("priceType", opt.value)}
-        className={`py-2 rounded-lg text-sm font-semibold ${
-          form.priceType === opt.value
-            ? "bg-indigo-600 text-white"
-            : "bg-slate-800 text-slate-400 border border-slate-700"
-        }`}
-      >
-        {t(opt.label)} {/* IMPORTANT */}
-      </button>
-    ))}
-  </div>
-
-  {form.priceType && (
-    <>
-      {/* Currency */}
-      <select
-        className={inputBase}
-        value={form.currency}
-        onChange={(e) => handleChange("currency", e.target.value)}
-      >
-        {currencies.map((c) => (
-          <option key={c.code} value={c.code}>
-            {c.display}
-          </option>
-        ))}
-      </select>
-
-      {/* FIXED PRICE */}
-      {form.priceType === t("fixed") && (
-        <input
-          type="number"
-          className={inputBase}
-          placeholder={t("fixed_price", { symbol: selectedCurrency?.symbol })}
-          value={form.expectedPrice}
-          onChange={(e) =>
-            handleChange("expectedPrice", e.target.value)
-          }
-        />
-      )}
-
-      {/* HOURLY */}
-      {form.priceType === t("hourly") && (
-        <input
-          type="number"
-          className={inputBase}
-          placeholder={t("hourly_rate", { symbol: selectedCurrency?.symbol })}
-          value={form.expectedPrice}
-          onChange={(e) =>
-            handleChange("expectedPrice", e.target.value)
-          }
-        />
-      )}
-
-      {/* NEGOTIABLE */}
-      {form.priceType === t("negotiable") && (
-        <div className="flex gap-3">
-          <input
-            type="number"
-            className={inputBase}
-            placeholder={t("min_price")}
-            value={form.minPrice}
-            onChange={(e) =>
-              handleChange("minPrice", e.target.value)
-            }
-          />
-          <input
-            type="number"
-            className={inputBase}
-            placeholder={t("max_price")}
-            value={form.maxPrice}
-            onChange={(e) =>
-              handleChange("maxPrice", e.target.value)
-            }
-          />
-        </div>
-      )}
-
-      {/* INSPECT FIRST */}
-      {form.priceType === t("inspect_quote") && (
-        <p className="text-xs text-slate-500">
-          {t("inspect_quote_desc")}
+      
+{/* ================= PRICE ================= */}
+      <div className="space-y-3">
+        <p className="text-sm text-slate-400">
+          {t("Price (optional)")}
         </p>
-      )}
-    </>
-  )}
+
+        <div className="grid grid-cols-3 gap-3">
+  {standardPriceOptions.map((opt) => (
+    <button
+      key={opt.value ?? t("no-budget")}
+      onClick={() =>
+        handleChange("priceType", opt.value)
+      }
+      className={`py-2 rounded-lg text-sm font-semibold ${
+        form.priceType === opt.value
+          ? "bg-indigo-600 text-white"
+          : "bg-slate-800 text-slate-400 border border-slate-700"
+      }`}
+    >
+      {opt.label}
+    </button>
+  ))}
 </div>
+
+        {form.priceType && (
+  <>
+    {/* Currency */}
+    <select
+      className={inputBase}
+      value={form.currency}
+      onChange={(e) =>
+        handleChange("currency", e.target.value)
+      }
+    >
+      {currencies.map((c) => (
+        <option key={c.code} value={c.code}>
+          {c.display}
+        </option>
+      ))}
+    </select>
+
+    {/* FIXED PRICE */}
+    {form.priceType === t("fixed") && (
+      <input
+        type="number"
+        className={inputBase}
+        placeholder={`Fixed price (${selectedCurrency?.symbol})`}
+        value={form.expectedPrice}
+        onChange={(e) =>
+          handleChange("expectedPrice", e.target.value)
+        }
+      />
+    )}
+
+    {/* HOURLY */}
+    {form.priceType === t("hourly") && (
+      <input
+        type="number"
+        className={inputBase}
+        placeholder={`Hourly rate (${selectedCurrency?.symbol}/hr)`}
+        value={form.expectedPrice}
+        onChange={(e) =>
+          handleChange("expectedPrice", e.target.value)
+        }
+      />
+    )}
+
+    {/* NEGOTIABLE */}
+    {form.priceType === t("negotiable") && (
+      <div className="flex gap-3">
+        <input
+          type="number"
+          className={inputBase}
+          placeholder="Min price"
+          value={form.minPrice}
+          onChange={(e) =>
+            handleChange("minPrice", e.target.value)
+          }
+        />
+        <input
+          type="number"
+          className={inputBase}
+          placeholder="Max price"
+          value={form.maxPrice}
+          onChange={(e) =>
+            handleChange("maxPrice", e.target.value)
+          }
+        />
+      </div>
+    )}
+
+    {/* INSPECT FIRST */}
+    {form.priceType === t("inspect_quote") && (
+      <p className="text-xs text-slate-500">
+        💡 The worker will inspect the job and quote the price later.
+      </p>
+    )}
+  </>
+)}
+      </div>
     </>
   );
 };

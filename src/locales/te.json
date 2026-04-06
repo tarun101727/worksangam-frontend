@@ -81,5 +81,12 @@
   "Urgent Offline Post" : "అత్యవసర ఆఫ్‌లైన్ పోస్ట్",
   "Online Posts" : "ఆన్‌లైన్ పోస్ట్‌లు",
   "Online Worker Post" : "ఆన్‌లైన్ వర్కర్ పోస్ట్",
-  "Urgent Online Post" : "అత్యవసర ఆన్‌లైన్ పోస్ట్"
+  "Urgent Online Post" : "అత్యవసర ఆన్‌లైన్ పోస్ట్",
+  "Create Offline Worker Post" : "ఆఫ్‌లైన్ వర్కర్ పోస్ట్‌ను సృష్టించండి",
+  "Post a job for electricians, plumbers, painters, carpenters and other offline workers." : "ఎలక్ట్రీషియన్లు, ప్లంబర్లు, పెయింటర్లు, వడ్రంగిలు మరియు ఇతర ఆఫ్‌లైన్ కార్మికుల కోసం ఉద్యోగ ప్రకటన పోస్ట్ చేయండి.",
+  "Exact Address / Nearby Landmark" : "ఖచ్చితమైన చిరునామా / సమీపంలోని ప్రముఖ ప్రదేశం",
+  "addressDetailsPlaceholder": "ఫ్లాట్ / ఇంటి నంబర్, భవనం పేరు\nవీధి / ప్రాంతం\nసమీప గుర్తింపు స్థలం\nఅంతస్తు, గేట్, లిఫ్ట్, యాక్సెస్ వివరాలు",
+  "Visible only after job acceptance." : "ఉద్యోగం అంగీకరించిన తర్వాత మాత్రమే కనిపిస్తుంది.",
+  "Please wait..." : "దయచేసి వేచి ఉండండి...",
+  "Submit Job Post" : "జాబ్ పోస్ట్‌ను సమర్పించండి"
 }

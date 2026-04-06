@@ -112,19 +112,19 @@ const handleChange = (value, field) => {
   let finalValue = value;
 
   if (currentLang === "te") {
-    finalValue = Sanscript.t(value, "itrans", "telugu");
+    finalValue = Sanscript.t(value, "hk", "telugu");
   }
 
   if (currentLang === "hi") {
-    finalValue = Sanscript.t(value, "itrans", "devanagari");
+    finalValue = Sanscript.t(value, "hk", "devanagari");
   }
 
   if (currentLang === "ta") {
-    finalValue = Sanscript.t(value, "itrans", "tamil");
+    finalValue = Sanscript.t(value, "hk", "tamil");
   }
 
   if (currentLang === "kn") {
-    finalValue = Sanscript.t(value, "itrans", "kannada");
+    finalValue = Sanscript.t(value, "hk", "kannada");
   }
 
   setForm((prev) => ({

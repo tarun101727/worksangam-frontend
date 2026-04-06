@@ -106,31 +106,36 @@ const profileFile = location.state?.file || null;
   const buttonPrimary =
     "w-full py-3 rounded-xl font-semibold text-white bg-[#6366F1] disabled:opacity-50";
 
-const handleChange = (value, field) => {
+const handleChange = async (value, field) => {
   const currentLang = i18n.language || "en";
 
-  let finalValue = value;
-
-  if (currentLang === "te") {
-    finalValue = Sanscript.t(value, "hk", "telugu");
+  // Only apply for Indian languages
+  if (!["te", "hi", "ta", "kn"].includes(currentLang)) {
+    setForm((prev) => ({ ...prev, [field]: value }));
+    return;
   }
 
-  if (currentLang === "hi") {
-    finalValue = Sanscript.t(value, "hk", "devanagari");
-  }
+  try {
+    const res = await fetch(
+      `https://inputtools.google.com/request?text=${value}&itc=${currentLang}-t-i0-und&num=1`
+    );
 
-  if (currentLang === "ta") {
-    finalValue = Sanscript.t(value, "hk", "tamil");
-  }
+    const data = await res.json();
 
-  if (currentLang === "kn") {
-    finalValue = Sanscript.t(value, "hk", "kannada");
-  }
+    if (data[0] === "SUCCESS") {
+      const translated = data[1][0][1][0];
 
-  setForm((prev) => ({
-    ...prev,
-    [field]: finalValue,
-  }));
+      setForm((prev) => ({
+        ...prev,
+        [field]: translated,
+      }));
+    } else {
+      setForm((prev) => ({ ...prev, [field]: value }));
+    }
+  } catch (err) {
+    console.error(err);
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }
 };
 
   return (

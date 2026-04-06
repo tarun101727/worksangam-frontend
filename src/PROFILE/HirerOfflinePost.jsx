@@ -288,8 +288,8 @@ const HirerOfflinePost = () => {
           value={
             form.location.address ||
             (locationLoading
-              ? "Detecting location…"
-              : "Tap to auto-detect your current location")
+              ? t("Detecting location…")
+              : t("Tap to auto-detect your current location"))
           }
         />
 

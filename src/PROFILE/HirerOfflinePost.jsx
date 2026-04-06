@@ -5,6 +5,8 @@ import L from "leaflet";
 import { useTranslation } from "react-i18next";
 import { BASE_URL } from "../config";
 import CreateOfflineWorkerPostPage from "./CreateOfflineWorkerPostPage";
+import i18n from "../i18n.js";
+
 
 /* ================= EMPTY FORM ================= */
 const emptyForm = () => ({
@@ -223,6 +225,78 @@ const HirerOfflinePost = () => {
   }
 };
 
+
+
+let latestRequest = "";
+let timer;
+
+const transliterate = async (value, field) => {
+  const currentLang = i18n.language || "en";
+
+  latestRequest = value;
+
+  const words = value.split(" ");
+  const lastWord = words[words.length - 1];
+
+  if (!lastWord) return;
+
+  try {
+    const res = await fetch(
+      `https://inputtools.google.com/request?text=${lastWord}&itc=${currentLang}-t-i0-und&num=5`
+    );
+
+    const data = await res.json();
+
+    // ❗ Ignore outdated responses
+    if (latestRequest !== value) return;
+
+    if (data[0] === "SUCCESS") {
+      const suggestions = data[1][0][1];
+      const bestMatch = suggestions[0];
+
+      words[words.length - 1] = bestMatch;
+
+      setForm((prev) => ({
+        ...prev,
+        [field]: words.join(" "),
+      }));
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const handleTranslatableChange = (value, field) => {
+  const currentLang = i18n.language || "en";
+
+  // Show raw typing first
+  setForm((prev) => ({
+    ...prev,
+    [field]: value,
+  }));
+
+  // Only for Indian languages
+  if (!["te", "hi", "ta", "kn"].includes(currentLang)) return;
+
+  clearTimeout(timer);
+
+  const words = value.split(" ");
+  const lastWord = words[words.length - 1];
+
+  // ✅ SPACE → instant transliteration
+  if (value.endsWith(" ") && lastWord.length >= 3) {
+    transliterate(value.trim(), field);
+    return;
+  }
+
+  // ✅ STOP typing → delayed transliteration
+  timer = setTimeout(() => {
+    if (lastWord.length >= 3) {
+      transliterate(value, field);
+    }
+  }, 1000);
+};
+
   /* ================= RENDER ================= */
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
@@ -262,16 +336,13 @@ const HirerOfflinePost = () => {
             📍 {t("Exact Address / Nearby Landmark")}
           </p>
 
-          <textarea
+         <textarea
   className={`${inputBase} h-32 resize-none overflow-y-auto`}
   placeholder={t("addressDetailsPlaceholder")}
   value={form.addressDetails}
   maxLength={500}
   onChange={(e) =>
-    setForm((prev) => ({
-      ...prev,
-      addressDetails: e.target.value,
-    }))
+    handleTranslatableChange(e.target.value, "addressDetails")
   }
 />
 

@@ -152,11 +152,11 @@ const HirerOfflinePost = () => {
   };
 
   const standardPriceOptions = [
-    { label: "No Budget", value: null },
-    { label: "Fixed Price", value: "fixed" },
-    { label: "Hourly", value: "hourly" },
-    { label: "Negotiable", value: "negotiable" },
-    { label: "Inspect first, then quote", value: "inspect_quote" },
+    { label: t("No Budget"), value: null },
+    { label: t("Fixed Price"), value: "fixed" },
+    { label: t("Hourly"), value: "hourly" },
+    { label: t("Negotiable"), value: "negotiable" },
+    { label: t("Inspect first, then quote"), value: "inspect_quote" },
   ];
 
   /* ================= SUBMIT ================= */

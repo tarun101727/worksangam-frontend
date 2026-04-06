@@ -106,12 +106,13 @@ const profileFile = location.state?.file || null;
   const buttonPrimary =
     "w-full py-3 rounded-xl font-semibold text-white bg-[#6366F1] disabled:opacity-50";
   
+    
+let latestRequest = "";
 
-    let timer;
-    
-    
 const transliterate = async (value, field) => {
   const currentLang = i18n.language || "en";
+
+  latestRequest = value;
 
   const words = value.split(" ");
   const lastWord = words[words.length - 1];
@@ -125,10 +126,12 @@ const transliterate = async (value, field) => {
 
     const data = await res.json();
 
+    // ❗ Ignore old responses
+    if (latestRequest !== value) return;
+
     if (data[0] === "SUCCESS") {
       const suggestions = data[1][0][1];
 
-      // 🔥 SMART PICK
       const bestMatch =
         suggestions.find((s) => s.length >= lastWord.length) ||
         suggestions[0];
@@ -145,10 +148,12 @@ const transliterate = async (value, field) => {
   }
 };
 
+let timer;
+
 const handleChange = (value, field) => {
   const currentLang = i18n.language || "en";
 
-  // show user typing instantly
+  // Always show what user types
   setForm((prev) => ({
     ...prev,
     [field]: value,
@@ -158,12 +163,16 @@ const handleChange = (value, field) => {
 
   clearTimeout(timer);
 
+  // ✅ ONLY transliterate AFTER pause (user finished typing word)
   timer = setTimeout(() => {
-    // ONLY run when typing last word
-    if (!value.endsWith(" ")) {
+    const words = value.trim().split(" ");
+    const lastWord = words[words.length - 1];
+
+    // 🔥 IMPORTANT: only if word length is enough
+    if (lastWord.length >= 3) {
       transliterate(value, field);
     }
-  }, 400);
+  }, 800); // ⬅️ increase delay (VERY IMPORTANT)
 };
 
   return (

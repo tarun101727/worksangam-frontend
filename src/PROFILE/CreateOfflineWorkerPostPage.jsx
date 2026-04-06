@@ -354,6 +354,7 @@ const filteredProfessions = onlineProfessions.filter((p) =>
       </div>
 
       
+
 {/* ================= PRICE ================= */}
       <div className="space-y-3">
         <p className="text-sm text-slate-400">
@@ -363,7 +364,7 @@ const filteredProfessions = onlineProfessions.filter((p) =>
         <div className="grid grid-cols-3 gap-3">
   {standardPriceOptions.map((opt) => (
     <button
-      key={opt.value ?? t("no-budget")}
+      key={opt.value ?? "no-budget"}
       onClick={() =>
         handleChange("priceType", opt.value)
       }
@@ -396,7 +397,7 @@ const filteredProfessions = onlineProfessions.filter((p) =>
     </select>
 
     {/* FIXED PRICE */}
-    {form.priceType === t("fixed") && (
+    {form.priceType === "fixed" && (
       <input
         type="number"
         className={inputBase}
@@ -409,7 +410,7 @@ const filteredProfessions = onlineProfessions.filter((p) =>
     )}
 
     {/* HOURLY */}
-    {form.priceType === t("hourly") && (
+    {form.priceType === "hourly" && (
       <input
         type="number"
         className={inputBase}
@@ -422,7 +423,7 @@ const filteredProfessions = onlineProfessions.filter((p) =>
     )}
 
     {/* NEGOTIABLE */}
-    {form.priceType === t("negotiable") && (
+    {form.priceType === "negotiable" && (
       <div className="flex gap-3">
         <input
           type="number"
@@ -446,7 +447,7 @@ const filteredProfessions = onlineProfessions.filter((p) =>
     )}
 
     {/* INSPECT FIRST */}
-    {form.priceType === t("inspect_quote") && (
+    {form.priceType === "inspect_quote" && (
       <p className="text-xs text-slate-500">
         💡 The worker will inspect the job and quote the price later.
       </p>

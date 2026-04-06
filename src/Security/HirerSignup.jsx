@@ -105,37 +105,54 @@ const profileFile = location.state?.file || null;
 
   const buttonPrimary =
     "w-full py-3 rounded-xl font-semibold text-white bg-[#6366F1] disabled:opacity-50";
+  
 
-const handleChange = async (value, field) => {
+    let timer;
+    const transliterate = async (value, field) => {
   const currentLang = i18n.language || "en";
-
-  // Only apply for Indian languages
-  if (!["te", "hi", "ta", "kn"].includes(currentLang)) {
-    setForm((prev) => ({ ...prev, [field]: value }));
-    return;
-  }
 
   try {
     const res = await fetch(
-      `https://inputtools.google.com/request?text=${value}&itc=${currentLang}-t-i0-und&num=1`
+      `https://inputtools.google.com/request?text=${value}&itc=${currentLang}-t-i0-und&num=5`
     );
 
     const data = await res.json();
 
     if (data[0] === "SUCCESS") {
-      const translated = data[1][0][1][0];
+      // ✅ pick BEST suggestion (not random)
+      const suggestions = data[1][0][1];
+
+      const bestMatch = suggestions[0]; // first suggestion
 
       setForm((prev) => ({
         ...prev,
-        [field]: translated,
+        [field]: bestMatch,
       }));
-    } else {
-      setForm((prev) => ({ ...prev, [field]: value }));
     }
   } catch (err) {
     console.error(err);
-    setForm((prev) => ({ ...prev, [field]: value }));
   }
+};
+
+const handleChange = (value, field) => {
+  const currentLang = i18n.language || "en";
+
+  // Always show user typing immediately
+  setForm((prev) => ({
+    ...prev,
+    [field]: value,
+  }));
+
+  // Only for Indian languages
+  if (!["te", "hi", "ta", "kn"].includes(currentLang)) return;
+
+  clearTimeout(timer);
+
+  timer = setTimeout(() => {
+    if (value.trim().length > 1) {
+      transliterate(value, field);
+    }
+  }, 400); // wait before calling API
 };
 
   return (

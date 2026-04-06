@@ -12,7 +12,6 @@ import i18n from "../i18n.js";
    CONSTANTS & VALIDATION
 ======================= */
 const GENDERS = ["Male", "Female", "Other"];
-const NAME_REGEX = /^[\p{L} .'-]{2,50}$/u;
 const MIN_AGE = 18;
 const MAX_AGE = 100;
 
@@ -38,13 +37,13 @@ const profileFile = location.state?.file || null;
      VALIDATION
   ======================= */
   const validateForm = () => {
-    if (!NAME_REGEX.test(form.firstName)) {
-      return "First name must be 2–30 letters only";
-    }
+    if (!form.firstName.trim()) {
+  return "First name is required";
+}
 
-    if (!NAME_REGEX.test(form.lastName)) {
-      return "Last name must be 2–30 letters only";
-    }
+if (!form.lastName.trim()) {
+  return "Last name is required";
+}
 
     const ageNum = Number(form.age);
     if (!Number.isInteger(ageNum) || ageNum < MIN_AGE || ageNum > MAX_AGE) {

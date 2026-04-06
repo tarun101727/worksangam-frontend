@@ -111,7 +111,7 @@ const profileFile = location.state?.file || null;
     let timer;
     
     
-    const transliterate = async (value, field) => {
+const transliterate = async (value, field) => {
   const currentLang = i18n.language || "en";
 
   const words = value.split(" ");
@@ -128,16 +128,17 @@ const profileFile = location.state?.file || null;
 
     if (data[0] === "SUCCESS") {
       const suggestions = data[1][0][1];
-      const bestMatch = suggestions[0];
 
-      // replace ONLY last word
+      // 🔥 SMART PICK
+      const bestMatch =
+        suggestions.find((s) => s.length >= lastWord.length) ||
+        suggestions[0];
+
       words[words.length - 1] = bestMatch;
-
-      const finalText = words.join(" ");
 
       setForm((prev) => ({
         ...prev,
-        [field]: finalText,
+        [field]: words.join(" "),
       }));
     }
   } catch (err) {

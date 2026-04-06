@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BASE_URL } from "./config";
 import { socket } from "./utils/socket";
+import { useTranslation } from "react-i18next";
+
 
 const getImageUrl = (img) => {
   if (!img) return null;
@@ -32,6 +34,8 @@ export default function Home() {
 
   const locationWatchIdRef = useRef(null);
   const lastCoordsRef = useRef(null);
+  const { t } = useTranslation();
+
 
   const formatPrice = (price) => {
   if (!price) return "Contact for pricing";
@@ -267,10 +271,10 @@ export default function Home() {
               selectedTab === tab ? "bg-[#6366F1]" : "bg-[#1f2937]"
             } py-2 px-4 rounded-xl`}
           >
-            {tab === "online" && "Online Employees"}
-            {tab === "offline" && "Offline Employees"}
-            {tab === "online-jobs" && "Online Jobs"}
-            {tab === "offline-jobs" && "Offline Jobs"}
+            {tab === "online" && t("Online Employees")}
+            {tab === "offline" && t("Offline Employees")}
+            {tab === "online-jobs" && t("Online Jobs")}
+            {tab === "offline-jobs" && t("Offline Jobs")}
           </button>
         ))}
 
@@ -281,7 +285,7 @@ export default function Home() {
               selectedTab === "my-job-posts" ? "bg-[#22c55e]" : "bg-[#1f2937]"
             } py-2 px-4 rounded-xl`}
           >
-            My Job Posts
+            {t("My Job Posts")}
           </button>
         )}
       </div>
@@ -293,8 +297,8 @@ export default function Home() {
             type="text"
             placeholder={
               selectedTab === "online"
-                ? "Search online profession..."
-                : "Search offline profession..."
+                ? t("Search online profession...")
+                : t("Search offline profession...")
             }
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
@@ -321,8 +325,8 @@ export default function Home() {
         <div className="max-w-3xl mx-auto space-y-4">
           {employees.length === 0 && (
             <p className="text-center text-white/60 py-10">
-              {selectedTab === "online" && "No online employees available"}
-              {selectedTab === "offline" && "No offline employees available"}
+              {selectedTab === "online" && t("No online employees available")}
+              {selectedTab === "offline" && t("No offline employees available")}
             </p>
           )}
 

@@ -88,5 +88,36 @@
   "addressDetailsPlaceholder": "ఫ్లాట్ / ఇంటి నంబర్, భవనం పేరు\nవీధి / ప్రాంతం\nసమీప గుర్తింపు స్థలం\nఅంతస్తు, గేట్, లిఫ్ట్, యాక్సెస్ వివరాలు",
   "Visible only after job acceptance." : "ఉద్యోగం అంగీకరించిన తర్వాత మాత్రమే కనిపిస్తుంది.",
   "Please wait..." : "దయచేసి వేచి ఉండండి...",
-  "Submit Job Post" : "జాబ్ పోస్ట్‌ను సమర్పించండి"
+  "Submit Job Post" : "జాబ్ పోస్ట్‌ను సమర్పించండి",
+  "Search online profession" : "ఆన్‌లైన్ వృత్తిని శోధించండి",
+  "No profession found" : "ఏ వృత్తి కనుగొనబడలేదు",
+  "Describe your requirement" : "మీ అవసరాన్ని వివరించండి",
+  "Preferred Time & Date" : "ప్రాధాన్య సమయం & తేదీ",
+  "Immediately" : "వెంటనే",
+  "Today" : "ఈరోజు",
+  "Select date & time" : "తేదీ & సమయాన్ని ఎంచుకోండి",
+  "Time is optional. You may select only dates." : "సమయం ఐచ్ఛికం. మీరు తేదీలను మాత్రమే ఎంచుకోవచ్చు.",
+  "Upload photos or a short video (optional)" : "ఫోటోలు లేదా చిన్న వీడియోను అప్‌లోడ్ చేయండి (ఐచ్ఛికం)",
+  "ADD IMAGE & VIDEO" : "చిత్రం & వీడియోను జోడించండి",
+  "Images or one short video (10–30 sec). Max 6 files." : "చిత్రాలు లేదా ఒక చిన్న వీడియో (10–30 సెకన్లు). గరిష్టంగా 6 ఫైళ్లు.",
+  "Click to view" : "వీక్షించడానికి క్లిక్ చేయండి",
+  "Special Conditions / Warnings" : "ప్రత్యేక షరతులు / హెచ్చరికలు",
+  "pets": "ఇంట్లో పెంపుడు జంతువులు",
+  "elderly": "వృద్ధుడు / వృద్ధురాలు",
+  "children": "పిల్లలు ఉన్నారు",
+  "safetyConcerns": "భద్రతా ఆందోళనలు",
+    "price_optional": "ధర (ఐచ్చికం)",
+
+  "fixed": "స్థిర ధర",
+  "hourly": "గంటకు",
+  "negotiable": "చర్చించవచ్చు",
+  "inspect_quote": "పరిశీలించి చెప్పండి",
+
+  "fixed_price": "స్థిర ధర ({{symbol}})",
+  "hourly_rate": "గంటకు ధర ({{symbol}}/గంట)",
+
+  "min_price": "కనిష్ట ధర",
+  "max_price": "గరిష్ట ధర",
+
+  "inspect_quote_desc": "వర్కర్ పని చూసి తరువాత ధర చెబుతాడు."
 }

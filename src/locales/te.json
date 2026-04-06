@@ -123,5 +123,7 @@
   "No Budget" : "బడ్జెట్ లేదు",
   "Fixed Price" : "స్థిర ధర",
   "Inspect first, then quote" : "ముందు పరిశీలించండి, ఆ తర్వాత ధరను తెలియజేయండి",
-  "The worker will inspect the job and quote the price later." : "కార్మికుడు పనిని తనిఖీ చేసి, తర్వాత ధరను తెలియజేస్తాడు."
+  "The worker will inspect the job and quote the price later." : "కార్మికుడు పనిని తనిఖీ చేసి, తర్వాత ధరను తెలియజేస్తాడు.",
+  "Tap to auto-detect your current location" : "మీ ప్రస్తుత స్థానాన్ని స్వయంచాలకంగా గుర్తించడానికి నొక్కండి",
+  "Detecting location…" : "స్థానాన్ని గుర్తిస్తోంది…"
 }

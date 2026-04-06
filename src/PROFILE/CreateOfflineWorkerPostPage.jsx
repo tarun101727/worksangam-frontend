@@ -2,6 +2,8 @@ import { BASE_URL } from "../config";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { currencies } from "../constants/currencies";
+import { useTranslation } from "react-i18next";
+
 
 const CreateOfflineWorkerPostPage = ({
   form,
@@ -22,6 +24,8 @@ const CreateOfflineWorkerPostPage = ({
   const [onlineProfessions, setOnlineProfessions] = useState([]);
 const [search, setSearch] = useState("");
 const [showSuggestions, setShowSuggestions] = useState(false);
+  const { t } = useTranslation();
+
 
 useEffect(() => {
   const fetchProfessions = async () => {
@@ -48,7 +52,7 @@ const filteredProfessions = onlineProfessions.filter((p) =>
   <input
     type="text"
     className={inputBase}
-    placeholder="Search online profession"
+    placeholder={t("Search online profession")}
     value={search}
     onChange={(e) => {
       setSearch(e.target.value);
@@ -76,7 +80,7 @@ const filteredProfessions = onlineProfessions.filter((p) =>
 ))
       ) : (
         <p className="px-4 py-2 text-sm text-slate-500">
-          No profession found
+          {t("No profession found")}
         </p>
       )}
     </div>
@@ -86,7 +90,7 @@ const filteredProfessions = onlineProfessions.filter((p) =>
       {/* ================= DESCRIPTION ================= */}
       <textarea
         className={`${inputBase} h-32 resize-none`}
-        placeholder="Describe your requirement"
+        placeholder={t("Describe your requirement")}
         value={form.description}
         onChange={(e) =>
           handleChange("description", e.target.value)
@@ -96,14 +100,14 @@ const filteredProfessions = onlineProfessions.filter((p) =>
       {/* ================= PREFERRED TIME ================= */}
       <div className="space-y-3">
         <p className="text-sm text-slate-400">
-          ⏱️ Preferred Time & Date
+          ⏱️ {t("Preferred Time & Date")}
         </p>
 
         <div className="flex gap-3">
           {[
-            { label: "Immediately", value: "asap" },
-            { label: "Today", value: "today" },
-            { label: "Select date & time", value: "custom" },
+            { label: t("Immediately"), value: "asap" },
+            { label: t("Today"), value: "today" },
+            { label: t("Select date & time"), value: "custom" },
           ].map((opt) => (
             <button
               key={opt.value}
@@ -200,17 +204,16 @@ const filteredProfessions = onlineProfessions.filter((p) =>
             </div>
 
             <p className="text-xs text-slate-500">
-              Time is optional. You may select only dates.
+              {t("Time is optional. You may select only dates.")}
             </p>
           </div>
         )}
       </div>
 
       {/* ================= MEDIA UPLOAD ================= */}
-      {/* ================= MEDIA UPLOAD ================= */}
 <div className="space-y-3">
   <p className="text-sm text-slate-400">
-    📸 Upload photos or a short video (optional)
+    📸 {t("Upload photos or a short video (optional)")}
   </p>
 
   {/* HIDDEN FILE INPUT */}
@@ -247,11 +250,11 @@ const filteredProfessions = onlineProfessions.filter((p) =>
                text-slate-300 hover:border-indigo-500 hover:text-indigo-400
                transition font-semibold"
   >
-    + ADD IMAGE & VIDEO
+    + {t("ADD IMAGE & VIDEO")}
   </button>
 
   <p className="text-xs text-slate-500">
-    Images or one short video (10–30 sec). Max 6 files.
+    {t("Images or one short video (10–30 sec). Max 6 files.")}
   </p>
 
   {/* PREVIEW GRID */}
@@ -280,7 +283,7 @@ const filteredProfessions = onlineProfessions.filter((p) =>
           <div className="absolute inset-0 bg-black/40 opacity-0
                           group-hover:opacity-100 flex items-center
                           justify-center text-xs text-white">
-            Click to view
+            {t("Click to view")}
           </div>
         </div>
       ))}
@@ -319,14 +322,14 @@ const filteredProfessions = onlineProfessions.filter((p) =>
       {/* ================= SAFETY WARNINGS ================= */}
       <div className="space-y-3">
         <p className="text-sm text-slate-400">
-          🚫 Special Conditions / Warnings
+          🚫 {t("Special Conditions / Warnings")}
         </p>
 
         {[
-          { key: "pets", label: "Pets at home" },
-          { key: "elderly", label: "Elderly person" },
-          { key: "children", label: "Children present" },
-          { key: "safetyConcerns", label: "Safety concerns" },
+         { key: "pets", label: t("pets") },
+  { key: "elderly", label: t("elderly") },
+  { key: "children", label: t("children") },
+  { key: "safetyConcerns", label: t("safetyConcerns") },
         ].map((item) => (
           <label
             key={item.key}
@@ -351,105 +354,101 @@ const filteredProfessions = onlineProfessions.filter((p) =>
       </div>
 
       {/* ================= PRICE ================= */}
-      <div className="space-y-3">
-        <p className="text-sm text-slate-400">
-          Price (optional)
+<div className="space-y-3">
+  <p className="text-sm text-slate-400">
+    {t("price_optional")}
+  </p>
+
+  <div className="grid grid-cols-3 gap-3">
+    {standardPriceOptions.map((opt) => (
+      <button
+        key={opt.value ?? "no-budget"}
+        onClick={() => handleChange("priceType", opt.value)}
+        className={`py-2 rounded-lg text-sm font-semibold ${
+          form.priceType === opt.value
+            ? "bg-indigo-600 text-white"
+            : "bg-slate-800 text-slate-400 border border-slate-700"
+        }`}
+      >
+        {t(opt.label)} {/* IMPORTANT */}
+      </button>
+    ))}
+  </div>
+
+  {form.priceType && (
+    <>
+      {/* Currency */}
+      <select
+        className={inputBase}
+        value={form.currency}
+        onChange={(e) => handleChange("currency", e.target.value)}
+      >
+        {currencies.map((c) => (
+          <option key={c.code} value={c.code}>
+            {c.display}
+          </option>
+        ))}
+      </select>
+
+      {/* FIXED PRICE */}
+      {form.priceType === "fixed" && (
+        <input
+          type="number"
+          className={inputBase}
+          placeholder={t("fixed_price", { symbol: selectedCurrency?.symbol })}
+          value={form.expectedPrice}
+          onChange={(e) =>
+            handleChange("expectedPrice", e.target.value)
+          }
+        />
+      )}
+
+      {/* HOURLY */}
+      {form.priceType === "hourly" && (
+        <input
+          type="number"
+          className={inputBase}
+          placeholder={t("hourly_rate", { symbol: selectedCurrency?.symbol })}
+          value={form.expectedPrice}
+          onChange={(e) =>
+            handleChange("expectedPrice", e.target.value)
+          }
+        />
+      )}
+
+      {/* NEGOTIABLE */}
+      {form.priceType === "negotiable" && (
+        <div className="flex gap-3">
+          <input
+            type="number"
+            className={inputBase}
+            placeholder={t("min_price")}
+            value={form.minPrice}
+            onChange={(e) =>
+              handleChange("minPrice", e.target.value)
+            }
+          />
+          <input
+            type="number"
+            className={inputBase}
+            placeholder={t("max_price")}
+            value={form.maxPrice}
+            onChange={(e) =>
+              handleChange("maxPrice", e.target.value)
+            }
+          />
+        </div>
+      )}
+
+      {/* INSPECT FIRST */}
+      {form.priceType === "inspect_quote" && (
+        <p className="text-xs text-slate-500">
+          {t("inspect_quote_desc")}
         </p>
-
-        <div className="grid grid-cols-3 gap-3">
-  {standardPriceOptions.map((opt) => (
-    <button
-      key={opt.value ?? "no-budget"}
-      onClick={() =>
-        handleChange("priceType", opt.value)
-      }
-      className={`py-2 rounded-lg text-sm font-semibold ${
-        form.priceType === opt.value
-          ? "bg-indigo-600 text-white"
-          : "bg-slate-800 text-slate-400 border border-slate-700"
-      }`}
-    >
-      {opt.label}
-    </button>
-  ))}
+      )}
+    </>
+  )}
 </div>
-
-        {form.priceType && (
-  <>
-    {/* Currency */}
-    <select
-      className={inputBase}
-      value={form.currency}
-      onChange={(e) =>
-        handleChange("currency", e.target.value)
-      }
-    >
-      {currencies.map((c) => (
-        <option key={c.code} value={c.code}>
-          {c.display}
-        </option>
-      ))}
-    </select>
-
-    {/* FIXED PRICE */}
-    {form.priceType === "fixed" && (
-      <input
-        type="number"
-        className={inputBase}
-        placeholder={`Fixed price (${selectedCurrency?.symbol})`}
-        value={form.expectedPrice}
-        onChange={(e) =>
-          handleChange("expectedPrice", e.target.value)
-        }
-      />
-    )}
-
-    {/* HOURLY */}
-    {form.priceType === "hourly" && (
-      <input
-        type="number"
-        className={inputBase}
-        placeholder={`Hourly rate (${selectedCurrency?.symbol}/hr)`}
-        value={form.expectedPrice}
-        onChange={(e) =>
-          handleChange("expectedPrice", e.target.value)
-        }
-      />
-    )}
-
-    {/* NEGOTIABLE */}
-    {form.priceType === "negotiable" && (
-      <div className="flex gap-3">
-        <input
-          type="number"
-          className={inputBase}
-          placeholder="Min price"
-          value={form.minPrice}
-          onChange={(e) =>
-            handleChange("minPrice", e.target.value)
-          }
-        />
-        <input
-          type="number"
-          className={inputBase}
-          placeholder="Max price"
-          value={form.maxPrice}
-          onChange={(e) =>
-            handleChange("maxPrice", e.target.value)
-          }
-        />
-      </div>
-    )}
-
-    {/* INSPECT FIRST */}
-    {form.priceType === "inspect_quote" && (
-      <p className="text-xs text-slate-500">
-        💡 The worker will inspect the job and quote the price later.
-      </p>
-    )}
-  </>
-)}
-      </div>
     </>
   );
 };

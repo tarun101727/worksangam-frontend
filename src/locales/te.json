@@ -73,5 +73,13 @@
   "No online jobs available" : "ఆన్‌లైన్ ఉద్యోగాలు అందుబాటులో లేవు",
   "No offline jobs available" : "ఆఫ్‌లైన్ ఉద్యోగాలు అందుబాటులో లేవు",
   "You haven't posted any jobs yet" : "మీరు ఇంకా ఏ ఉద్యోగాలనూ పోస్ట్ చేయలేదు",
-  "km" : "కి.మీ"
+  "km" : "కి.మీ",
+  "age" : "వయస్సు",
+  "gender" : "లింగం",
+  "Offline Posts" : "ఆఫ్‌లైన్ పోస్ట్‌లు",
+  "Offline Worker Post" : "ఆఫ్‌లైన్ వర్కర్ పోస్ట్",
+  "Urgent Offline Post" : "అత్యవసర ఆఫ్‌లైన్ పోస్ట్",
+  "Online Posts" : "ఆన్‌లైన్ పోస్ట్‌లు",
+  "Online Worker Post" : "ఆన్‌లైన్ వర్కర్ పోస్ట్",
+  "Urgent Online Post" : "అత్యవసర ఆన్‌లైన్ పోస్ట్"
 }

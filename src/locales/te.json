@@ -113,8 +113,8 @@
   "negotiable": "చర్చించవచ్చు",
   "inspect_quote": "పరిశీలించి చెప్పండి",
 
-  "fixed_price": "స్థిర ధర ({{symbol}})",
-  "hourly_rate": "గంటకు ధర ({{symbol}}/గంట)",
+  "fixed_price": "స్థిర ధర",
+  "hourly_rate": "గంటకు ధర ",
 
   "min_price": "కనిష్ట ధర",
   "max_price": "గరిష్ట ధర",

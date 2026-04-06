@@ -154,8 +154,8 @@ const HirerOfflinePost = () => {
   const standardPriceOptions = [
     { label: t("No Budget"), value: null },
     { label: t("Fixed Price"), value: "fixed" },
-    { label: t("Hourly"), value: "hourly" },
-    { label: t("Negotiable"), value: "negotiable" },
+    { label: t("hourly"), value: "hourly" },
+    { label: t("negotiable"), value: "negotiable" },
     { label: t("Inspect first, then quote"), value: "inspect_quote" },
   ];
 

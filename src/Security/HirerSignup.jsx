@@ -1,4 +1,4 @@
-
+import Sanscript from "sanscript";
 import React, { useState, Fragment } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
@@ -106,39 +106,31 @@ const profileFile = location.state?.file || null;
   const buttonPrimary =
     "w-full py-3 rounded-xl font-semibold text-white bg-[#6366F1] disabled:opacity-50";
 
-
-    let timer;
-
-const translateInput = async (text, field) => {
-  try {
-    const currentLang = i18n.language || "en"; // user's selected language
-    const isTransliterate = ["te", "hi", "ta"].includes(currentLang); // apply only to script-based languages
-
-    const res = await axios.post(`${BASE_URL}/api/auth/translate`, {
-      text,
-      target: currentLang,
-      transliterate: isTransliterate, // new param
-    });
-
-    setForm((prev) => ({
-      ...prev,
-      [field]: res.data.translated,
-    }));
-  } catch (err) {
-    console.error("Translation error", err);
-  }
-};
-
 const handleChange = (value, field) => {
-  setForm((prev) => ({ ...prev, [field]: value }));
+  const currentLang = i18n.language || "en";
 
-  clearTimeout(timer);
+  let finalValue = value;
 
-  timer = setTimeout(() => {
-    if (value.length >= 2) {
-      translateInput(value, field);
-    }
-  }, 600); // ⏳ debounce
+  if (currentLang === "te") {
+    finalValue = Sanscript.t(value, "itrans", "telugu");
+  }
+
+  if (currentLang === "hi") {
+    finalValue = Sanscript.t(value, "itrans", "devanagari");
+  }
+
+  if (currentLang === "ta") {
+    finalValue = Sanscript.t(value, "itrans", "tamil");
+  }
+
+  if (currentLang === "kn") {
+    finalValue = Sanscript.t(value, "itrans", "kannada");
+  }
+
+  setForm((prev) => ({
+    ...prev,
+    [field]: finalValue,
+  }));
 };
 
   return (

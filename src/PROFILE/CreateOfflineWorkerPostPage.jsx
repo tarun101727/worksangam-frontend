@@ -399,27 +399,27 @@ const filteredProfessions = onlineProfessions.filter((p) =>
     {/* FIXED PRICE */}
     {form.priceType === "fixed" && (
       <input
-        type="number"
-        className={inputBase}
-        placeholder={`Fixed price (${selectedCurrency?.symbol})`}
-        value={form.expectedPrice}
-        onChange={(e) =>
-          handleChange("expectedPrice", e.target.value)
-        }
-      />
+  type="number"
+  className={inputBase}
+  placeholder={`${t("fixed_price")} (${selectedCurrency?.symbol})`}
+  value={form.expectedPrice}
+  onChange={(e) =>
+    handleChange("expectedPrice", e.target.value)
+  }
+/>
     )}
 
     {/* HOURLY */}
     {form.priceType === "hourly" && (
       <input
-        type="number"
-        className={inputBase}
-        placeholder={`Hourly rate (${selectedCurrency?.symbol}/hr)`}
-        value={form.expectedPrice}
-        onChange={(e) =>
-          handleChange("expectedPrice", e.target.value)
-        }
-      />
+  type="number"
+  className={inputBase}
+  placeholder={`${t("hourly_rate")} (${selectedCurrency?.symbol}/hr)`}
+  value={form.expectedPrice}
+  onChange={(e) =>
+    handleChange("expectedPrice", e.target.value)
+  }
+/>
     )}
 
     {/* NEGOTIABLE */}
@@ -428,7 +428,7 @@ const filteredProfessions = onlineProfessions.filter((p) =>
         <input
           type="number"
           className={inputBase}
-          placeholder="Min price"
+          placeholder={t("min_price")}
           value={form.minPrice}
           onChange={(e) =>
             handleChange("minPrice", e.target.value)
@@ -437,7 +437,7 @@ const filteredProfessions = onlineProfessions.filter((p) =>
         <input
           type="number"
           className={inputBase}
-          placeholder="Max price"
+          placeholder={t("max_price")}
           value={form.maxPrice}
           onChange={(e) =>
             handleChange("maxPrice", e.target.value)
@@ -449,7 +449,7 @@ const filteredProfessions = onlineProfessions.filter((p) =>
     {/* INSPECT FIRST */}
     {form.priceType === "inspect_quote" && (
       <p className="text-xs text-slate-500">
-        💡 The worker will inspect the job and quote the price later.
+        💡 {t("The worker will inspect the job and quote the price later.")}
       </p>
     )}
   </>

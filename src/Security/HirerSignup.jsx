@@ -126,15 +126,14 @@ const transliterate = async (value, field) => {
 
     const data = await res.json();
 
-    // ❗ Ignore old responses
+    // ❗ Ignore outdated responses
     if (latestRequest !== value) return;
 
     if (data[0] === "SUCCESS") {
       const suggestions = data[1][0][1];
 
-      const bestMatch =
-        suggestions.find((s) => s.length >= lastWord.length) ||
-        suggestions[0];
+      // ✅ ALWAYS pick BEST suggestion
+      const bestMatch = suggestions[0];
 
       words[words.length - 1] = bestMatch;
 
@@ -153,7 +152,7 @@ let timer;
 const handleChange = (value, field) => {
   const currentLang = i18n.language || "en";
 
-  // Always show what user types
+  // Show raw typing
   setForm((prev) => ({
     ...prev,
     [field]: value,
@@ -163,16 +162,21 @@ const handleChange = (value, field) => {
 
   clearTimeout(timer);
 
-  // ✅ ONLY transliterate AFTER pause (user finished typing word)
-  timer = setTimeout(() => {
-    const words = value.trim().split(" ");
-    const lastWord = words[words.length - 1];
+  const words = value.split(" ");
+  const lastWord = words[words.length - 1];
 
-    // 🔥 IMPORTANT: only if word length is enough
+  // ✅ CASE 1: If user presses SPACE → instant transliteration
+  if (value.endsWith(" ") && lastWord.length >= 3) {
+    transliterate(value.trim(), field);
+    return;
+  }
+
+  // ✅ CASE 2: User stopped typing
+  timer = setTimeout(() => {
     if (lastWord.length >= 3) {
       transliterate(value, field);
     }
-  }, 800); // ⬅️ increase delay (VERY IMPORTANT)
+  }, 1000); // ⬅️ slightly longer delay = more accuracy
 };
 
   return (

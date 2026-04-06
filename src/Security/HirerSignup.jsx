@@ -106,11 +106,7 @@ const profileFile = location.state?.file || null;
 
   const buttonPrimary =
     "w-full py-3 rounded-xl font-semibold text-white bg-[#6366F1] disabled:opacity-50";
-  
-
-    let timer;
-    
-    
+      
 const transliterate = async (value, field) => {
   const currentLang = i18n.language || "en";
 
@@ -149,7 +145,6 @@ const transliterate = async (value, field) => {
 const handleChange = (value, field) => {
   const currentLang = i18n.language || "en";
 
-  // show user typing instantly
   setForm((prev) => ({
     ...prev,
     [field]: value,
@@ -157,14 +152,10 @@ const handleChange = (value, field) => {
 
   if (!["te", "hi", "ta", "kn"].includes(currentLang)) return;
 
-  clearTimeout(timer);
-
-  timer = setTimeout(() => {
-    // ONLY run when typing last word
-    if (!value.endsWith(" ")) {
-      transliterate(value, field);
-    }
-  }, 400);
+  // ✅ ONLY convert when user presses space
+  if (value.endsWith(" ")) {
+    transliterate(value.trim(), field);
+  }
 };
 
   return (

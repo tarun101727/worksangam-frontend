@@ -12,7 +12,7 @@ import i18n from "../i18n.js";
    CONSTANTS & VALIDATION
 ======================= */
 const GENDERS = ["Male", "Female", "Other"];
-const NAME_REGEX = /^[\p{L} ]{2,30}$/u;
+const NAME_REGEX = /^[\p{L}]{2,30}$/u;
 const MIN_AGE = 18;
 const MAX_AGE = 100;
 
@@ -38,11 +38,11 @@ const profileFile = location.state?.file || null;
      VALIDATION
   ======================= */
   const validateForm = () => {
-    if (!NAME_REGEX.test(form.firstName.trim())) {
+    if (!NAME_REGEX.test(form.firstName)) {
       return "First name must be 2–30 letters only";
     }
 
-    if (!NAME_REGEX.test(form.lastName.trim())) {
+    if (!NAME_REGEX.test(form.lastName)) {
       return "Last name must be 2–30 letters only";
     }
 
@@ -299,3 +299,4 @@ const handleChange = (value, field) => {
 };
 
 export default HirerSignup;
+

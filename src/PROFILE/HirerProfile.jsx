@@ -38,7 +38,7 @@ const HirerProfile = ({ user: initialUser, token }) => {
         
         <div className="grid grid-cols-2 gap-4">
   <ProfileRow label={t("age")} value={user.age || "-"} />
-  <ProfileRow label={t("gender")} value={t("user.gender") || "-"} />
+  <ProfileRow label={t("gender")} value={user.gender || "-"} />
 </div>
         {user.bio && <p className="mt-2 text-sm text-white/70">{user.bio}</p>}
 

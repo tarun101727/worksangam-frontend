@@ -425,9 +425,9 @@ export default function Home() {
         <div className="max-w-3xl mx-auto space-y-4">
           {jobs.length === 0 && (
             <p className="text-center text-white/60 py-10">
-              {selectedTab === "online-jobs" && "No online jobs available"}
-              {selectedTab === "offline-jobs" && "No offline jobs available"}
-              {selectedTab === "my-job-posts" && "You haven't posted any jobs yet"}
+              {selectedTab === "online-jobs" && t("No online jobs available")}
+              {selectedTab === "offline-jobs" && t("No offline jobs available")}
+              {selectedTab === "my-job-posts" && t("You haven't posted any jobs yet")}
             </p>
           )}
 

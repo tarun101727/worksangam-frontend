@@ -108,25 +108,35 @@ const profileFile = location.state?.file || null;
   
 
     let timer;
+    
+    
     const transliterate = async (value, field) => {
   const currentLang = i18n.language || "en";
 
+  const words = value.split(" ");
+  const lastWord = words[words.length - 1];
+
+  if (!lastWord) return;
+
   try {
     const res = await fetch(
-      `https://inputtools.google.com/request?text=${value}&itc=${currentLang}-t-i0-und&num=5`
+      `https://inputtools.google.com/request?text=${lastWord}&itc=${currentLang}-t-i0-und&num=5`
     );
 
     const data = await res.json();
 
     if (data[0] === "SUCCESS") {
-      // ✅ pick BEST suggestion (not random)
       const suggestions = data[1][0][1];
+      const bestMatch = suggestions[0];
 
-      const bestMatch = suggestions[0]; // first suggestion
+      // replace ONLY last word
+      words[words.length - 1] = bestMatch;
+
+      const finalText = words.join(" ");
 
       setForm((prev) => ({
         ...prev,
-        [field]: bestMatch,
+        [field]: finalText,
       }));
     }
   } catch (err) {
@@ -137,22 +147,22 @@ const profileFile = location.state?.file || null;
 const handleChange = (value, field) => {
   const currentLang = i18n.language || "en";
 
-  // Always show user typing immediately
+  // show user typing instantly
   setForm((prev) => ({
     ...prev,
     [field]: value,
   }));
 
-  // Only for Indian languages
   if (!["te", "hi", "ta", "kn"].includes(currentLang)) return;
 
   clearTimeout(timer);
 
   timer = setTimeout(() => {
-    if (value.trim().length > 1) {
+    // ONLY run when typing last word
+    if (!value.endsWith(" ")) {
       transliterate(value, field);
     }
-  }, 400); // wait before calling API
+  }, 400);
 };
 
   return (

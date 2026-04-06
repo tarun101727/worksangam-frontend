@@ -1,3 +1,4 @@
+
 import Sanscript from "sanscript";
 import React, { useState, Fragment } from "react";
 import axios from "axios";
@@ -7,7 +8,6 @@ import { useAuth } from "../useAuth.js";
 import { Listbox, Transition } from "@headlessui/react";
 import { useTranslation } from "react-i18next";
 import i18n from "../i18n.js";
-import { useRef } from "react";
 
 /* =======================
    CONSTANTS & VALIDATION
@@ -30,11 +30,11 @@ const HirerSignup = () => {
   });
 
   const profileImage = location.state?.profileImage || null;
-  const profileFile = location.state?.file || null;
+const profileFile = location.state?.file || null;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { t } = useTranslation();
-  const timerRef = useRef(null);
+
   /* =======================
      VALIDATION
   ======================= */
@@ -108,25 +108,36 @@ const HirerSignup = () => {
     "w-full py-3 rounded-xl font-semibold text-white bg-[#6366F1] disabled:opacity-50";
   
 
-  const transliterate = async (text, field) => {
+    let timer;
+    
+    
+    const transliterate = async (value, field) => {
   const currentLang = i18n.language || "en";
+
+  const words = value.split(" ");
+  const lastWord = words[words.length - 1];
+
+  if (!lastWord) return;
 
   try {
     const res = await fetch(
-      `https://inputtools.google.com/request?text=${text}&itc=${currentLang}-t-i0-und&num=5`
+      `https://inputtools.google.com/request?text=${lastWord}&itc=${currentLang}-t-i0-und&num=5`
     );
 
     const data = await res.json();
 
     if (data[0] === "SUCCESS") {
       const suggestions = data[1][0][1];
+      const bestMatch = suggestions[0];
 
-      // pick best suggestion
-      const best = suggestions[0];
+      // replace ONLY last word
+      words[words.length - 1] = bestMatch;
+
+      const finalText = words.join(" ");
 
       setForm((prev) => ({
         ...prev,
-        [field]: best + " ",
+        [field]: finalText,
       }));
     }
   } catch (err) {
@@ -137,7 +148,7 @@ const HirerSignup = () => {
 const handleChange = (value, field) => {
   const currentLang = i18n.language || "en";
 
-  // show typing instantly
+  // show user typing instantly
   setForm((prev) => ({
     ...prev,
     [field]: value,
@@ -145,19 +156,14 @@ const handleChange = (value, field) => {
 
   if (!["te", "hi", "ta", "kn"].includes(currentLang)) return;
 
-  // clear previous timer
-  if (timerRef.current) {
-    clearTimeout(timerRef.current);
-  }
+  clearTimeout(timer);
 
-  // ONLY run on space
-  if (value.endsWith(" ")) {
-    const trimmed = value.trim();
-
-    timerRef.current = setTimeout(() => {
-      transliterate(trimmed, field);
-    }, 300);
-  }
+  timer = setTimeout(() => {
+    // ONLY run when typing last word
+    if (!value.endsWith(" ")) {
+      transliterate(value, field);
+    }
+  }, 400);
 };
 
   return (

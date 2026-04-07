@@ -569,7 +569,7 @@ const createEmployeeAccount = async () => {
             className={inputBase}
             placeholder={t("Your skills (e.g. Excel, React, Accounting)")}
             value={form.skills}
-            onChange={(e) => updateForm("skills", e.target.value)}
+            onChange={(e) => handleChange(e.target.value, "skills")}
           />
 
           <input
@@ -577,7 +577,7 @@ const createEmployeeAccount = async () => {
             type="number"
             placeholder={t("Total work experience (in years)")}
             value={form.experience}
-            onChange={(e) => updateForm("experience", e.target.value)}
+            onChange={(e) => handleChange(e.target.value, "experience")}
             onWheel={(e) => e.target.blur()}
           />
 
@@ -585,7 +585,7 @@ const createEmployeeAccount = async () => {
             className={`${inputBase} h-24`}
             placeholder={t("Write a short introduction about yourself (2–3 lines)")}
             value={form.bio}
-            onChange={(e) => updateForm("bio", e.target.value)}
+            onChange={(e) => handleChange(e.target.value, "bio")}
           />
 
           <button

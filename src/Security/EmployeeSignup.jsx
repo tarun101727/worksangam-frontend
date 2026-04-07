@@ -1,3 +1,4 @@
+
 import React, { useState, Fragment, useCallback, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
@@ -323,22 +324,19 @@ const createEmployeeAccount = async () => {
         )}
 
         <div className="space-y-4">
-          {/* Update these lines */}
-<div className="flex flex-col sm:flex-row gap-4">
-  <input
-    className={inputBase}
-    placeholder="First name (e.g. Rahul)"
-    value={form.firstName}
-    onChange={(e) => updateForm("firstName", e.target.value)}
-  />
+          <input
+            className={inputBase}
+            placeholder="First name (e.g. Rahul)"
+            value={form.firstName}
+            onChange={(e) => updateForm("firstName", e.target.value)}
+          />
 
-  <input
-    className={inputBase}
-    placeholder="Last name (e.g. Sharma)"
-    value={form.lastName}
-    onChange={(e) => updateForm("lastName", e.target.value)}
-  />
-</div>
+          <input
+            className={inputBase}
+            placeholder="Last name (e.g. Sharma)"
+            value={form.lastName}
+            onChange={(e) => updateForm("lastName", e.target.value)}
+          />
 
           <input
             className={inputBase}

@@ -1,3 +1,4 @@
+
 import React, { useState, Fragment, useCallback, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
@@ -49,7 +50,6 @@ const EmployeeSignup = () => {
   const [professions, setProfessions] = useState([]);
   const [professionSearch, setProfessionSearch] = useState("");
   const [filteredProfessions, setFilteredProfessions] = useState([]);
-  const [languageSearch, setLanguageSearch] = useState(""); // <-- add this
 
 
   useEffect(() => {
@@ -238,13 +238,6 @@ const createEmployeeAccount = async () => {
     setLoading(false);
   }
 };
-
-
-const filteredLanguages = languageSearch
-  ? indianLanguages.filter((lang) =>
-      lang.toLowerCase().includes(languageSearch.toLowerCase())
-    )
-  : [];
 
   /* =======================
      JSX
@@ -443,53 +436,33 @@ const filteredLanguages = languageSearch
               Select all that apply
             </p>
 
-           {/* LANGUAGES */}
-<div>
-  <label className="block text-sm text-white/70 mb-1">
-    Languages you can communicate in
-  </label>
-  <p className="text-xs text-white/40 mb-3">
-    Select all that apply
-  </p>
+            <div className="flex flex-wrap gap-2">
+              {indianLanguages.map((lang) => {
+                const selected = form.languages.includes(lang);
 
-  {/* SEARCH INPUT */}
-  <input
-    type="text"
-    placeholder="Search language..."
-    value={languageSearch}
-    onChange={(e) => setLanguageSearch(e.target.value)}
-    className={inputBase + " mb-2"}
-  />
-
-  {/* LANGUAGE BUTTONS */}
-  <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
-    {(languageSearch ? filteredLanguages : indianLanguages).map((lang) => {
-      const selected = form.languages.includes(lang);
-
-      return (
-        <button
-          key={lang}
-          type="button"
-          onClick={() =>
-            updateForm(
-              "languages",
-              selected
-                ? form.languages.filter((l) => l !== lang)
-                : [...form.languages, lang]
-            )
-          }
-          className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${
-            selected
-              ? "bg-[#6366F1] text-white shadow-md"
-              : "bg-[#1F2937] text-white/80 hover:bg-[#374151]"
-          }`}
-        >
-          {lang}
-        </button>
-      );
-    })}
-  </div>
-</div>
+                return (
+                  <button
+                    key={lang}
+                    type="button"
+                    onClick={() =>
+                      updateForm(
+                        "languages",
+                        selected
+                          ? form.languages.filter((l) => l !== lang)
+                          : [...form.languages, lang]
+                      )
+                    }
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${
+                      selected
+                        ? "bg-[#6366F1] text-white shadow-md"
+                        : "bg-[#1F2937] text-white/80 hover:bg-[#374151]"
+                    }`}
+                  >
+                    {lang}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <input

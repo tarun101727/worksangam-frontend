@@ -1,4 +1,3 @@
-import { useDebounce } from "use-debounce";
 import React, { useState, Fragment, useCallback, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
@@ -49,22 +48,23 @@ const EmployeeSignup = () => {
   const [error, setError] = useState("");
   const [professions, setProfessions] = useState([]);
   const [professionSearch, setProfessionSearch] = useState("");
-  const [debouncedProfessionSearch] = useDebounce(professionSearch, 200);
   const [filteredProfessions, setFilteredProfessions] = useState([]);
 
 
   useEffect(() => {
-  if (!debouncedProfessionSearch) {
+
+  if (!professionSearch) {
     setFilteredProfessions([]);
     return;
   }
 
   const filtered = professions.filter((p) =>
-    p.name.toLowerCase().includes(debouncedProfessionSearch.toLowerCase())
+    p.name.toLowerCase().includes(professionSearch.toLowerCase())
   );
 
   setFilteredProfessions(filtered);
-}, [debouncedProfessionSearch, professions]);
+
+}, [professionSearch, professions]);
 
   useEffect(() => {
 
@@ -103,7 +103,7 @@ const EmployeeSignup = () => {
   setForm((prev) => ({
     ...prev,
     profession: professionName,
-    professionType: selected ? selected.type : "offline",
+    professionType: selected ? selected.type : "offline", // fallback to offline
   }));
 }, [professions]);
 
@@ -436,27 +436,32 @@ const createEmployeeAccount = async () => {
             </p>
 
             <div className="flex flex-wrap gap-2">
-  {indianLanguages.map((lang) => {
-    const selected = form.languages.includes(lang);
-    const handleClick = () => {
-      updateForm(
-        "languages",
-        selected
-          ? form.languages.filter((l) => l !== lang)
-          : [...form.languages, lang]
-      );
-    };
+              {indianLanguages.map((lang) => {
+                const selected = form.languages.includes(lang);
 
-    return (
-      <LanguageButton
-        key={lang}
-        lang={lang}
-        selected={selected}
-        onClick={handleClick}
-      />
-    );
-  })}
-</div>
+                return (
+                  <button
+                    key={lang}
+                    type="button"
+                    onClick={() =>
+                      updateForm(
+                        "languages",
+                        selected
+                          ? form.languages.filter((l) => l !== lang)
+                          : [...form.languages, lang]
+                      )
+                    }
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${
+                      selected
+                        ? "bg-[#6366F1] text-white shadow-md"
+                        : "bg-[#1F2937] text-white/80 hover:bg-[#374151]"
+                    }`}
+                  >
+                    {lang}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <input

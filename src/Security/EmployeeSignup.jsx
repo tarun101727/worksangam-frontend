@@ -52,6 +52,8 @@ const EmployeeSignup = () => {
   // For Languages multi-select input
 const [languageSearch, setLanguageSearch] = useState(""); // input text
 const [showDropdown, setShowDropdown] = useState(false); // whether dropdown is visible
+// Add this
+const [showProfessionsDropdown, setShowProfessionsDropdown] = useState(false);
 
 // Filtered languages based on search
 const filteredLanguages = indianLanguages.filter(
@@ -61,18 +63,11 @@ const filteredLanguages = indianLanguages.filter(
 );
 
   useEffect(() => {
-
-  if (!professionSearch) {
-    setFilteredProfessions([]);
-    return;
-  }
-
   const filtered = professions.filter((p) =>
     p.name.toLowerCase().includes(professionSearch.toLowerCase())
   );
 
   setFilteredProfessions(filtered);
-
 }, [professionSearch, professions]);
 
   useEffect(() => {
@@ -103,6 +98,17 @@ useEffect(() => {
       setShowDropdown(false);
     }
   };
+  document.addEventListener("click", handleClickOutside);
+  return () => document.removeEventListener("click", handleClickOutside);
+}, []);
+
+useEffect(() => {
+  const handleClickOutside = (e) => {
+    if (!e.target.closest("#profession-container")) {
+      setShowProfessionsDropdown(false);
+    }
+  };
+
   document.addEventListener("click", handleClickOutside);
   return () => document.removeEventListener("click", handleClickOutside);
 }, []);
@@ -362,87 +368,68 @@ const createEmployeeAccount = async () => {
             </div>
           </Listbox>
 
-          {/* PROFESSION */}
-          {/* PROFESSION SEARCH */}
-<label className="block text-sm text-white/70">
-  What do you do?
-</label>
+          <div id="profession-container" className="relative mt-2">
+  <input
+    className={inputBase}
+    placeholder="Search your profession (e.g. Electrician)"
+    value={professionSearch}
+    onChange={(e) => {
+      setProfessionSearch(e.target.value);
+      updateForm("profession", e.target.value);
+      setShowProfessionsDropdown(true); // show dropdown when typing
+    }}
+    onFocus={() => setShowProfessionsDropdown(true)} // show dropdown when focused
+  />
 
-<input
-  className={inputBase}
-  placeholder="Search your profession (e.g. Electrician)"
-  value={professionSearch}
-  onChange={(e) => {
-    setProfessionSearch(e.target.value);
-    updateForm("profession", e.target.value);
-  }}
-/>
-
-
-{/* PROFESSION RESULTS */}
-{professionSearch && (
-  <div className="mt-2 rounded-xl bg-[#0F172A] border border-white/10 max-h-60 overflow-y-auto">
-
-    {filteredProfessions.length > 0 ? (
-
-      filteredProfessions.map((p) => (
-        <div
-          key={p._id}
-          onClick={() => {
-            handleProfessionChange(p.name);
-            setProfessionSearch(p.name);
-          }}
-          className="px-4 py-2 text-white hover:bg-[#1F2937] cursor-pointer"
-        >
-          {p.name}
+  {/* Dropdown */}
+  {showProfessionsDropdown && (
+    <div className="mt-2 rounded-xl bg-[#0F172A] border border-white/10 max-h-60 overflow-y-auto">
+      {filteredProfessions.length > 0 ? (
+        filteredProfessions.map((p) => (
+          <div
+            key={p._id}
+            onClick={() => {
+              handleProfessionChange(p.name);
+              setProfessionSearch(p.name);
+              setShowProfessionsDropdown(false); // hide dropdown on select
+            }}
+            className="px-4 py-2 text-white hover:bg-[#1F2937] cursor-pointer"
+          >
+            {p.name}
+          </div>
+        ))
+      ) : (
+        <div className="px-4 py-3 text-yellow-400">
+          Profession not found. Save new profession.
         </div>
-      ))
+      )}
+    </div>
+  )}
 
-    ) : (
-
-      <div className="px-4 py-3 text-yellow-400">
-        Profession not found. Save new profession.
-      </div>
-
-    )}
-  </div>
-)}
-
-{/* SAVE NEW PROFESSION BUTTON */}
-{professionSearch &&
-  filteredProfessions.length === 0 && (
+  {/* Save new profession button */}
+  {professionSearch && filteredProfessions.length === 0 && (
     <button
       type="button"
       onClick={async () => {
-
         try {
-
-          const res = await axios.post(
-             `${BASE_URL}/api/professions/create`,
-            { name: professionSearch }
-          );
+          const res = await axios.post(`${BASE_URL}/api/professions/create`, {
+            name: professionSearch,
+          });
 
           handleProfessionChange(res.data.profession.name);
-
           setProfessionSearch(res.data.profession.name);
-
-          setProfessions((prev) => [
-            ...prev,
-            res.data.profession
-          ]);
-
+          setProfessions((prev) => [...prev, res.data.profession]);
+          setShowProfessionsDropdown(false);
         } catch (err) {
-
           console.error("Failed to save profession", err);
-
         }
-
       }}
       className="mt-2 w-full py-2 rounded-xl bg-[#22C55E] text-white font-semibold hover:bg-[#16A34A]"
     >
       Save "{professionSearch}" Profession
     </button>
-)}
+  )}
+</div>
 
 
           <div id="languages-container" className="relative mt-2">

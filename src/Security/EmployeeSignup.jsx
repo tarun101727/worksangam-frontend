@@ -13,15 +13,6 @@ import { indianLanguages } from "../constants/languages";
 const NAME_REGEX = /^[A-Za-z]{2,30}$/;
 const SKILLS_REGEX = /^[A-Za-z ,.-]{3,}$/;
 
-/* =======================
-   OPTIONS
-======================= */
-const genders = [
-  { id: "Male", name: "Male" },
-  { id: "Female", name: "Female" },
-  { id: "Other", name: "Other" },
-];
-
 const EmployeeSignup = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -56,7 +47,14 @@ const [showDropdown, setShowDropdown] = useState(false); // whether dropdown is 
 // Add this
 const [showProfessionsDropdown, setShowProfessionsDropdown] = useState(false);
   const { t } = useTranslation();
-
+/* =======================
+   OPTIONS
+======================= */
+const genders = [
+  { id: "Male", name: t("Male") },
+  { id: "Female", name: t("Female") },
+  { id: "Other", name: t("Other") },
+];
 // Filtered languages based on search
 const filteredLanguages = indianLanguages.filter(
   (lang) =>

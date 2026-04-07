@@ -49,7 +49,16 @@ const EmployeeSignup = () => {
   const [professions, setProfessions] = useState([]);
   const [professionSearch, setProfessionSearch] = useState("");
   const [filteredProfessions, setFilteredProfessions] = useState([]);
+  // For Languages multi-select input
+const [languageSearch, setLanguageSearch] = useState(""); // input text
+const [showDropdown, setShowDropdown] = useState(false); // whether dropdown is visible
 
+// Filtered languages based on search
+const filteredLanguages = indianLanguages.filter(
+  (lang) =>
+    lang.toLowerCase().includes(languageSearch.toLowerCase()) &&
+    !form.languages.includes(lang)
+);
 
   useEffect(() => {
 
@@ -86,6 +95,16 @@ const EmployeeSignup = () => {
 
   fetchProfessions();
 
+}, []);
+
+useEffect(() => {
+  const handleClickOutside = (e) => {
+    if (!e.target.closest("#languages-container")) {
+      setShowDropdown(false);
+    }
+  };
+  document.addEventListener("click", handleClickOutside);
+  return () => document.removeEventListener("click", handleClickOutside);
 }, []);
 
   /* =======================
@@ -426,79 +445,67 @@ const createEmployeeAccount = async () => {
 )}
 
 
-          {/* LANGUAGES */}
-          <div>
-            <label className="block text-sm text-white/70 mb-1">
-              Languages you can communicate in
-            </label>
-            <p className="text-xs text-white/40 mb-3">
-              Select all that apply
-            </p>
+          <div id="languages-container" className="relative mt-2">
 
-         {/* LANGUAGES */}
-<div className="mt-4">
-  <label className="block text-sm text-white/70 mb-1">
-    Languages you can communicate in
-  </label>
-  <p className="text-xs text-white/40 mb-3">
-    Select all that apply
-  </p>
-
-  {/* Language Buttons */}
-  <div className="flex flex-wrap gap-2 mb-3">
-    {indianLanguages.map((lang) => {
-      const isSelected = form.languages.includes(lang);
-      return (
+  {/* Selected Languages Tags */}
+  <div className="flex flex-wrap gap-2 mb-2">
+    {form.languages.map((lang) => (
+      <div
+        key={lang}
+        className="flex items-center bg-[#1F2937] text-white/90 px-3 py-1.5 rounded-full text-sm font-medium"
+      >
+        {lang}
         <button
-          key={lang}
           type="button"
           onClick={() =>
             updateForm(
               "languages",
-              isSelected
-                ? form.languages.filter((l) => l !== lang)
-                : [...form.languages, lang]
+              form.languages.filter((l) => l !== lang)
             )
           }
-          className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${
-            isSelected
-              ? "bg-[#6366F1] text-white shadow-md"
-              : "bg-[#1F2937] text-white/80 hover:bg-[#374151]"
-          }`}
+          className="ml-2 text-white/50 hover:text-red-400 font-bold"
         >
-          {lang}
+          ×
         </button>
-      );
-    })}
+      </div>
+    ))}
   </div>
 
-  {/* Selected Languages */}
-  {form.languages.length > 0 && (
-    <div className="flex flex-wrap gap-2">
-      {form.languages.map((lang) => (
-        <div
-          key={lang}
-          className="flex items-center bg-[#1F2937] text-white/90 px-3 py-1.5 rounded-full text-sm font-medium"
-        >
-          {lang}
-          <button
-            type="button"
-            onClick={() =>
-              updateForm(
-                "languages",
-                form.languages.filter((l) => l !== lang)
-              )
-            }
-            className="ml-2 text-white/50 hover:text-red-400 font-bold"
+  {/* Input Field */}
+  <input
+    type="text"
+    className={inputBase}
+    placeholder="Search or type to add language..."
+    value={languageSearch}
+    onChange={(e) => setLanguageSearch(e.target.value)}
+    onFocus={() => setShowDropdown(true)}
+  />
+
+  {/* Dropdown */}
+  {showDropdown && (
+    <div className="absolute z-50 mt-1 w-full max-h-64 overflow-auto rounded-xl bg-[#0F172A] border border-white/10 shadow-xl">
+      {filteredLanguages.length > 0 ? (
+        filteredLanguages.map((lang) => (
+          <div
+            key={lang}
+            className="px-4 py-2 cursor-pointer text-white hover:bg-[#374151]"
+            onClick={() => {
+              updateForm("languages", [...form.languages, lang]);
+              setLanguageSearch("");
+              setShowDropdown(false);
+            }}
           >
-            ×
-          </button>
+            {lang}
+          </div>
+        ))
+      ) : (
+        <div className="px-4 py-2 text-yellow-400">
+          No languages found
         </div>
-      ))}
+      )}
     </div>
   )}
 </div>
-          </div>
 
           <input
             className={inputBase}

@@ -118,28 +118,6 @@ const handleChange = (value, field) => {
     }
   }, 1000);
 };
-
-const translateText = async (text, field) => {
-  const currentLang = i18n.language || "en";
-
-  if (currentLang === "en") return;
-
-  try {
-    const res = await axios.post(`${BASE_URL}/api/translate`, {
-      text,
-      targetLang: currentLang,
-    });
-
-    const translated = res.data.translatedText;
-
-    setForm((prev) => ({
-      ...prev,
-      [field]: translated,
-    }));
-  } catch (err) {
-    console.error("Translation failed", err);
-  }
-};
 /* =======================
    OPTIONS
 ======================= */
@@ -588,29 +566,27 @@ const createEmployeeAccount = async () => {
 </div>
 
           <input
-  className={inputBase}
-  placeholder={t("Your skills (e.g. Excel, React, Accounting)")}
-  value={form.skills}
-  onChange={(e) => updateForm("skills", e.target.value)}
-  onBlur={() => translateText(form.skills, "skills")}
-/>
+            className={inputBase}
+            placeholder={t("Your skills (e.g. Excel, React, Accounting)")}
+            value={form.skills}
+            onChange={(e) => handleChange(e.target.value, "skills")}
+          />
 
           <input
-  className={inputBase}
-  type="number"
-  placeholder={t("Total work experience (in years)")}
-  value={form.experience}
-  onChange={(e) => updateForm("experience", e.target.value)}
-  onWheel={(e) => e.target.blur()}
-/>
+            className={inputBase}
+            type="number"
+            placeholder={t("Total work experience (in years)")}
+            value={form.experience}
+            onChange={(e) => handleChange(e.target.value, "experience")}
+            onWheel={(e) => e.target.blur()}
+          />
 
           <textarea
-  className={`${inputBase} h-24`}
-  placeholder={t("Write a short introduction about yourself (2–3 lines)")}
-  value={form.bio}
-  onChange={(e) => updateForm("bio", e.target.value)}
-  onBlur={() => translateText(form.bio, "bio")}
-/>
+            className={`${inputBase} h-24`}
+            placeholder={t("Write a short introduction about yourself (2–3 lines)")}
+            value={form.bio}
+            onChange={(e) => handleChange(e.target.value, "bio")}
+          />
 
           <button
             onClick={createEmployeeAccount}

@@ -1,4 +1,4 @@
-
+import { useTranslation } from "react-i18next";
 import React, { useState, Fragment, useCallback, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
@@ -55,6 +55,7 @@ const [languageSearch, setLanguageSearch] = useState(""); // input text
 const [showDropdown, setShowDropdown] = useState(false); // whether dropdown is visible
 // Add this
 const [showProfessionsDropdown, setShowProfessionsDropdown] = useState(false);
+  const { t } = useTranslation();
 
 // Filtered languages based on search
 const filteredLanguages = indianLanguages.filter(
@@ -281,10 +282,10 @@ const createEmployeeAccount = async () => {
 
         
         <h2 className="text-3xl font-bold text-white text-center">
-          Create Your Employee Profile
+          {t("Create Your Employee Profile")}
         </h2>
         <p className="text-white/60 text-center text-sm mt-2 mb-6">
-          Help employers know who you are and what you do
+          {t("Help employers know who you are and what you do")}
         </p>
 
         {/* PROFILE IMAGE */}
@@ -305,7 +306,7 @@ const createEmployeeAccount = async () => {
         className="w-full h-full object-cover rounded-full"
       />
     ) : (
-      <span className="text-white/60 text-sm">Add Photo</span>
+      <span className="text-white/60 text-sm">{t("Add Photo")}</span>
     )}
   </div>
 </div>
@@ -314,7 +315,7 @@ const createEmployeeAccount = async () => {
 
 
         <p className="text-center text-xs text-white/40 mb-6">
-          Recommended: clear face photo
+          {t("Recommended: clear face photo")}
         </p>
 
         {error && (
@@ -326,14 +327,14 @@ const createEmployeeAccount = async () => {
         <div className="space-y-4">
           <input
             className={inputBase}
-            placeholder="First name (e.g. Rahul)"
+            placeholder={t("First name (e.g. Rahul)")}
             value={form.firstName}
             onChange={(e) => updateForm("firstName", e.target.value)}
           />
 
           <input
             className={inputBase}
-            placeholder="Last name (e.g. Sharma)"
+            placeholder={t("Last name (e.g. Sharma)")}
             value={form.lastName}
             onChange={(e) => updateForm("lastName", e.target.value)}
           />
@@ -341,7 +342,7 @@ const createEmployeeAccount = async () => {
           <input
             className={inputBase}
             type="number"
-            placeholder="Your age"
+            placeholder={t("Your age")}
             value={form.age}
             onChange={(e) => updateForm("age", e.target.value)}
              onWheel={(e) => e.target.blur()}
@@ -351,7 +352,7 @@ const createEmployeeAccount = async () => {
           <Listbox value={form.gender} onChange={(v) => updateForm("gender", v)}>
             <div className="relative">
               <Listbox.Button className={inputBase}>
-                {form.gender || "Select your gender"}
+                {form.gender || t("Select your gender")}
               </Listbox.Button>
               <Transition as={Fragment}>
                 <Listbox.Options className={listboxPanel}>
@@ -372,7 +373,7 @@ const createEmployeeAccount = async () => {
           <div id="profession-container" className="relative mt-2">
   <input
     className={inputBase}
-    placeholder="Search your profession (e.g. Electrician)"
+    placeholder={t("Search your profession (e.g. Electrician)")}
     value={professionSearch}
     onChange={(e) => {
       setProfessionSearch(e.target.value);
@@ -401,7 +402,7 @@ const createEmployeeAccount = async () => {
         ))
       ) : (
         <div className="px-4 py-3 text-yellow-400">
-          Profession not found. Save new profession.
+          {t("Profession not found. Save new profession.")}
         </div>
       )}
     </div>
@@ -427,7 +428,7 @@ const createEmployeeAccount = async () => {
       }}
       className="mt-2 w-full py-2 rounded-xl bg-[#22C55E] text-white font-semibold hover:bg-[#16A34A]"
     >
-      Save "{professionSearch}" Profession
+      {t("Save")} "{professionSearch}" {t("Profession")}
     </button>
   )}
 </div>
@@ -463,7 +464,7 @@ const createEmployeeAccount = async () => {
   <input
     type="text"
     className={inputBase}
-    placeholder="Search or type to add language..."
+    placeholder={t("Search or type to add language...")}
     value={languageSearch}
     onChange={(e) => setLanguageSearch(e.target.value)}
     onFocus={() => setShowDropdown(true)}
@@ -488,7 +489,7 @@ const createEmployeeAccount = async () => {
         ))
       ) : (
         <div className="px-4 py-2 text-yellow-400">
-          No languages found
+          {t("No languages found")}
         </div>
       )}
     </div>
@@ -497,7 +498,7 @@ const createEmployeeAccount = async () => {
 
           <input
             className={inputBase}
-            placeholder="Your skills (e.g. Excel, React, Accounting)"
+            placeholder={t("Your skills (e.g. Excel, React, Accounting)")}
             value={form.skills}
             onChange={(e) => updateForm("skills", e.target.value)}
           />
@@ -505,7 +506,7 @@ const createEmployeeAccount = async () => {
           <input
             className={inputBase}
             type="number"
-            placeholder="Total work experience (in years)"
+            placeholder={t("Total work experience (in years)")}
             value={form.experience}
             onChange={(e) => updateForm("experience", e.target.value)}
             onWheel={(e) => e.target.blur()}
@@ -513,7 +514,7 @@ const createEmployeeAccount = async () => {
 
           <textarea
             className={`${inputBase} h-24`}
-            placeholder="Write a short introduction about yourself (2–3 lines)"
+            placeholder={t("Write a short introduction about yourself (2–3 lines)")}
             value={form.bio}
             onChange={(e) => updateForm("bio", e.target.value)}
           />
@@ -523,7 +524,7 @@ const createEmployeeAccount = async () => {
             disabled={!isFormComplete || loading}
             className={buttonPrimary}
           >
-            {loading ? "Setting up your profile..." : "Complete Profile"}
+            {loading ? t("Setting up your profile...") : t("Complete Profile")}
           </button>
         </div>
       </div>

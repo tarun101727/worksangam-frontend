@@ -51,6 +51,44 @@ const EmployeeSignup = () => {
   const [professionSearch, setProfessionSearch] = useState("");
   const [filteredProfessions, setFilteredProfessions] = useState([]);
 
+
+  useEffect(() => {
+
+  if (!professionSearch) {
+    setFilteredProfessions([]);
+    return;
+  }
+
+  const filtered = professions.filter((p) =>
+    p.name.toLowerCase().includes(professionSearch.toLowerCase())
+  );
+
+  setFilteredProfessions(filtered);
+
+}, [professionSearch, professions]);
+
+  useEffect(() => {
+
+  const fetchProfessions = async () => {
+
+    try {
+
+      const res = await axios.get(
+        `${BASE_URL}/api/professions`
+      );
+
+      setProfessions(res.data.professions);
+
+    } catch (err) {
+      console.error("Failed to load professions" , err );
+    }
+
+  };
+
+  fetchProfessions();
+
+}, []);
+
   /* =======================
      HELPERS
   ======================= */
@@ -127,22 +165,6 @@ const EmployeeSignup = () => {
     return null;
   };
 
-
-  useEffect(() => {
-
-  if (!professionSearch) {
-    setFilteredProfessions([]);
-    return;
-  }
-
-  const filtered = professions.filter((p) =>
-    p.name.toLowerCase().includes(professionSearch.toLowerCase())
-  );
-
-  setFilteredProfessions(filtered);
-
-}, [professionSearch, professions]);
-
   /* =======================
      SUBMIT
   ======================= */
@@ -216,29 +238,6 @@ const createEmployeeAccount = async () => {
     setLoading(false);
   }
 };
-
-
-  useEffect(() => {
-
-  const fetchProfessions = async () => {
-
-    try {
-
-      const res = await axios.get(
-        `${BASE_URL}/api/professions`
-      );
-
-      setProfessions(res.data.professions);
-
-    } catch (err) {
-      console.error("Failed to load professions" , err );
-    }
-
-  };
-
-  fetchProfessions();
-
-}, []);
 
   /* =======================
      JSX

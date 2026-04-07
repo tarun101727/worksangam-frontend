@@ -1,4 +1,3 @@
-
 import React, { useState, Fragment, useCallback, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
@@ -436,33 +435,69 @@ const createEmployeeAccount = async () => {
               Select all that apply
             </p>
 
-            <div className="flex flex-wrap gap-2">
-              {indianLanguages.map((lang) => {
-                const selected = form.languages.includes(lang);
+         {/* LANGUAGES */}
+<div className="mt-4">
+  <label className="block text-sm text-white/70 mb-1">
+    Languages you can communicate in
+  </label>
+  <p className="text-xs text-white/40 mb-3">
+    Select all that apply
+  </p>
 
-                return (
-                  <button
-                    key={lang}
-                    type="button"
-                    onClick={() =>
-                      updateForm(
-                        "languages",
-                        selected
-                          ? form.languages.filter((l) => l !== lang)
-                          : [...form.languages, lang]
-                      )
-                    }
-                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${
-                      selected
-                        ? "bg-[#6366F1] text-white shadow-md"
-                        : "bg-[#1F2937] text-white/80 hover:bg-[#374151]"
-                    }`}
-                  >
-                    {lang}
-                  </button>
-                );
-              })}
-            </div>
+  {/* Language Buttons */}
+  <div className="flex flex-wrap gap-2 mb-3">
+    {indianLanguages.map((lang) => {
+      const isSelected = form.languages.includes(lang);
+      return (
+        <button
+          key={lang}
+          type="button"
+          onClick={() =>
+            updateForm(
+              "languages",
+              isSelected
+                ? form.languages.filter((l) => l !== lang)
+                : [...form.languages, lang]
+            )
+          }
+          className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${
+            isSelected
+              ? "bg-[#6366F1] text-white shadow-md"
+              : "bg-[#1F2937] text-white/80 hover:bg-[#374151]"
+          }`}
+        >
+          {lang}
+        </button>
+      );
+    })}
+  </div>
+
+  {/* Selected Languages */}
+  {form.languages.length > 0 && (
+    <div className="flex flex-wrap gap-2">
+      {form.languages.map((lang) => (
+        <div
+          key={lang}
+          className="flex items-center bg-[#1F2937] text-white/90 px-3 py-1.5 rounded-full text-sm font-medium"
+        >
+          {lang}
+          <button
+            type="button"
+            onClick={() =>
+              updateForm(
+                "languages",
+                form.languages.filter((l) => l !== lang)
+              )
+            }
+            className="ml-2 text-white/50 hover:text-red-400 font-bold"
+          >
+            ×
+          </button>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
           </div>
 
           <input

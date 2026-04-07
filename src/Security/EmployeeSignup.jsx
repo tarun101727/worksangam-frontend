@@ -6,6 +6,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../useAuth";
 import { Listbox, Transition } from "@headlessui/react";
 import { indianLanguages } from "../constants/languages";
+import i18n from "../i18n.js";
 
 /* =======================
    VALIDATION REGEX
@@ -47,6 +48,76 @@ const [showDropdown, setShowDropdown] = useState(false); // whether dropdown is 
 // Add this
 const [showProfessionsDropdown, setShowProfessionsDropdown] = useState(false);
   const { t } = useTranslation();
+
+  let latestRequest = "";
+let timer;
+
+const transliterate = async (value, field) => {
+  const currentLang = i18n.language || "en";
+
+  latestRequest = value;
+
+  const words = value.split(" ");
+  const lastWord = words[words.length - 1];
+
+  if (!lastWord) return;
+
+  try {
+    const res = await fetch(
+      `https://inputtools.google.com/request?text=${lastWord}&itc=${currentLang}-t-i0-und&num=5`
+    );
+
+    const data = await res.json();
+
+    // Ignore outdated responses
+    if (latestRequest !== value) return;
+
+    if (data[0] === "SUCCESS") {
+      const suggestions = data[1][0][1];
+      const bestMatch = suggestions[0];
+
+      words[words.length - 1] = bestMatch;
+
+      setForm((prev) => ({
+        ...prev,
+        [field]: words.join(" "),
+      }));
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const handleChange = (value, field) => {
+  const currentLang = i18n.language || "en";
+
+  // Show raw typing
+  setForm((prev) => ({
+    ...prev,
+    [field]: value,
+  }));
+
+  // Only apply for Indian languages
+  if (!["te", "hi", "ta", "kn"].includes(currentLang)) return;
+
+  clearTimeout(timer);
+
+  const words = value.split(" ");
+  const lastWord = words[words.length - 1];
+
+  // SPACE → instant convert
+  if (value.endsWith(" ") && lastWord.length >= 3) {
+    transliterate(value.trim(), field);
+    return;
+  }
+
+  // Delay convert
+  timer = setTimeout(() => {
+    if (lastWord.length >= 3) {
+      transliterate(value, field);
+    }
+  }, 1000);
+};
 /* =======================
    OPTIONS
 ======================= */
@@ -327,14 +398,14 @@ const createEmployeeAccount = async () => {
             className={inputBase}
             placeholder={t("First name (e.g. Rahul)")}
             value={form.firstName}
-            onChange={(e) => updateForm("firstName", e.target.value)}
+            onChange={(e) => handleChange(e.target.value, "firstName")}
           />
 
           <input
             className={inputBase}
             placeholder={t("Last name (e.g. Sharma)")}
             value={form.lastName}
-            onChange={(e) => updateForm("lastName", e.target.value)}
+            onChange={(e) => handleChange(e.target.value, "lastName")}
           />
 
           <input

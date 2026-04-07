@@ -106,7 +106,7 @@ const handleChange = (value, field) => {
   const lastWord = words[words.length - 1];
 
   // SPACE → instant convert
-  if (value.endsWith(" ") && lastWord.length >= 3) {
+  if (value.endsWith(" ") && lastWord.length >= 2) {
     transliterate(value.trim(), field);
     return;
   }

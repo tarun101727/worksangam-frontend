@@ -177,6 +177,7 @@ useEffect(() => {
     "/hirer-online-urgent-post",
     "/online-worker-urgent-posts",
     "/profile-preview/Employee-edit",
+    "/select-language"
   ];
 
   const shouldHideHeader = hideHeaderOnRoutes.some((route) =>

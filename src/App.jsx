@@ -376,7 +376,7 @@ const openNotifications = async () => {
               className="text-2xl font-serif cursor-pointer"
               onClick={() => navigate("/home")}
             >
-              {t("worksangam")}
+              {t("WORKSANGAM")}
             </h1>
 
            <div className="flex items-center gap-4 sm:gap-5 md:gap-6 lg:gap-7 xl:gap-8 relative">

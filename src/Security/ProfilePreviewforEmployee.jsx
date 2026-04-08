@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const SIZE = 260;
 
@@ -14,6 +15,8 @@ const ProfilePreviewforEmployee = () => {
 
   const [scale, setScale] = useState(1); // ✅ zoom state
   const lastDistance = useRef(null);
+    const { t } = useTranslation();
+
 
   if (!state?.profileImage) return null;
 
@@ -149,7 +152,7 @@ const ProfilePreviewforEmployee = () => {
   ======================= */
   return (
     <div
-      className="min-h-screen flex items-center justify-center bg-black touch-none"
+      className="min-h-screen flex items-center justify-center touch-none"
       onMouseMove={onDrag}
       onMouseUp={stopDrag}
       onMouseLeave={stopDrag}
@@ -205,7 +208,7 @@ const ProfilePreviewforEmployee = () => {
           onClick={cropAndSave}
           className="absolute bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl bg-indigo-500 text-white font-semibold"
         >
-          Use This Photo
+          {t("Use This Photo")}
         </button>
       </div>
     </div>

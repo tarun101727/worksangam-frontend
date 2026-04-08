@@ -514,7 +514,7 @@ d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03
       {/* ROUTES */}
 <div>
       <Routes>
-        <Route path="/" element={<LanguageSelect />} />
+        <Route path="/select-language" element={<LanguageSelect />} />
 
         <Route
           path="/signup"
@@ -635,7 +635,14 @@ element={<ProfilePreviewforhirerEdit/>}
       <Route path="/job/:jobId" element={<JobDetails />} />
       <Route path="/edit-job/:jobId" element={<EditJob />} />
    <Route path="/buy-credits" element={<BuyCredits/>}/>
-        <Route path="*" element={<Navigate to="/signup" replace />} />
+        <Route
+  path="*"
+  element={
+    !localStorage.getItem("lang")
+      ? <Navigate to="/select-language" replace />
+      : <Navigate to="/signup" replace />
+  }
+/>
       </Routes>
       </div>
     </div>

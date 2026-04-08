@@ -66,6 +66,10 @@ import { urlBase64ToUint8Array } from "./utils/push";
 import JobDetails from "./JobPost/JobDetails";
 import EditJob from "./JobPost/EditJob";
 import LanguageSelect from "./LanguageSelect";
+import { useTranslation } from "react-i18next";
+
+
+
 
 const getImageUrl = (img) => {
   if (!img) return "";
@@ -84,6 +88,7 @@ export default function App() {
   const [showNotifications, setShowNotifications] = useState(false);
 const [notifications, setNotifications] = useState([]); // job notifications
 const [chatNotifications, setChatNotifications] = useState([]); // chat notifications
+  const { t } = useTranslation();
 
 
 // Combined unread count for the bell
@@ -171,7 +176,7 @@ useEffect(() => {
     "/Hirer/Urgent",
     "/hirer-online-urgent-post",
     "/online-worker-urgent-posts",
-    "/profile-preview/Employee-edit"
+    "/profile-preview/Employee-edit",
   ];
 
   const shouldHideHeader = hideHeaderOnRoutes.some((route) =>
@@ -370,7 +375,7 @@ const openNotifications = async () => {
               className="text-2xl font-serif cursor-pointer"
               onClick={() => navigate("/home")}
             >
-              ✨ GUILD
+              {t("worksangam")}
             </h1>
 
            <div className="flex items-center gap-4 sm:gap-5 md:gap-6 lg:gap-7 xl:gap-8 relative">

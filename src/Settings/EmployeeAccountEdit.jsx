@@ -39,7 +39,6 @@ export default function EmployeeAccountEdit({ user }) {
   const [filteredProfessions, setFilteredProfessions] = useState([]);
   const [showProfessionsDropdown, setShowProfessionsDropdown] = useState(false);
     const { t } = useTranslation();
-  const [loaded, setLoaded] = useState(false);
   const translateTimer = useRef(null);
 const latestTypedValue = useRef({});
 const transliterateTimer = useRef(null);
@@ -180,34 +179,37 @@ useEffect(() => {
 }, []);
 
   useEffect(() => {
-    if (!user || loaded) return;
+  if (!user) return;
 
-    setForm({
-      firstName: user.firstName || "",
-      lastName: user.lastName || "",
-      age: user.age || "",
-      gender: user.gender || "",
-      genderLabel: user.genderLabel || user.gender || "",
-      profession: user.profession || "",
-      professionType: user.professionType || "",
-      skills: user.skills || "",
-      experience: user.experience || "",
-      languages: user.languages || [],
-      bio: user.bio || "",
-    });
-    
-    setProfessionSearch(user.profession || "");
+  setForm((prev) => ({
+    ...prev,
+    firstName: user.firstName || "",
+    lastName: user.lastName || "",
+    age: user.age || "",
+    gender: user.gender || "",
+    genderLabel:
+      user.genderLabel ||
+      t(user.gender) || // 🔥 auto translate fallback
+      "",
+    profession: user.profession || "",
+    professionType: user.professionType || "",
+    skills: user.skills || "",
+    experience: user.experience || "",
+    languages: user.languages || [],
+    bio: user.bio || "",
+  }));
 
-    if (user.profileImage) {
-      setPreview(
-  user.profileImage.startsWith("http")
-    ? user.profileImage
-    : `${BASE_URL}${user.profileImage}`
-);
-    }
+  setProfessionSearch(user.profession || "");
 
-    setLoaded(true);
-  }, [user, loaded]);
+  if (user.profileImage) {
+    setPreview(
+      user.profileImage.startsWith("http")
+        ? user.profileImage
+        : `${BASE_URL}${user.profileImage}`
+    );
+  }
+
+}, [user, i18n.language]); // 🔥 VERY IMPORTANT
 
   // -------------------------
   // Receive image from preview page
@@ -404,10 +406,9 @@ useEffect(() => {
 >
             <div className="relative">
               <Listbox.Button className={inputBase}>
-  {
-    genders.find(g => g.id === form.gender)?.name 
-    || t("Select your gender")
-  }
+{
+  form.genderLabel || t("Select your gender")
+}
 </Listbox.Button>
               <Transition as={Fragment}>
                 <Listbox.Options className={listboxPanel}>

@@ -24,6 +24,7 @@ const EmployeeSignup = () => {
     lastName: "",
     age: "",
     gender: "",
+    genderLabel: "",
     profession: "",
     professionType: "",
     skills: "",
@@ -465,7 +466,15 @@ const createEmployeeAccount = async () => {
           />
 
           {/* GENDER */}
-          <Listbox value={form.gender} onChange={(v) => updateForm("gender", v)}>
+          <Listbox
+  value={form.gender}
+  onChange={(v) => {
+    const selected = genders.find(g => g.id === v);
+
+    updateForm("gender", v); // ✅ English (for backend logic)
+    updateForm("genderLabel", selected.name); // ✅ Translated (for DB)
+  }}
+>
             <div className="relative">
               <Listbox.Button className={inputBase}>
   {

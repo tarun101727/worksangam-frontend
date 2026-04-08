@@ -119,7 +119,6 @@ const handleChange = (value, field) => {
   }, 1000);
 };
 
-
 const translateText = async (text, field) => {
   const lang = i18n.language || "en";
 
@@ -146,23 +145,19 @@ const translateText = async (text, field) => {
 let translateTimer;
 
 const handleSentenceChange = (value, field) => {
-  // Show typing instantly
   setForm((prev) => ({
     ...prev,
     [field]: value,
   }));
 
   const lang = i18n.language || "en";
-  if (!["te", "hi", "ta", "kn"].includes(lang)) return;
+  if (lang === "en") return;
 
   clearTimeout(translateTimer);
 
-  // Translate after user stops typing
   translateTimer = setTimeout(() => {
-    if (value.length > 3) {
-      translateText(value, field);
-    }
-  }, 1200);
+    translateText(value, field);
+  }, 1200); // delay for better sentence accuracy
 };
 
 

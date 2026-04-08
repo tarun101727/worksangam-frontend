@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import React, { useState, Fragment, useCallback, useEffect } from "react";
+import React, { useState, useRef, Fragment, useCallback, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -49,10 +49,10 @@ const [showDropdown, setShowDropdown] = useState(false); // whether dropdown is 
 const [showProfessionsDropdown, setShowProfessionsDropdown] = useState(false);
   const { t } = useTranslation();
 
+  const translateTimer = useRef(null);
+  const latestTypedValue = useRef({});
   let latestRequest = "";
   let timer;
-  let latestTranslationRequest = "";
-  let translateTimer;
 
 const transliterate = async (value, field) => {
   const currentLang = i18n.language || "en";
@@ -123,10 +123,7 @@ const handleChange = (value, field) => {
 
 const translateText = async (text, field) => {
   const lang = i18n.language || "en";
-
   if (lang === "en") return;
-
-  latestTranslationRequest = text;
 
   try {
     const res = await fetch(
@@ -134,11 +131,10 @@ const translateText = async (text, field) => {
     );
 
     const data = await res.json();
-
-    // ❗ Ignore outdated responses
-    if (latestTranslationRequest !== text) return;
-
     const translated = data[0].map((item) => item[0]).join("");
+
+    // only update if user didn't type new text
+    if (latestTypedValue.current[field] !== text) return;
 
     setForm((prev) => ({
       ...prev,
@@ -150,6 +146,10 @@ const translateText = async (text, field) => {
 };
 
 const handleSentenceChange = (value, field) => {
+  // store latest typed value
+  latestTypedValue.current[field] = value;
+
+  // update UI immediately
   setForm((prev) => ({
     ...prev,
     [field]: value,
@@ -158,14 +158,14 @@ const handleSentenceChange = (value, field) => {
   const lang = i18n.language || "en";
   if (lang === "en") return;
 
-  clearTimeout(translateTimer);
+  clearTimeout(translateTimer.current);
 
-  // ❗ Prevent translation when user presses SPACE
-  if (value.endsWith(" ")) return;
+  translateTimer.current = setTimeout(() => {
+    // if user typed something new, skip
+    if (latestTypedValue.current[field] !== value) return;
 
-  translateTimer = setTimeout(() => {
     translateText(value, field);
-  }, 1200);
+  }, 800);
 };
 
 

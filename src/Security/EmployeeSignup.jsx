@@ -478,10 +478,10 @@ const createEmployeeAccount = async () => {
                   {genders.map((g) => (
                     <Listbox.Option
   key={g.id}
-  value={g.id}   // ✅ FIX: send English constant
+  value={g.id} 
   className={({ active }) => listboxOption(active)}
 >
-  {g.name}       // ✅ still show translated text
+  {g.name}   
 </Listbox.Option>
                   ))}
                 </Listbox.Options>

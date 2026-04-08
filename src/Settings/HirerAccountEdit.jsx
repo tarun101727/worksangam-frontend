@@ -1,17 +1,17 @@
-
 import { useState, Fragment, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
 import { Listbox, Transition } from "@headlessui/react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n.js";
+
 
 const GENDERS = ["Male", "Female", "Other"];
-
 export default function HirerAccountEdit({ user }) {
-
+  const { t } = useTranslation();
 const navigate = useNavigate();
 const location = useLocation();
-
 /* =======================
    FORM STATE
 ======================= */
@@ -76,7 +76,74 @@ state:{}
 
 },[location.state,navigate,location.pathname]);
 
+let latestRequest = "";
 
+const transliterate = async (value, field) => {
+  const currentLang = i18n.language || "en";
+
+  latestRequest = value;
+
+  const words = value.split(" ");
+  const lastWord = words[words.length - 1];
+
+  if (!lastWord) return;
+
+  try {
+    const res = await fetch(
+      `https://inputtools.google.com/request?text=${lastWord}&itc=${currentLang}-t-i0-und&num=5`
+    );
+
+    const data = await res.json();
+
+    if (latestRequest !== value) return;
+
+    if (data[0] === "SUCCESS") {
+      const suggestions = data[1][0][1];
+      const bestMatch = suggestions[0];
+
+      words[words.length - 1] = bestMatch;
+
+      setForm((prev) => ({
+        ...prev,
+        [field]: words.join(" "),
+      }));
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+let timer;
+
+const handleChange = (value, field) => {
+  const currentLang = i18n.language || "en";
+
+  // show typing instantly
+  setForm((prev) => ({
+    ...prev,
+    [field]: value,
+  }));
+
+  if (!["te", "hi", "ta", "kn"].includes(currentLang)) return;
+
+  clearTimeout(timer);
+
+  const words = value.split(" ");
+  const lastWord = words[words.length - 1];
+
+  // SPACE pressed → instant transliteration
+  if (value.endsWith(" ") && lastWord.length >= 3) {
+    transliterate(value.trim(), field);
+    return;
+  }
+
+  // user stopped typing
+  timer = setTimeout(() => {
+    if (lastWord.length >= 3) {
+      transliterate(value, field);
+    }
+  }, 1000);
+};
 
 /* =======================
    INPUT STYLE
@@ -151,7 +218,7 @@ rounded-none md:rounded-3xl
 >
 
 <h2 className="text-3xl font-bold text-center text-white mb-6">
-Edit Profile
+{t("Edit Profile")}
 </h2>
 
 
@@ -181,7 +248,7 @@ className="w-full h-full object-cover rounded-full"
 ):( 
 
 <span className="text-white/60 text-sm">
-Add Photo
+{t("Add Photo")}
 </span>
 
 )}
@@ -191,7 +258,7 @@ Add Photo
 </div>
 
 <p className="text-xs text-white/60 mt-2 text-center">
-Click on the image to change your profile image
+{t("Click on the image to change your profile image")}
 </p>
 
 </div>
@@ -199,29 +266,19 @@ Click on the image to change your profile image
 
 {/* FIRST NAME */}
 <input
-placeholder="First Name"
-value={form.firstName}
-onChange={(e)=>
-setForm({
-...form,
-firstName:e.target.value.replace(/[^A-Za-z]/g,"")
-})
-}
-className={inputBase}
+  placeholder={t("First Name")}
+  value={form.firstName}
+  onChange={(e) => handleChange(e.target.value, "firstName")}
+  className={inputBase}
 />
 
 
 {/* LAST NAME */}
 <input
-placeholder="Last Name"
-value={form.lastName}
-onChange={(e)=>
-setForm({
-...form,
-lastName:e.target.value.replace(/[^A-Za-z]/g,"")
-})
-}
-className={`${inputBase} mt-4`}
+  placeholder={t("Last Name")}
+  value={form.lastName}
+  onChange={(e) => handleChange(e.target.value, "lastName")}
+  className={`${inputBase} mt-4`}
 />
 
 
@@ -230,7 +287,7 @@ className={`${inputBase} mt-4`}
 type="number"
 min="18"
 max="100"
-placeholder="Age"
+placeholder={t("Age")}
 value={form.age}
 onChange={(e)=>setForm({...form,age:e.target.value})}
 className={`${inputBase} mt-4`}
@@ -250,10 +307,8 @@ onChange={(v)=>setForm({...form,gender:v})}
 className={`relative w-full ${open ? "md:mb-36":"md:mb-0"}`}
 >
 
-<Listbox.Button
-className={`${inputBase} mt-4 text-left`}
->
-{form.gender || "Select Gender"}
+<Listbox.Button className={`${inputBase} mt-4 text-left`}>
+  {form.gender ? t(form.gender) : t("Select Gender")}
 </Listbox.Button>
 
 <Transition as={Fragment}>
@@ -267,18 +322,14 @@ static md:absolute z-10
 "
 >
 
-{GENDERS.map((g)=>(
-
-<Listbox.Option
-key={g}
-value={g}
-className="px-4 py-2 cursor-pointer hover:bg-[#6366F1]/20"
->
-
-{g}
-
-</Listbox.Option>
-
+{GENDERS.map((g) => (
+  <Listbox.Option
+    key={g}
+    value={g}
+    className="px-4 py-2 cursor-pointer hover:bg-[#6366F1]/20"
+  >
+    {t(g)}
+  </Listbox.Option>
 ))}
 
 </Listbox.Options>
@@ -298,7 +349,7 @@ disabled={loading}
 className={`${buttonPrimary} mt-6`}
 >
 
-{loading ? "Saving..." : "Save Changes"}
+{loading ? t("Saving...") : t("Save Changes")}
 
 </button>
 

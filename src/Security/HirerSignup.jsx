@@ -265,8 +265,8 @@ const handleChange = (value, field) => {
                 ${open ? "md:mb-36" : "md:mb-0"}
               `}
             >
-              <Listbox.Button className={`${inputBase} mt-4 text-left`}>
-  {form.gender ? t(form.gender) : t("Select Gender")}
+            <Listbox.Button className={`${inputBase} mt-4 text-left`}>
+  {form.genderLabel || t("Select Gender")}
 </Listbox.Button>
 
               <Transition as={Fragment}>

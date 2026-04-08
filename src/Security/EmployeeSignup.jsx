@@ -8,11 +8,6 @@ import { Listbox, Transition } from "@headlessui/react";
 import { indianLanguages } from "../constants/languages";
 import i18n from "../i18n.js";
 
-/* =======================
-   VALIDATION REGEX
-======================= */
-const SKILLS_REGEX = /^[\p{L} ,.-]{3,}$/u;
-
 const EmployeeSignup = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -301,9 +296,6 @@ if (!form.lastName.trim()) {
 
     if (!form.gender) return "Please select your gender";
     if (!form.profession) return "Please select your profession";
-
-    if (!SKILLS_REGEX.test(form.skills))
-      return "Enter valid skills (comma separated)";
 
     const exp = Number(form.experience);
     if (!Number.isInteger(exp) || exp < 0 || exp > 60)

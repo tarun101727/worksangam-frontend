@@ -50,7 +50,9 @@ const [showProfessionsDropdown, setShowProfessionsDropdown] = useState(false);
   const { t } = useTranslation();
 
   let latestRequest = "";
-let timer;
+  let timer;
+  let latestTranslationRequest = "";
+  let translateTimer;
 
 const transliterate = async (value, field) => {
   const currentLang = i18n.language || "en";
@@ -124,12 +126,17 @@ const translateText = async (text, field) => {
 
   if (lang === "en") return;
 
+  latestTranslationRequest = text;
+
   try {
     const res = await fetch(
       `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${lang}&dt=t&q=${encodeURIComponent(text)}`
     );
 
     const data = await res.json();
+
+    // ❗ Ignore outdated responses
+    if (latestTranslationRequest !== text) return;
 
     const translated = data[0].map((item) => item[0]).join("");
 
@@ -142,8 +149,6 @@ const translateText = async (text, field) => {
   }
 };
 
-let translateTimer;
-
 const handleSentenceChange = (value, field) => {
   setForm((prev) => ({
     ...prev,
@@ -155,9 +160,12 @@ const handleSentenceChange = (value, field) => {
 
   clearTimeout(translateTimer);
 
+  // ❗ Prevent translation when user presses SPACE
+  if (value.endsWith(" ")) return;
+
   translateTimer = setTimeout(() => {
     translateText(value, field);
-  }, 1200); // delay for better sentence accuracy
+  }, 1200);
 };
 
 

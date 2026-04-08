@@ -11,8 +11,8 @@ import i18n from "../i18n.js";
 /* =======================
    VALIDATION REGEX
 ======================= */
-const NAME_REGEX = /^[A-Za-z]{2,30}$/;
-const SKILLS_REGEX = /^[A-Za-z ,.-]{3,}$/;
+const NAME_REGEX = /^[\p{L}]{2,30}$/u;
+const SKILLS_REGEX = /^[\p{L} ,.-]{3,}$/u;
 
 const EmployeeSignup = () => {
   const navigate = useNavigate();

@@ -1,4 +1,4 @@
-
+import { useTranslation } from "react-i18next";
 import ProfileComments from "../ProfileComments";
 import { useState, useEffect, useCallback, memo } from "react";
 import axios from "axios";
@@ -74,6 +74,8 @@ const EmployeeProfile = ({ user, notification, clear, readOnly }) => {
 
   const [avgRating, setAvgRating] = useState(0);
   const [myRating, setMyRating] = useState(0);
+    const { t } = useTranslation();
+  
 
   /* Join socket room */
   useEffect(() => {
@@ -251,7 +253,7 @@ const EmployeeProfile = ({ user, notification, clear, readOnly }) => {
               isAvailable ? "text-green-400" : "text-red-400"
             }`}
           >
-            {isAvailable ? "LIVE" : "OFFLINE"}
+            {isAvailable ? t("LIVE") : t("OFFLINE")}
           </span>
         </p>
 
@@ -265,7 +267,7 @@ const EmployeeProfile = ({ user, notification, clear, readOnly }) => {
                 : "bg-green-500 hover:bg-green-600"
             }`}
           >
-            {loading ? "Please wait..." : isAvailable ? "Go Offline" : "Go Live"}
+            {loading ? t("Please wait...") : isAvailable ? t("Go Offline") : t("Go Live")}
           </button>
         )}
       </div>
@@ -274,7 +276,7 @@ const EmployeeProfile = ({ user, notification, clear, readOnly }) => {
       {readOnly && (
         <div className="mt-8 text-white">
 
-          <p className="text-white/60 mb-2">Your Rating</p>
+          <p className="text-white/60 mb-2">{t("Your Rating")}</p>
 
           <div className="flex gap-1">
             {[1,2,3,4,5].map((star) => (
@@ -293,7 +295,7 @@ const EmployeeProfile = ({ user, notification, clear, readOnly }) => {
               onClick={submitRating}
               className="mt-3 px-4 py-2 bg-indigo-500 rounded-lg"
             >
-              Submit
+              {t("Submit")}
             </button>
           )}
 
@@ -309,16 +311,16 @@ const EmployeeProfile = ({ user, notification, clear, readOnly }) => {
 
       {/* PROFILE INFO */}
       <div className="space-y-4 text-white mt-6">
-        <ProfileRow label="Age" value={user?.age ?? "—"} />
-        <ProfileRow label="Gender" value={user?.gender ?? "—"} />
-        <ProfileRow label="Profession" value={user?.profession ?? "—"} />
-        <ProfileRow label="Skills" value={user?.skills ?? "—"} />
+        <ProfileRow label={t("Age")} value={user?.age ?? "—"} />
+        <ProfileRow label={t("Gender")} value={user?.gender ?? "—"} />
+        <ProfileRow label={t("Profession")} value={user?.profession ?? "—"} />
+        <ProfileRow label={t("Skills")} value={user?.skills ?? "—"} />
         <ProfileRow
-          label="Experience"
+          label={t("Experience")}
           value={user?.experience ? `${user.experience} years` : "—"}
         />
         <ProfileRow
-  label="Languages"
+  label={t("Languages")}
   value={user?.languages?.length ? user.languages.join(", ") : "—"}
 />
       </div>
@@ -348,14 +350,14 @@ const EmployeeProfile = ({ user, notification, clear, readOnly }) => {
               onClick={acceptJob}
               className="flex-1 bg-indigo-500 py-2 rounded-xl"
             >
-              Accept
+              {t("Accept")}
             </button>
 
             <button
               onClick={clear}
               className="flex-1 bg-gray-800 py-2 rounded-xl"
             >
-              Deny
+              {t("Deny")}
             </button>
 
           </div>

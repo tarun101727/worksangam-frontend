@@ -8,13 +8,6 @@ import i18n from "../i18n.js";
 import { useRef } from "react";
 import { indianLanguages } from "../constants/languages";
 
-
-const genders = [
-  { id: "Male", name: "Male" },
-  { id: "Female", name: "Female" },
-  { id: "Other", name: "Other" },
-];
-
 export default function EmployeeAccountEdit({ user }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -53,6 +46,12 @@ const latestTransliterateValue = useRef("");
 
 const [languageSearch, setLanguageSearch] = useState("");
 const [showDropdown, setShowDropdown] = useState(false);
+
+const genders = [
+  { id: "Male", name: t("Male") },
+  { id: "Female", name: t("Female") },
+  { id: "Other", name: t("Other") },
+];
 
 const transliterate = async (value, field) => {
   const currentLang = i18n.language || "en";

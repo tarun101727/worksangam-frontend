@@ -19,7 +19,8 @@ const [form,setForm] = useState({
 firstName:"",
 lastName:"",
 age:"",
-gender:""
+gender:"",
+genderLabel:""
 });
 
 /* =======================
@@ -42,7 +43,8 @@ setForm(prev => ({
 firstName: prev.firstName || user.firstName || "",
 lastName: prev.lastName || user.lastName || "",
 age: prev.age || user.age || "",
-gender: prev.gender || user.gender || ""
+gender: prev.gender || user.gender || "",
+genderLabel: prev.genderLabel || user.genderLabel || user.gender || ""
 }));
 
 if(!preview && user.profileImage){
@@ -177,6 +179,7 @@ const save = async () => {
     }
     if (form.gender !== user.gender) {
       formData.append("gender", form.gender);
+      formData.append("genderLabel", form.genderLabel);
     }
     /* image upload only if changed */
     if (image) {
@@ -298,7 +301,13 @@ onWheel={(e)=>e.target.blur()}
 {/* GENDER */}
 <Listbox
 value={form.gender}
-onChange={(v)=>setForm({...form,gender:v})}
+onChange={(v)=>{
+  setForm({
+    ...form,
+    gender: v,              // English
+    genderLabel: t(v),      // Translated
+  });
+}}
 >
 
 {({open})=>(
@@ -308,7 +317,7 @@ className={`relative w-full ${open ? "md:mb-36":"md:mb-0"}`}
 >
 
 <Listbox.Button className={`${inputBase} mt-4 text-left`}>
-  {form.gender ? t(form.gender) : t("Select Gender")}
+ {form.genderLabel || t("Select Gender")}
 </Listbox.Button>
 
 <Transition as={Fragment}>

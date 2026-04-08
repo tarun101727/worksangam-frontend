@@ -12,9 +12,9 @@ const LanguageSelect = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#020617] via-[#020617] to-[#020617] text-white px-4">
       
-      <div className="bg-gray-900/70 backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full max-w-md text-center border border-gray-700">
+      <div className="bg-[#0F172A]/90 backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full max-w-md text-center border border-gray-700">
         
         <h1 className="text-3xl font-bold mb-2 tracking-wide">
           🌐 Select Language

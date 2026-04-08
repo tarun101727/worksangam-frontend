@@ -11,7 +11,6 @@ import i18n from "../i18n.js";
 /* =======================
    VALIDATION REGEX
 ======================= */
-const NAME_REGEX = /^[\p{L}\s]{2,50}$/u;
 const SKILLS_REGEX = /^[\p{L} ,.-]{3,}$/u;
 
 const EmployeeSignup = () => {
@@ -288,11 +287,13 @@ useEffect(() => {
      VALIDATION
   ======================= */
   const validateForm = () => {
-    if (!NAME_REGEX.test(form.firstName))
-      return "Please enter a valid first name";
+      if (!form.firstName.trim()) {
+  return "First name is required";
+}
 
-    if (!NAME_REGEX.test(form.lastName))
-      return "Please enter a valid last name";
+if (!form.lastName.trim()) {
+  return "Last name is required";
+}
 
     const age = Number(form.age);
     if (!Number.isInteger(age) || age < 18 || age > 100)

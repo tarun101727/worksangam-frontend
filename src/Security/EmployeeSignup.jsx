@@ -468,18 +468,21 @@ const createEmployeeAccount = async () => {
           <Listbox value={form.gender} onChange={(v) => updateForm("gender", v)}>
             <div className="relative">
               <Listbox.Button className={inputBase}>
-                {form.gender || t("Select your gender")}
-              </Listbox.Button>
+  {
+    genders.find(g => g.id === form.gender)?.name 
+    || t("Select your gender")
+  }
+</Listbox.Button>
               <Transition as={Fragment}>
                 <Listbox.Options className={listboxPanel}>
                   {genders.map((g) => (
                     <Listbox.Option
-                      key={g.id}
-                      value={g.name}
-                      className={({ active }) => listboxOption(active)}
-                    >
-                      {g.name}
-                    </Listbox.Option>
+  key={g.id}
+  value={g.id}   // ✅ FIX: send English constant
+  className={({ active }) => listboxOption(active)}
+>
+  {g.name}       // ✅ still show translated text
+</Listbox.Option>
                   ))}
                 </Listbox.Options>
               </Transition>

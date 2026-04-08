@@ -566,27 +566,27 @@ const createEmployeeAccount = async () => {
 </div>
 
           <input
-            className={inputBase}
-            placeholder={t("Your skills (e.g. Excel, React, Accounting)")}
-            value={form.skills}
-            onChange={(e) => handleChange(e.target.value, "skills")}
-          />
+  className={inputBase}
+  placeholder={t("Your skills (e.g. Excel, React, Accounting)")}
+  value={form.skills}
+  onChange={(e) => updateForm("skills", e.target.value)}
+/>
 
-          <input
-            className={inputBase}
-            type="number"
-            placeholder={t("Total work experience (in years)")}
-            value={form.experience}
-            onChange={(e) => handleChange(e.target.value, "experience")}
-            onWheel={(e) => e.target.blur()}
-          />
+<input
+  className={inputBase}
+  type="number"
+  placeholder={t("Total work experience (in years)")}
+  value={form.experience}
+  onChange={(e) => updateForm("experience", e.target.value)}
+  onWheel={(e) => e.target.blur()}
+/>
 
-          <textarea
-            className={`${inputBase} h-24`}
-            placeholder={t("Write a short introduction about yourself (2–3 lines)")}
-            value={form.bio}
-            onChange={(e) => handleChange(e.target.value, "bio")}
-          />
+<textarea
+  className={`${inputBase} h-24`}
+  placeholder={t("Write a short introduction about yourself (2–3 lines)")}
+  value={form.bio}
+  onChange={(e) => updateForm("bio", e.target.value)}
+/>
 
           <button
             onClick={createEmployeeAccount}

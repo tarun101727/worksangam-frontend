@@ -25,6 +25,7 @@ const HirerSignup = () => {
     lastName: "",
     age: "",
     gender: "",
+    genderLabel: "",
   });
 
   const profileImage = location.state?.profileImage || null;
@@ -80,6 +81,7 @@ if (!form.lastName.trim()) {
       formData.append("lastName", form.lastName.trim());
       formData.append("age", Number(form.age));
       formData.append("gender", form.gender);
+      formData.append("genderLabel", form.genderLabel);
       formData.append("profileImage", profileFile);
 
       const res = await axios.post(
@@ -247,9 +249,15 @@ const handleChange = (value, field) => {
 
         {/* GENDER — DESKTOP GAP WHEN OPEN */}
         <Listbox
-          value={form.gender}
-          onChange={(v) => setForm({ ...form, gender: v })}
-        >
+  value={form.gender}
+  onChange={(v) => {
+    setForm({
+      ...form,
+      gender: v,                // ✅ English
+      genderLabel: t(v),        // ✅ Translated
+    });
+  }}
+>
           {({ open }) => (
             <div
               className={`

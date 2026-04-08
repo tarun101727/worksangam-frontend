@@ -119,10 +119,14 @@ const handleChange = (value, field) => {
   }, 1000);
 };
 
+let latestTranslateRequest = "";
+
 const translateText = async (text, field) => {
   const lang = i18n.language || "en";
-
   if (lang === "en") return;
+
+  // ✅ Track latest request
+  latestTranslateRequest = text;
 
   try {
     const res = await fetch(
@@ -130,6 +134,9 @@ const translateText = async (text, field) => {
     );
 
     const data = await res.json();
+
+    // ❗ Ignore old responses
+    if (latestTranslateRequest !== text) return;
 
     const translated = data[0].map((item) => item[0]).join("");
 
@@ -145,6 +152,7 @@ const translateText = async (text, field) => {
 let translateTimer;
 
 const handleSentenceChange = (value, field) => {
+  // Show typing instantly
   setForm((prev) => ({
     ...prev,
     [field]: value,
@@ -155,9 +163,16 @@ const handleSentenceChange = (value, field) => {
 
   clearTimeout(translateTimer);
 
+  // ✅ SPACE → instant translate
+  if (value.endsWith(" ")) {
+    translateText(value.trim(), field);
+    return;
+  }
+
+  // ✅ Delay translate
   translateTimer = setTimeout(() => {
     translateText(value, field);
-  }, 1200); // delay for better sentence accuracy
+  }, 1200);
 };
 
 

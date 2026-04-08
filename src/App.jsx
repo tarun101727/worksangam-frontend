@@ -635,14 +635,7 @@ element={<ProfilePreviewforhirerEdit/>}
       <Route path="/job/:jobId" element={<JobDetails />} />
       <Route path="/edit-job/:jobId" element={<EditJob />} />
    <Route path="/buy-credits" element={<BuyCredits/>}/>
-        <Route
-  path="*"
-  element={
-    !localStorage.getItem("lang")
-      ? <Navigate to="/select-language" replace />
-      : <Navigate to="/signup" replace />
-  }
-/>
+        <Route path="*" element={<Navigate to="/select-language" replace />} />
       </Routes>
       </div>
     </div>

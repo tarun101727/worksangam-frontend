@@ -118,6 +118,54 @@ const handleChange = (value, field) => {
     }
   }, 1000);
 };
+
+
+const translateText = async (text, field) => {
+  const lang = i18n.language || "en";
+
+  if (lang === "en") return;
+
+  try {
+    const res = await fetch(
+      `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${lang}&dt=t&q=${encodeURIComponent(text)}`
+    );
+
+    const data = await res.json();
+
+    const translated = data[0].map((item) => item[0]).join("");
+
+    setForm((prev) => ({
+      ...prev,
+      [field]: translated,
+    }));
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+let translateTimer;
+
+const handleSentenceChange = (value, field) => {
+  // Show typing instantly
+  setForm((prev) => ({
+    ...prev,
+    [field]: value,
+  }));
+
+  const lang = i18n.language || "en";
+  if (!["te", "hi", "ta", "kn"].includes(lang)) return;
+
+  clearTimeout(translateTimer);
+
+  // Translate after user stops typing
+  translateTimer = setTimeout(() => {
+    if (value.length > 3) {
+      translateText(value, field);
+    }
+  }, 1200);
+};
+
+
 /* =======================
    OPTIONS
 ======================= */
@@ -569,7 +617,7 @@ const createEmployeeAccount = async () => {
             className={inputBase}
             placeholder={t("Your skills (e.g. Excel, React, Accounting)")}
             value={form.skills}
-            onChange={(e) => handleChange(e.target.value, "skills")}
+            onChange={(e) => handleSentenceChange(e.target.value, "skills")}
           />
 
           <input
@@ -585,7 +633,7 @@ const createEmployeeAccount = async () => {
             className={`${inputBase} h-24`}
             placeholder={t("Write a short introduction about yourself (2–3 lines)")}
             value={form.bio}
-            onChange={(e) => handleChange(e.target.value, "bio")}
+            onChange={(e) => handleSentenceChange(e.target.value, "bio")}
           />
 
           <button

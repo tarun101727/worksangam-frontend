@@ -17,6 +17,7 @@ export default function EmployeeAccountEdit({ user }) {
     lastName: "",
     age: "",
     gender: "",
+    genderLabel: "",
     profession: "",
     professionType: "",
     skills: "",
@@ -186,6 +187,7 @@ useEffect(() => {
       lastName: user.lastName || "",
       age: user.age || "",
       gender: user.gender || "",
+      genderLabel: user.genderLabel || user.gender || "",
       profession: user.profession || "",
       professionType: user.professionType || "",
       skills: user.skills || "",
@@ -391,7 +393,15 @@ useEffect(() => {
           />
 
           {/* GENDER */}
-          <Listbox value={form.gender} onChange={(v) => updateForm("gender", v)}>
+          <Listbox
+  value={form.gender}
+  onChange={(v) => {
+    const selected = genders.find(g => g.id === v);
+
+    updateForm("gender", v); // ✅ English
+    updateForm("genderLabel", selected.name); // ✅ Translated
+  }}
+>
             <div className="relative">
               <Listbox.Button className={inputBase}>
   {

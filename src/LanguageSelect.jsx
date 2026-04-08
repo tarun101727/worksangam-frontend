@@ -1,4 +1,4 @@
-import i18n from "./i18n"; 
+import i18n from "./i18n";
 import { useNavigate } from "react-router-dom";
 
 const LanguageSelect = () => {
@@ -8,17 +8,43 @@ const LanguageSelect = () => {
     i18n.changeLanguage(lang);
     localStorage.setItem("lang", lang);
 
-    // after selecting → go to signup
     navigate("/signup");
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white">
-      <h1 className="text-2xl mb-6">Select Language</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white px-4">
+      
+      <div className="bg-gray-900/70 backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full max-w-md text-center border border-gray-700">
+        
+        <h1 className="text-3xl font-bold mb-2 tracking-wide">
+          🌐 Select Language
+        </h1>
 
-      <div className="grid grid-cols-2 gap-4">
-        <button onClick={() => handleLanguage("en")}>English</button>
-        <button onClick={() => handleLanguage("te")}>తెలుగు</button>
+        <p className="text-gray-400 mb-6 text-sm">
+          Choose your preferred language to continue
+        </p>
+
+        <div className="grid grid-cols-2 gap-4">
+          
+          <button
+            onClick={() => handleLanguage("en")}
+            className="py-3 rounded-xl bg-gray-800 hover:bg-gray-700 transition-all duration-200 shadow-md hover:scale-105 font-medium"
+          >
+            English
+          </button>
+
+          <button
+            onClick={() => handleLanguage("te")}
+            className="py-3 rounded-xl bg-gray-800 hover:bg-gray-700 transition-all duration-200 shadow-md hover:scale-105 font-medium"
+          >
+            తెలుగు
+          </button>
+
+        </div>
+
+        <div className="mt-6 text-xs text-gray-500">
+          You can change language anytime later
+        </div>
       </div>
     </div>
   );

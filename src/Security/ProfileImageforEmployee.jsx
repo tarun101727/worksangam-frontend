@@ -1,10 +1,14 @@
 import React, { useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
+
 
 const ProfileImageforEmployee = () => {
   const fileRef = useRef();
 const navigate = useNavigate();
 const location = useLocation();
+  const { t } = useTranslation();
 
   const handleFile = (file) => {
     if (!file) return;
@@ -62,22 +66,22 @@ const location = useLocation();
         "
       >
         <h2 className="text-xl md:text-2xl font-bold text-white mb-2">
-          Add Profile Photo
+          {t("Add Profile Photo")}
         </h2>
 
         <p className="text-sm md:text-base text-white/60 mb-8">
-          Choose a photo from your gallery or take one using your camera
+          {t("Choose a photo from your gallery or take one using your camera")}
         </p>
 
         <button
           onClick={() => fileRef.current.click()}
           className={`${buttonPrimary} mb-4`}
         >
-          📁 Choose from Gallery
+          📁 {t("Choose from Gallery")}
         </button>
 
         <button onClick={openCamera} className={buttonSecondary}>
-          📷 Open Camera
+          📷 {t("Open Camera")}
         </button>
 
         <input

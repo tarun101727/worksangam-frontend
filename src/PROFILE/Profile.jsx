@@ -7,6 +7,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import EmployeeProfile from "./EmployeeProfile";
 import HirerProfile from "./HirerProfile";
 import AdminProfile from "../AdminProfile";
+import { useTranslation } from "react-i18next";
+
 
 const Profile = () => {
   const { user: loggedInUser, setUser } = useAuth();
@@ -17,6 +19,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showImage, setShowImage] = useState(false);
+  const { t } = useTranslation();
 
   const isOwnProfile = !userId || userId === loggedInUser?._id;
 
@@ -60,7 +63,7 @@ const Profile = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex sm:items-center sm:justify-center pt-6 text-white/70">
-        Loading profile...
+        {t("Loading profile...")}
       </div>
     );
   }
@@ -70,7 +73,7 @@ const Profile = () => {
   if (error || !profileUser) {
     return (
       <div className="min-h-screen flex sm:items-center sm:justify-center pt-6 text-red-400">
-        {error || "User not found"}
+        {error || t("User not found")}
       </div>
     );
   }
@@ -117,7 +120,7 @@ const Profile = () => {
                  hover:bg-green-600 
                  transition-all"
       >
-        Chat with {profileUser.firstName}
+        {t("chat_with_user", { name: profileUser.firstName })}
       </button>
   )}
 
@@ -218,7 +221,7 @@ const Profile = () => {
 
             {!isOwnProfile && (
               <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full bg-yellow-400/20 text-yellow-300">
-                Viewing profile
+                {t("Viewing profile")}
               </span>
             )}
           </div>

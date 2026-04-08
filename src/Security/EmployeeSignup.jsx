@@ -127,9 +127,16 @@ const translateText = async (text, field) => {
     );
 
     const data = await res.json();
-    const translated = data[0].map((item) => item[0]).join("");
 
-    // only update if user didn't type new text
+    let translated = data[0].map((item) => item[0]).join("");
+
+    // ✅ preserve trailing spaces
+    const trailingSpaces = text.match(/\s+$/);
+    if (trailingSpaces) {
+      translated += trailingSpaces[0];
+    }
+
+    // prevent overwrite
     if (latestTypedValue.current[field] !== text) return;
 
     setForm((prev) => ({

@@ -51,13 +51,13 @@ const [showProfessionsDropdown, setShowProfessionsDropdown] = useState(false);
 
   const translateTimer = useRef(null);
   const latestTypedValue = useRef({});
-  let latestRequest = "";
-  let timer;
+  const transliterateTimer = useRef(null);
+  const latestTransliterateValue = useRef("");
 
 const transliterate = async (value, field) => {
   const currentLang = i18n.language || "en";
 
-  latestRequest = value;
+  latestTransliterateValue.current = value;
 
   const words = value.split(" ");
   const lastWord = words[words.length - 1];
@@ -71,14 +71,14 @@ const transliterate = async (value, field) => {
 
     const data = await res.json();
 
-    // Ignore outdated responses
-    if (latestRequest !== value) return;
-
     if (data[0] === "SUCCESS") {
       const suggestions = data[1][0][1];
       const bestMatch = suggestions[0];
 
       words[words.length - 1] = bestMatch;
+
+      // prevent overwrite
+      if (latestTransliterateValue.current !== value) return;
 
       setForm((prev) => ({
         ...prev,
@@ -93,28 +93,24 @@ const transliterate = async (value, field) => {
 const handleChange = (value, field) => {
   const currentLang = i18n.language || "en";
 
-  // Show raw typing
   setForm((prev) => ({
     ...prev,
     [field]: value,
   }));
 
-  // Only apply for Indian languages
   if (!["te", "hi", "ta", "kn"].includes(currentLang)) return;
 
-  clearTimeout(timer);
+  clearTimeout(transliterateTimer.current);
 
   const words = value.split(" ");
   const lastWord = words[words.length - 1];
 
-  // SPACE → instant convert
   if (value.endsWith(" ") && lastWord.length >= 2) {
     transliterate(value.trim(), field);
     return;
   }
 
-  // Delay convert
-  timer = setTimeout(() => {
+  transliterateTimer.current = setTimeout(() => {
     if (lastWord.length >= 3) {
       transliterate(value, field);
     }

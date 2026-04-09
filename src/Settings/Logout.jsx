@@ -50,7 +50,7 @@ return(
 </h1>
 
 <p className="text-gray-300 mb-6">
-{t("Logging out will end your current session on this device.You will need to sign in again to access your account,manage your profile, post jobs, hire employees, or update your settings.")}
+{t("log_description")}
 </p>
 
 <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-xl p-4 mb-6">

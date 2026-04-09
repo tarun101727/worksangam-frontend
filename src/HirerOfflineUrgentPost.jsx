@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import L from "leaflet";
+import { useTranslation } from "react-i18next";
 
 import { BASE_URL } from "./config";
 import CreateOfflineWorkerPostPage from "./PROFILE/CreateOfflineWorkerPostPage";
@@ -45,6 +46,7 @@ const HirerOfflineUrgentPost = () => {
   const [error, setError] = useState("");
   const [mediaPreviews, setMediaPreviews] = useState([]);
   const [activeMedia, setActiveMedia] = useState(null);
+  const { t } = useTranslation();
 
   const inputBase =
     "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700/60 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition";
@@ -149,11 +151,11 @@ const HirerOfflineUrgentPost = () => {
   };
 
   const standardPriceOptions = [
-    { label: "No Budget", value: null },
-    { label: "Fixed Price", value: "fixed" },
-    { label: "Hourly", value: "hourly" },
-    { label: "Negotiable", value: "negotiable" },
-    { label: "Inspect first, then quote", value: "inspect_quote" },
+    { label: t("No Budget"), value: null },
+    { label: t("Fixed Price"), value: "fixed" },
+    { label: t("Hourly"), value: "hourly" },
+    { label: t("Negotiable"), value: "negotiable" },
+    { label: t("Inspect first, then quote"), value: "inspect_quote" },
   ];
 
   const submit = async () => {
@@ -197,11 +199,11 @@ const HirerOfflineUrgentPost = () => {
       <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/90 border border-slate-700/50 shadow-xl space-y-6">
 
       <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-  🧰 Create OFFLINE Worker Post
+  🧰 {t("Create OFFLINE Worker Post")}
 </h1>
 
 <p className="text-sm text-slate-400">
-  Post a job for electricians, plumbers, painters, carpenters and other offline workers.
+  {t("Post a job for electricians, plumbers, painters, carpenters and other offline workers.")}
 </p>
 
         {error && (
@@ -226,15 +228,12 @@ const HirerOfflineUrgentPost = () => {
         {/* ================= EXACT ADDRESS ================= */}
         <div className="space-y-3">
           <p className="text-sm text-slate-400">
-            📍 Exact Address / Nearby Landmark
+            📍 {t("Exact Address / Nearby Landmark")}
           </p>
 
           <textarea
             className={`${inputBase} h-32 resize-none overflow-y-auto`}
-            placeholder={`Flat / House number, Building name
-Street / Area
-Nearby landmark
-Floor, gate, lift, access notes`}
+            placeholder={t("Flat / House number, Building name Street / Area Nearby landmark Floor, gate, lift, access notes")}
             value={form.addressDetails}
             maxLength={500}
             onChange={(e) =>
@@ -246,7 +245,7 @@ Floor, gate, lift, access notes`}
           />
 
           <div className="flex justify-between text-xs text-slate-500">
-            <span>Visible only after job acceptance.</span>
+            <span>{t("Visible only after job acceptance.")}</span>
             <span>{form.addressDetails.length}/500</span>
           </div>
         </div>
@@ -258,8 +257,8 @@ Floor, gate, lift, access notes`}
           value={
             form.location.address ||
             (locationLoading
-              ? "Detecting location…"
-              : "Tap to auto-detect your current location")
+              ? t("Detecting location…")
+              : t("Tap to auto-detect your current location"))
           }
         />
 
@@ -273,7 +272,7 @@ Floor, gate, lift, access notes`}
           disabled={loading}
           className="w-full py-3 rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-500"
         >
-          {loading ? "Please wait..." : "Submit Job Post"}
+          {loading ? t("Please wait...") : t("Submit Job Post")}
         </button>
 
       </div>

@@ -97,7 +97,11 @@ const handleSentenceChange = (value, field) => {
 useEffect(() => {
   const fetchProfessions = async () => {
     try {
-      const res = await axios.get(`${BASE_URL}/api/offline-professions`);
+      const lang = i18n.language || "en";
+
+const res = await axios.get(
+  `${BASE_URL}/api/offline-professions?lang=${lang}`
+);
 
       setOnlineProfessions(res.data.professions || []);
     } catch (err) {
@@ -110,8 +114,11 @@ useEffect(() => {
 }, []);
 
 const filteredProfessions = onlineProfessions.filter((p) =>
-  p?.name?.toLowerCase().includes(search.toLowerCase())
+  p?.name?.toLowerCase().includes(search.toLowerCase()) ||
+  p?.originalName?.toLowerCase().includes(search.toLowerCase())
 );
+
+
   return (
     <>
    <div ref={professionRef} className="profession-input relative">

@@ -28,6 +28,25 @@ const [showSuggestions, setShowSuggestions] = useState(false);
   const { t } = useTranslation();
 const translateTimer = useRef(null);
 const latestTypedValue = useRef({});
+const professionRef = useRef(null);
+
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (
+      professionRef.current &&
+      !professionRef.current.contains(event.target)
+    ) {
+      setShowSuggestions(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
+
 
 const translateText = async (text, field) => {
   const lang = i18n.language || "en";
@@ -95,7 +114,7 @@ const filteredProfessions = onlineProfessions.filter((p) =>
 );
   return (
     <>
-     <div className="profession-input relative">
+   <div ref={professionRef} className="profession-input relative">
   <input
     type="text"
     className={inputBase}

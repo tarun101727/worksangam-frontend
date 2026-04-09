@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
+import { useTranslation } from "react-i18next";
 
 export default function HirerEmailChanging(){
 
@@ -13,6 +14,7 @@ const [newEmailOtp,setNewEmailOtp] = useState("");
 const [otpSent,setOtpSent] = useState(false);
 const [verified,setVerified] = useState(false);
 const [newEmailOtpSent,setNewEmailOtpSent] = useState(false);
+const { t } = useTranslation();
 
 
 /* GET USER */
@@ -104,7 +106,7 @@ return(
 <div className="w-full max-w-md text-white bg-[#0f172a] border border-white/10 rounded-2xl p-6 shadow-lg">
 
 <h2 className="text-xl font-semibold mb-5">
-Change Email
+{t("Change Email")}
 </h2>
 
 
@@ -127,7 +129,7 @@ className="w-full p-3 rounded-lg bg-[#020617] border border-white/10 mb-4"
 onClick={sendOtp}
 className="w-full bg-indigo-600 hover:bg-indigo-500 p-3 rounded-lg"
 >
-Send OTP
+{t("Send OTP")}
 </button>
 
 )}
@@ -138,7 +140,7 @@ Send OTP
 <>
 
 <input
-placeholder="Enter OTP"
+placeholder={t("Enter OTP")}
 value={otp}
 onChange={(e)=>setOtp(e.target.value)}
 className="w-full p-3 rounded-lg bg-[#020617] border border-white/10 mb-3"
@@ -148,7 +150,7 @@ className="w-full p-3 rounded-lg bg-[#020617] border border-white/10 mb-3"
 onClick={verifyOtp}
 className="w-full bg-green-600 hover:bg-green-500 p-3 rounded-lg"
 >
-Verify OTP
+{t("Verify OTP")}
 </button>
 
 </>
@@ -168,7 +170,7 @@ Verify OTP
 <>
 
 <input
-placeholder="Enter new email"
+placeholder={t("Enter new email")}
 value={newEmail}
 onChange={(e)=>setNewEmail(e.target.value)}
 className="w-full p-3 rounded-lg bg-[#020617] border border-white/10 mb-4"
@@ -178,7 +180,7 @@ className="w-full p-3 rounded-lg bg-[#020617] border border-white/10 mb-4"
 onClick={sendNewEmailOtp}
 className="w-full bg-indigo-600 hover:bg-indigo-500 p-3 rounded-lg"
 >
-Send OTP to New Email
+{t("Send OTP to New Email")}
 </button>
 
 </>
@@ -194,7 +196,7 @@ Send OTP to New Email
 <>
 
 <input
-placeholder="Enter OTP from new email"
+placeholder={t("Enter OTP from new email")}
 value={newEmailOtp}
 onChange={(e)=>setNewEmailOtp(e.target.value)}
 className="w-full p-3 rounded-lg bg-[#020617] border border-white/10 mb-3"
@@ -204,7 +206,7 @@ className="w-full p-3 rounded-lg bg-[#020617] border border-white/10 mb-3"
 onClick={confirmEmailChange}
 className="w-full bg-green-600 hover:bg-green-500 p-3 rounded-lg"
 >
-Verify & Update Email
+{t("Verify & Update Email")}
 </button>
 
 </>

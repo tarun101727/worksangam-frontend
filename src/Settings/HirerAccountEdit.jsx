@@ -31,31 +31,27 @@ const [preview,setPreview] = useState("");
 
 const [loading,setLoading] = useState(false);
 
-/* =======================
-   LOAD USER DATA
-======================= */
 useEffect(()=>{
+  if(!user) return;
 
-if(!user) return;
+  setForm(prev => ({
+    firstName: prev.firstName || user.firstName || "",
+    lastName: prev.lastName || user.lastName || "",
+    age: prev.age || user.age || "",
+    gender: user.gender || "",
+    genderLabel: user.gender ? t(user.gender) : "", // 🔥 FIX
+  }));
 
-/* keep existing form values if already filled */
-setForm(prev => ({
-firstName: prev.firstName || user.firstName || "",
-lastName: prev.lastName || user.lastName || "",
-age: prev.age || user.age || "",
-gender: prev.gender || user.gender || "",
-genderLabel: prev.genderLabel || user.genderLabel || user.gender || ""
-}));
+},[user, t]);
 
-if(!preview && user.profileImage){
-setPreview(
-  user.profileImage.startsWith("http")
-    ? user.profileImage
-    : `${BASE_URL}${user.profileImage}`
-);
-}
-
-},[user]);
+useEffect(()=>{
+  if(form.gender){
+    setForm(prev => ({
+      ...prev,
+      genderLabel: t(prev.gender)
+    }));
+  }
+}, [i18n.language]);
 
 
 /* =======================

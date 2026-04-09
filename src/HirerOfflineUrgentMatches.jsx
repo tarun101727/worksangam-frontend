@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
@@ -26,6 +27,7 @@ const HirerOfflineUrgentMatches = () => {
   const [maxRadiusReached, setMaxRadiusReached] = useState(false);
   const circleRef = useRef(null);
 const maxAnimatedRadius = 2000; // 2 km max for the blinking animation
+    const { t } = useTranslation();
 
 
 /* ================= BLINKING RADIUS ANIMATION (SLOW & SMOOTH) ================= */
@@ -224,7 +226,7 @@ useEffect(() => {
           {hirerPost.firstName} {hirerPost.lastName}
         </p>
         <p className="text-indigo-400 font-bold text-sm leading-snug">
-          Profession: {hirerPost.profession}
+          {t("Profession")}: {hirerPost.profession}
         </p>
       </div>
     </div>
@@ -232,14 +234,14 @@ useEffect(() => {
     {/* Description */}
     {hirerPost.description && (
       <p className="text-slate-300 text-sm leading-relaxed break-words whitespace-pre-wrap max-w-full">
-        <span className="font-semibold text-indigo-400">Description:</span> {hirerPost.description}
+        <span className="font-semibold text-indigo-400">{t("Description")}:</span> {hirerPost.description}
       </p>
     )}
 
     {/* Preferred Time */}
     {hirerPost.preferredTime && (
       <p className="text-slate-400 text-sm leading-relaxed break-words whitespace-pre-wrap">
-        ⏱️ <span className="font-semibold text-indigo-400">Preferred Time:</span>{" "}
+        ⏱️ <span className="font-semibold text-indigo-400">{t("Preferred Time")}:</span>{" "}
         {hirerPost.preferredTime.type === "asap"
           ? "Immediately"
           : hirerPost.preferredTime.type === "today"
@@ -274,18 +276,18 @@ useEffect(() => {
     {/* Safety Warnings */}
     {hirerPost.safetyWarnings && Object.keys(hirerPost.safetyWarnings).length > 0 && (
       <div className="flex flex-wrap gap-2">
-        <h1 className="text-white font-semibold text-sm">Warning:</h1>
+        <h1 className="text-white font-semibold text-sm">{t("Warning")}:</h1>
         {hirerPost.safetyWarnings.pets && (
-          <span className="px-2 py-1 bg-red-600 text-white text-xs rounded-full">Pets at home</span>
+          <span className="px-2 py-1 bg-red-600 text-white text-xs rounded-full">{t("Pets at home")}</span>
         )}
         {hirerPost.safetyWarnings.elderly && (
-          <span className="px-2 py-1 bg-red-600 text-white text-xs rounded-full">Elderly person</span>
+          <span className="px-2 py-1 bg-red-600 text-white text-xs rounded-full">{t("Elderly person")}</span>
         )}
         {hirerPost.safetyWarnings.children && (
-          <span className="px-2 py-1 bg-red-600 text-white text-xs rounded-full">Children present</span>
+          <span className="px-2 py-1 bg-red-600 text-white text-xs rounded-full">{t("Children present")}</span>
         )}
         {hirerPost.safetyWarnings.safetyConcerns && (
-          <span className="px-2 py-1 bg-red-600 text-white text-xs rounded-full">Safety concerns</span>
+          <span className="px-2 py-1 bg-red-600 text-white text-xs rounded-full">{t("Safety concerns")}</span>
         )}
       </div>
     )}
@@ -293,16 +295,16 @@ useEffect(() => {
     {/* Price */}
     {hirerPost.price && (
       <p className="text-slate-400 text-sm leading-relaxed break-words whitespace-pre-wrap">
-        💰 <span className="font-semibold text-indigo-400">Price:</span>{" "}
+        💰 <span className="font-semibold text-indigo-400">{t("Price")}:</span>{" "}
         {hirerPost.price.type === "not_added"
-          ? "Not added"
-          : hirerPost.price.type === "fixed"
+          ? t("Not added")
+          : hirerPost.price.type === t("fixed")
           ? `${hirerPost.price.value} ${hirerPost.price.currency}`
-          : hirerPost.price.type === "hourly"
+          : hirerPost.price.type === t("hourly")
           ? `${hirerPost.price.value} ${hirerPost.price.currency}/hr`
-          : hirerPost.price.type === "negotiable"
+          : hirerPost.price.type === t("negotiable")
           ? `${hirerPost.price.min}-${hirerPost.price.max} ${hirerPost.price.currency}`
-          : "Inspect & Quote"}
+          : t("Inspect & Quote")}
       </p>
     )}
 
@@ -310,12 +312,12 @@ useEffect(() => {
     <div className="space-y-2">
       {hirerPost.addressDetails && (
         <p className="text-slate-400 text-sm leading-relaxed break-words whitespace-pre-wrap">
-          <span className="font-semibold text-indigo-400">📍 Landmark / Extra Address:</span> {hirerPost.addressDetails}
+          <span className="font-semibold text-indigo-400">📍 {t("Landmark / Extra Address")}:</span> {hirerPost.addressDetails}
         </p>
       )}
       {hirerPost.location?.address && hirerPost.location.address !== hirerPost.addressDetails && (
         <p className="text-slate-400 text-sm leading-relaxed break-words whitespace-pre-wrap">
-          <span className="font-semibold text-indigo-400">🗺️ Full Address:</span> {hirerPost.location.address}
+          <span className="font-semibold text-indigo-400">🗺️ {t("Full Address")}:</span> {hirerPost.location.address}
         </p>
       )}
     </div>
@@ -325,7 +327,7 @@ useEffect(() => {
       {/* Map & Radius */}
       <div className="p-6 rounded-3xl bg-slate-900/90 border border-slate-700/50 shadow-xl space-y-3">
         <p className="text-slate-400">
-          Searching for {hirerPost?.profession || ""} within {Math.round(radius / 1000)} km...
+          {t("Searching for")} {hirerPost?.profession || ""} {t("within")} {Math.round(radius / 1000)} {t("km...")}
         </p>
         <div className="overflow-hidden rounded-xl border border-slate-700">
           <div id="map" style={{ height: 300 }} />
@@ -334,7 +336,7 @@ useEffect(() => {
 
       {/* Employee Matches */}
       <div className="p-6 rounded-3xl bg-slate-900/90 border border-slate-700/50 shadow-xl space-y-4">
-        <h3 className="text-lg font-semibold text-white">Matching Employees</h3>
+        <h3 className="text-lg font-semibold text-white">{t("Matching Employees")}</h3>
         {employees.length ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {employees.map((e) => (
@@ -353,7 +355,7 @@ useEffect(() => {
             ))}
           </div>
         ) : (
-          <p className="text-slate-400">No employees found yet...</p>
+          <p className="text-slate-400">{t("No employees found yet...")}</p>
         )}
 
         {!maxRadiusReached && (
@@ -361,7 +363,7 @@ useEffect(() => {
             onClick={handleSearchMore}
             className="mt-4 w-full py-3 rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-500"
           >
-            Search for more employees
+            {t("Search for more employees")}
           </button>
         )}
       </div>

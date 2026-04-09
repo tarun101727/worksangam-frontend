@@ -84,7 +84,11 @@ const latestTypedValue = useRef({});
   useEffect(() => {
     const fetchProfessions = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}/api/online-professions`);
+        const lang = i18n.language || "en";
+
+const res = await axios.get(
+  `${BASE_URL}/api/online-professions?lang=${lang}`
+);
         setOnlineProfessions(res.data.professions || []);
       } catch (err) {
         console.error("Failed to fetch professions", err);
@@ -97,9 +101,10 @@ const latestTypedValue = useRef({});
 
   /* ================= FILTER ================= */
 
-  const filteredProfessions = search
+const filteredProfessions = search
   ? onlineProfessions.filter((p) =>
-      p?.name?.toLowerCase().includes(search.toLowerCase())
+      p?.name?.toLowerCase().includes(search.toLowerCase()) ||
+      p?.originalName?.toLowerCase().includes(search.toLowerCase())
     )
   : onlineProfessions;
 

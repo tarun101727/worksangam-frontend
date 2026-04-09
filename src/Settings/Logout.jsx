@@ -59,7 +59,7 @@ return(
 
 <ul className="text-sm text-gray-300 space-y-1 list-disc ml-4">
 
-<li>{t("Your session will be closed.")}</li>
+<li>{t("Your session will be closed")} .</li>
 
 <li>{t("You will be signed out from this device.")}</li>
 

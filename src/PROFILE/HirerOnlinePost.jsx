@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
@@ -5,6 +6,9 @@ import { useNavigate } from "react-router-dom";
 
 import { BASE_URL } from "../config";
 import { currencies } from "../constants/currencies";
+import i18n from "../i18n";
+import { useRef } from "react";
+
 
 /* ================= EMPTY FORM ================= */
 
@@ -46,7 +50,9 @@ const HirerOnlinePost = () => {
 const [languageInput, setLanguageInput] = useState("");
 const [languages, setLanguages] = useState([]);
 const [languageSuggestions, setLanguageSuggestions] = useState([]);
-
+    const { t } = useTranslation();
+const translateTimer = useRef(null);
+const latestTypedValue = useRef({});
 
   const inputBase =
     "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700/60 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition";
@@ -138,13 +144,59 @@ const submit = async () => {
   }
 };
 
+const translateText = async (text, field) => {
+  const lang = i18n.language || "en";
+  if (lang === "en") return;
+
+  try {
+    const res = await fetch(
+      `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${lang}&dt=t&q=${encodeURIComponent(text)}`
+    );
+
+    const data = await res.json();
+
+    let translated = data[0].map((item) => item[0]).join("");
+
+    // preserve trailing spaces
+    const trailingSpaces = text.match(/\s+$/);
+    if (trailingSpaces) {
+      translated += trailingSpaces[0];
+    }
+
+    // prevent overwrite race condition
+    if (latestTypedValue.current[field] !== text) return;
+
+    handleChange(field, translated);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const handleSentenceChange = (value, field) => {
+  latestTypedValue.current[field] = value;
+
+  // instant UI update
+  handleChange(field, value);
+
+  const lang = i18n.language || "en";
+  if (lang === "en") return;
+
+  clearTimeout(translateTimer.current);
+
+  translateTimer.current = setTimeout(() => {
+    if (latestTypedValue.current[field] !== value) return;
+
+    translateText(value, field);
+  }, 800); // delay for smooth typing
+};
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
 
       <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/90 border border-slate-700/50 shadow-xl space-y-6">
 
         <h2 className="text-xl font-semibold text-white">
-          Create Online Worker Post
+          {t("Create Online Worker Post")}
         </h2>
 
         {error && (
@@ -160,7 +212,7 @@ const submit = async () => {
           <input
             type="text"
             className={inputBase}
-            placeholder="Search worker (Web Developer, Graphic Designer...)"
+            placeholder={t("Search worker (Web Developer, Graphic Designer...)")}
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -190,7 +242,7 @@ const submit = async () => {
                 ))
               ) : (
                 <p className="px-4 py-2 text-sm text-slate-500">
-                  No profession found
+                  {t("No profession found")}
                 </p>
               )}
 
@@ -204,15 +256,17 @@ const submit = async () => {
         <div className="space-y-2">
 
           <p className="text-sm font-medium text-red-400">
-            💻 Work Description
+            💻 {t("Work Description")}
           </p>
 
           <textarea
             className={`${inputBase} h-28 resize-none`}
-            placeholder="Example: Need a React developer to fix login authentication bug..."
+            placeholder={t("Example: Need a React developer to fix login authentication bug...")}
             value={form.description}
             maxLength={250}
-            onChange={(e) => handleChange("description", e.target.value)}
+            onChange={(e) =>
+  handleSentenceChange(e.target.value, "description")
+}
           />
 
         </div>
@@ -221,7 +275,7 @@ const submit = async () => {
 
         <div className="space-y-3">
 
-          <p className="text-sm text-slate-400">Price</p>
+          <p className="text-sm text-slate-400">{t("Price")}</p>
 
           <div className="flex gap-3 flex-wrap">
             {urgentPriceOptions.map((opt) => (
@@ -258,7 +312,7 @@ const submit = async () => {
                 <input
                   type="number"
                   className={inputBase}
-                  placeholder={`Fixed price (${selectedCurrency?.symbol})`}
+                  placeholder={`t(Fixed price) (${selectedCurrency?.symbol})`}
                   value={form.expectedPrice}
                   onChange={(e) =>
                     handleChange("expectedPrice", e.target.value)
@@ -271,7 +325,7 @@ const submit = async () => {
                   <input
                     type="number"
                     className={inputBase}
-                    placeholder="Min price"
+                    placeholder={t("Min price")}
                     value={form.minPrice}
                     onChange={(e) =>
                       handleChange("minPrice", e.target.value)
@@ -281,7 +335,7 @@ const submit = async () => {
                   <input
                     type="number"
                     className={inputBase}
-                    placeholder="Max price"
+                    placeholder={t("Max price")}
                     value={form.maxPrice}
                     onChange={(e) =>
                       handleChange("maxPrice", e.target.value)
@@ -297,7 +351,7 @@ const submit = async () => {
         
         
 <div className="space-y-2 relative">
-  <p className="text-sm font-medium text-red-400">🗣 Languages Required</p>
+  <p className="text-sm font-medium text-red-400">🗣 {t("Languages Required")}</p>
 
   {/* Selected languages */}
   <div className="flex flex-wrap gap-2 mb-2">
@@ -324,7 +378,7 @@ const submit = async () => {
   <input
     type="text"
     className={inputBase}
-    placeholder="Add a language (English, Hindi...)"
+    placeholder={t("Add a language (English, Hindi...)")}
     value={languageInput}
     onChange={async (e) => {
       const val = e.target.value;
@@ -386,7 +440,7 @@ const submit = async () => {
           disabled={loading}
           className="w-full py-3 rounded-xl font-semibold bg-red-600 hover:bg-red-500"
         >
-          {loading ? "Please wait..." : "Submit Job Post"}
+          {loading ? t("Please wait...") : t("Submit Job Post")}
         </button>
 
       </div>

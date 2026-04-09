@@ -243,8 +243,8 @@ useEffect(() => {
       <p className="text-slate-400 text-sm leading-relaxed break-words whitespace-pre-wrap">
         ⏱️ <span className="font-semibold text-indigo-400">{t("Preferred Time")}:</span>{" "}
         {hirerPost.preferredTime.type === "asap"
-          ? "Immediately"
-          : hirerPost.preferredTime.type === "today"
+          ? t("Immediately")
+          : hirerPost.preferredTime.type === t("today")
           ? `Today (${hirerPost.preferredTime.date})`
           : `Custom: ${hirerPost.preferredTime.from} to ${hirerPost.preferredTime.to}`}
       </p>

@@ -317,7 +317,7 @@ const handleSentenceChange = (value, field) => {
                 <input
                   type="number"
                   className={inputBase}
-                  placeholder={`t("Fixed price") (${selectedCurrency?.symbol})`}
+                 placeholder={`${t("Fixed price")} (${selectedCurrency?.symbol})`}
                   value={form.expectedPrice}
                   onChange={(e) =>
                     handleChange("expectedPrice", e.target.value)

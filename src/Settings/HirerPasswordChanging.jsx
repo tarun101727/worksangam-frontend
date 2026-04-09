@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
+import { useTranslation } from "react-i18next";
 
 export default function HirerPasswordChanging(){
 
@@ -19,7 +20,9 @@ const [oldVerified,setOldVerified] = useState(false);
 
 /* NEW PASSWORD */
 const [newPassword,setNewPassword] = useState("");
-const [confirmPassword,setConfirmPassword] = useState("");
+const [confirmPassword,setConfirmPassword] = useState("")
+const { t } = useTranslation();
+
 
 
 
@@ -156,7 +159,7 @@ return(
 <div className="w-full max-w-md text-white bg-[#0f172a] border border-white/10 rounded-2xl p-6 shadow-lg">
 
 <h2 className="text-xl font-semibold mb-5 text-center">
-Change Password
+{t("Change Password")}
 </h2>
 
 
@@ -173,7 +176,7 @@ method === "email"
 : "hover:bg-[#111827]"
 }`}
 >
-Email
+{t("Email")}
 </button>
 
 <button
@@ -184,7 +187,7 @@ method === "oldPassword"
 : "hover:bg-[#111827]"
 }`}
 >
-Old Password
+{t("Old Password")}
 </button>
 
 </div>
@@ -213,7 +216,7 @@ className="w-full p-3 rounded-lg bg-[#020617] border border-white/10 mb-4"
 onClick={sendOtp}
 className="w-full bg-indigo-600 hover:bg-indigo-500 p-3 rounded-lg mb-4"
 >
-Send OTP
+{t("Send OTP")}
 </button>
 
 )}
@@ -225,7 +228,7 @@ Send OTP
 <>
 
 <input
-placeholder="Enter OTP"
+placeholder={t("Enter OTP")}
 value={otp}
 onChange={(e)=>setOtp(e.target.value)}
 className="w-full p-3 rounded-lg bg-[#020617] border border-white/10 mb-3"
@@ -235,7 +238,7 @@ className="w-full p-3 rounded-lg bg-[#020617] border border-white/10 mb-3"
 onClick={verifyOtp}
 className="w-full bg-green-600 hover:bg-green-500 p-3 rounded-lg mb-4"
 >
-Verify OTP
+{t("Verify OTP")}
 </button>
 
 </>
@@ -250,7 +253,7 @@ Verify OTP
 
 <input
 type="password"
-placeholder="New Password"
+placeholder={t("New Password")}
 value={newPassword}
 onChange={(e)=>setNewPassword(e.target.value)}
 className="w-full p-3 rounded-lg bg-[#020617] border border-white/10 mb-3"
@@ -258,7 +261,7 @@ className="w-full p-3 rounded-lg bg-[#020617] border border-white/10 mb-3"
 
 <input
 type="password"
-placeholder="Confirm Password"
+placeholder={t("Confirm Password")}
 value={confirmPassword}
 onChange={(e)=>setConfirmPassword(e.target.value)}
 className="w-full p-3 rounded-lg bg-[#020617] border border-white/10 mb-4"
@@ -268,7 +271,7 @@ className="w-full p-3 rounded-lg bg-[#020617] border border-white/10 mb-4"
 onClick={updatePasswordWithOtp}
 className="w-full bg-green-600 hover:bg-green-500 p-3 rounded-lg"
 >
-Update Password
+{t("Update Password")}
 </button>
 
 </>
@@ -291,7 +294,7 @@ Update Password
 
 <input
 type="password"
-placeholder="Old Password"
+placeholder={t("Old Password")}
 value={oldPassword}
 onChange={(e)=>setOldPassword(e.target.value)}
 className="w-full p-3 rounded-lg bg-[#020617] border border-white/10 mb-3"
@@ -305,7 +308,7 @@ className="w-full p-3 rounded-lg bg-[#020617] border border-white/10 mb-3"
 onClick={checkOldPassword}
 className="w-full bg-indigo-600 hover:bg-indigo-500 p-3 rounded-lg mb-4"
 >
-Check Old Password
+{t("Check Old Password")}
 </button>
 
 )}
@@ -318,7 +321,7 @@ Check Old Password
 
 <input
 type="password"
-placeholder="New Password"
+placeholder={t("New Password")}
 value={newPassword}
 onChange={(e)=>setNewPassword(e.target.value)}
 className="w-full p-3 rounded-lg bg-[#020617] border border-white/10 mb-3"
@@ -326,7 +329,7 @@ className="w-full p-3 rounded-lg bg-[#020617] border border-white/10 mb-3"
 
 <input
 type="password"
-placeholder="Confirm Password"
+placeholder={t("Confirm Password")}
 value={confirmPassword}
 onChange={(e)=>setConfirmPassword(e.target.value)}
 className="w-full p-3 rounded-lg bg-[#020617] border border-white/10 mb-4"
@@ -336,7 +339,7 @@ className="w-full p-3 rounded-lg bg-[#020617] border border-white/10 mb-4"
 onClick={updatePasswordWithOld}
 className="w-full bg-red-600 hover:bg-red-500 p-3 rounded-lg"
 >
-Update Password
+{t("Update Password")}
 </button>
 
 </>

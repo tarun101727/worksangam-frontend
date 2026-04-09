@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { currencies } from "../constants/currencies";
 import { useTranslation } from "react-i18next";
-
+import i18n from "../i18n";
+import { useRef } from "react";
 
 const CreateOfflineWorkerPostPage = ({
   form,
@@ -25,7 +26,54 @@ const CreateOfflineWorkerPostPage = ({
 const [search, setSearch] = useState("");
 const [showSuggestions, setShowSuggestions] = useState(false);
   const { t } = useTranslation();
+const translateTimer = useRef(null);
+const latestTypedValue = useRef({});
 
+const translateText = async (text, field) => {
+  const lang = i18n.language || "en";
+  if (lang === "en") return;
+
+  try {
+    const res = await fetch(
+      `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${lang}&dt=t&q=${encodeURIComponent(text)}`
+    );
+
+    const data = await res.json();
+
+    let translated = data[0].map((item) => item[0]).join("");
+
+    // preserve trailing spaces
+    const trailingSpaces = text.match(/\s+$/);
+    if (trailingSpaces) {
+      translated += trailingSpaces[0];
+    }
+
+    // prevent overwrite
+    if (latestTypedValue.current[field] !== text) return;
+
+    handleChange(field, translated);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const handleSentenceChange = (value, field) => {
+  latestTypedValue.current[field] = value;
+
+  // update UI immediately
+  handleChange(field, value);
+
+  const lang = i18n.language || "en";
+  if (lang === "en") return;
+
+  clearTimeout(translateTimer.current);
+
+  translateTimer.current = setTimeout(() => {
+    if (latestTypedValue.current[field] !== value) return;
+
+    translateText(value, field);
+  }, 800);
+};
 
 useEffect(() => {
   const fetchProfessions = async () => {
@@ -91,8 +139,8 @@ const filteredProfessions = onlineProfessions.filter((p) =>
         placeholder={t("Describe your requirement")}
         value={form.description}
         onChange={(e) =>
-          handleChange("description", e.target.value)
-        }
+  handleSentenceChange(e.target.value, "description")
+}
       />
 
       {/* ================= PREFERRED TIME ================= */}

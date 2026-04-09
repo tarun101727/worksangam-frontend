@@ -31,27 +31,31 @@ const [preview,setPreview] = useState("");
 
 const [loading,setLoading] = useState(false);
 
+/* =======================
+   LOAD USER DATA
+======================= */
 useEffect(()=>{
-  if(!user) return;
 
-  setForm(prev => ({
-    firstName: prev.firstName || user.firstName || "",
-    lastName: prev.lastName || user.lastName || "",
-    age: prev.age || user.age || "",
-    gender: user.gender || "",
-    genderLabel: user.gender ? t(user.gender) : "", // 🔥 FIX
-  }));
+if(!user) return;
 
-},[user, t]);
+/* keep existing form values if already filled */
+setForm(prev => ({
+firstName: prev.firstName || user.firstName || "",
+lastName: prev.lastName || user.lastName || "",
+age: prev.age || user.age || "",
+gender: prev.gender || user.gender || "",
+genderLabel: prev.genderLabel || user.genderLabel || user.gender || ""
+}));
 
-useEffect(()=>{
-  if(form.gender){
-    setForm(prev => ({
-      ...prev,
-      genderLabel: t(prev.gender)
-    }));
-  }
-}, [i18n.language]);
+if(!preview && user.profileImage){
+setPreview(
+  user.profileImage.startsWith("http")
+    ? user.profileImage
+    : `${BASE_URL}${user.profileImage}`
+);
+}
+
+},[user]);
 
 
 /* =======================
@@ -173,10 +177,15 @@ const save = async () => {
     if (Number(form.age) !== Number(user.age)) {
       formData.append("age", Number(form.age));
     }
-    if (form.gender !== user.gender) {
-      formData.append("gender", form.gender);
-      formData.append("genderLabel", form.genderLabel);
-    }
+    // ✅ send gender separately
+if (form.gender !== user.gender) {
+  formData.append("gender", form.gender);
+}
+
+// ✅ send genderLabel separately
+if (form.genderLabel !== user.genderLabel) {
+  formData.append("genderLabel", form.genderLabel);
+}
     /* image upload only if changed */
     if (image) {
       formData.append("profileImage", image);

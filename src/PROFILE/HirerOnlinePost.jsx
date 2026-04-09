@@ -55,6 +55,17 @@ const [languageSuggestions, setLanguageSuggestions] = useState([]);
     (c) => c.code === form.currency
   );
 
+  useEffect(() => {
+  const handleClickOutside = (e) => {
+    if (!e.target.closest(".profession-dropdown")) {
+      setShowSuggestions(false);
+    }
+  };
+
+  document.addEventListener("click", handleClickOutside);
+  return () => document.removeEventListener("click", handleClickOutside);
+}, []);
+
   /* ================= HANDLE CHANGE ================= */
 
   const handleChange = (key, value) => {
@@ -80,9 +91,11 @@ const [languageSuggestions, setLanguageSuggestions] = useState([]);
 
   /* ================= FILTER ================= */
 
-  const filteredProfessions = onlineProfessions.filter((p) =>
-    p?.name?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredProfessions = search
+  ? onlineProfessions.filter((p) =>
+      p?.name?.toLowerCase().includes(search.toLowerCase())
+    )
+  : onlineProfessions;
 
   /* ================= SUBMIT ================= */
 
@@ -142,7 +155,7 @@ const submit = async () => {
 
         {/* ================= PROFESSION SEARCH ================= */}
 
-        <div className="relative">
+        <div className="relative profession-dropdown">
 
           <input
             type="text"
@@ -156,7 +169,7 @@ const submit = async () => {
             onFocus={() => setShowSuggestions(true)}
           />
 
-          {showSuggestions && search && (
+          {showSuggestions && (
             <div className="absolute z-20 w-full mt-2 max-h-60 overflow-auto rounded-xl bg-slate-900 border border-slate-700 shadow-lg">
 
               {filteredProfessions.length > 0 ? (

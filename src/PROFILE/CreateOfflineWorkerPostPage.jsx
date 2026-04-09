@@ -47,8 +47,7 @@ const filteredProfessions = onlineProfessions.filter((p) =>
 );
   return (
     <>
-      {/* ================= PROFESSION SEARCH ================= */}
-<div className="relative">
+     <div className="profession-input relative">
   <input
     type="text"
     className={inputBase}
@@ -61,23 +60,22 @@ const filteredProfessions = onlineProfessions.filter((p) =>
     onFocus={() => setShowSuggestions(true)}
   />
 
-  {showSuggestions && search && (
+  {showSuggestions && (
     <div className="absolute z-20 w-full mt-2 max-h-60 overflow-auto rounded-xl bg-slate-900 border border-slate-700 shadow-lg">
       {filteredProfessions.length > 0 ? (
         filteredProfessions.map((profession) => (
-  <div
-    key={profession._id}
-    className="px-4 py-2 text-sm text-slate-200 hover:bg-indigo-500/20 cursor-pointer"
-    onClick={() => {
-      handleChange("profession", profession.name);
-      
-      setSearch(profession.name);
-      setShowSuggestions(false);
-    }}
-  >
-    {profession.name}
-  </div>
-))
+          <div
+            key={profession._id}
+            className="px-4 py-2 text-sm text-slate-200 hover:bg-indigo-500/20 cursor-pointer"
+            onClick={() => {
+              handleChange("profession", profession.name);
+              setSearch(profession.name);
+              setShowSuggestions(false);
+            }}
+          >
+            {profession.name}
+          </div>
+        ))
       ) : (
         <p className="px-4 py-2 text-sm text-slate-500">
           {t("No profession found")}

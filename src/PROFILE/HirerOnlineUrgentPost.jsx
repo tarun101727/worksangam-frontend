@@ -45,7 +45,18 @@ const HirerOnlineUrgentPost = () => {
 const wrapperRef = useRef(null);
 const translateTimer = useRef(null);
 const latestTypedValue = useRef({});
+const languageRef = useRef(null);
 
+useEffect(() => {
+  const handleClickOutside = (e) => {
+    if (languageRef.current && !languageRef.current.contains(e.target)) {
+      setLanguageSuggestions([]);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => document.removeEventListener("mousedown", handleClickOutside);
+}, []);
 
 useEffect(() => {
   const handleClickOutside = (e) => {
@@ -368,7 +379,7 @@ const handleSentenceChange = (value, field) => {
         </div>
         
       
-<div className="space-y-2 relative">
+<div ref={languageRef} className="space-y-2 relative">
   <p className="text-sm font-medium text-red-400">🗣 {t("Languages Required")}</p>
 
   {/* Selected languages */}
@@ -392,42 +403,53 @@ const handleSentenceChange = (value, field) => {
     ))}
   </div>
 
-  {/* Input */}
   <input
-    type="text"
-    className={inputBase}
-    placeholder={t("Add a language (English, Hindi...)")}
-    value={languageInput}
-    onChange={async (e) => {
-      const val = e.target.value;
-      setLanguageInput(val);
+  type="text"
+  className={inputBase}
+  placeholder={t("Add a language (English, Hindi...)")}
+  value={languageInput}
 
-      if (val.trim()) {
-        try {
-          const res = await axios.get(
-            `${BASE_URL}/api/languages?search=${val.trim()}`,
-            { withCredentials: true }
-          );
-          setLanguageSuggestions(res.data || []);
-        } catch (err) {
-          console.error(err);
-          setLanguageSuggestions([]);
-        }
-      } else {
+  // ✅ SHOW ALL LANGUAGES ON CLICK
+  onFocus={async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/api/languages`, {
+        withCredentials: true,
+      });
+      setLanguageSuggestions(res.data || []);
+    } catch (err) {
+      console.error(err);
+      setLanguageSuggestions([]);
+    }
+  }}
+
+  // ✅ FILTER WHEN TYPING
+  onChange={async (e) => {
+    const val = e.target.value;
+    setLanguageInput(val);
+
+    try {
+      const res = await axios.get(
+        `${BASE_URL}/api/languages?search=${val}`,
+        { withCredentials: true }
+      );
+      setLanguageSuggestions(res.data || []);
+    } catch (err) {
+      console.error(err);
+      setLanguageSuggestions([]);
+    }
+  }}
+
+  onKeyDown={(e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      if (languageInput.trim() && !languages.includes(languageInput.trim())) {
+        setLanguages(prev => [...prev, languageInput.trim()]);
+        setLanguageInput("");
         setLanguageSuggestions([]);
       }
-    }}
-    onKeyDown={(e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        if (languageInput.trim() && !languages.includes(languageInput.trim())) {
-          setLanguages(prev => [...prev, languageInput.trim()]);
-          setLanguageInput("");
-          setLanguageSuggestions([]);
-        }
-      }
-    }}
-  />
+    }
+  }}
+/>
 
   {/* Suggestions dropdown */}
   {languageSuggestions.length > 0 && (

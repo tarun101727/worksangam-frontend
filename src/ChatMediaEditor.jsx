@@ -211,7 +211,7 @@ const addText = () => {
     width: 260,
     height: 120,
     text: "",
-    color: "#ffffff",
+    color: "#000000",
     fontSize: fontSize,
     fontStyle: fontStyle
   };
@@ -1051,6 +1051,13 @@ objectFit:"contain"
       <textarea
         ref={textRef}
         value={text}
+          placeholder="Enter text..."
+  onFocus={(e) => {
+    if (!text) e.target.placeholder = "";
+  }}
+  onBlur={(e) => {
+    if (!text) e.target.placeholder = "Enter text...";
+  }}
         onChange={handleTextChange}
         onMouseDown={(e) => e.stopPropagation()}
 onClick={(e) => e.stopPropagation()}
@@ -1060,7 +1067,7 @@ onClick={(e) => e.stopPropagation()}
           background: "transparent",
           border: "none",
           outline: "none",
-          color: boxItem.color,
+          color: "#000000",
           fontSize: boxItem.fontSize,
           fontWeight: boxItem.fontStyle === "bold" ? "bold" : "normal",
           fontStyle: boxItem.fontStyle === "italic" ? "italic" : "normal",

@@ -1,4 +1,6 @@
+
 import { useTranslation } from "react-i18next";
+
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
@@ -6,8 +8,6 @@ import { BASE_URL } from "./config";
 import ReactCrop from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 import getCroppedImg from "./utils/cropImage";
- import { socket } from "./utils/socket";
-
 
 // Paint brush style cursor
 const BRUSH_CURSOR = `url('data:image/svg+xml;base64,${btoa(`
@@ -103,36 +103,39 @@ const closeToolbar = () => {
 useEffect(() => {
   const handleGlobalClick = (e) => {
     const toolbar = document.getElementById("editor-toolbar");
+    const canvas = canvasRef.current;
 
-    // ✅ Close toolbar if clicked outside
+    // ✅ 1. Ignore clicks inside toolbar
+    if (toolbar && toolbar.contains(e.target)) return;
+
+    // ✅ 2. Ignore clicks on canvas (pen/eraser)
+    if (canvas && canvas.contains(e.target)) return;
+
+    // ===== EXISTING LOGIC BELOW =====
+
     if (toolbarVisible) {
       if (!toolbar || !toolbar.contains(e.target)) {
         setToolbarVisible(false);
       }
     }
 
-    // ✅ Handle text box behavior
     if (textActive) {
       let clickedInsideBox = false;
 
       textBoxes.forEach(box => {
         const el = document.getElementById(`textbox-${box.id}`);
-
         if (el && (el === e.target || el.contains(e.target))) {
           clickedInsideBox = true;
         }
       });
 
-      // ❌ Clicked outside
       if (!clickedInsideBox) {
         const currentBox = textBoxes.find(b => b.id === currentBoxId);
 
-        // 🔥 DELETE if empty
         if (currentBox && (!currentBox.text || currentBox.text.trim() === "")) {
           setTextBoxes(prev => prev.filter(b => b.id !== currentBoxId));
         }
 
-        // ✅ Stop editing
         setIsEditingText(false);
         setCurrentBoxId(null);
         setTextActive(false);
@@ -627,20 +630,13 @@ const sendMedia = async () => {
   formData.append("image", finalFile);
   formData.append("caption", caption);
 
-const res = await axios.post(
-  `${BASE_URL}/api/chat/send-media/${chatId}`,
-  formData,
-  { withCredentials: true }
-);
+  await axios.post(
+    `${BASE_URL}/api/chat/send-media/${chatId}`,
+    formData,
+    { withCredentials: true }
+  );
 
-// ✅ EMIT TO SOCKET (IMPORTANT)
-socket.emit("send-message", {
-  chatId,
-  ...res.data // backend should return message object
-});
-
-// ✅ GO BACK
-navigate(-1);
+  navigate(-1);
 };
 
 const previewHeight = "70vh"; // keep constant
@@ -890,16 +886,15 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
   >
     {/* Text */}
     <button
-      onClick={() => {
-        addText();
-       closeToolbar();
-        setPenMode(false); 
-        
-      }}
-      className="px-4 py-1 bg-[#020617]/90  rounded-lg transition"
-    >
-      {t("Text")}
-    </button>
+  onMouseDown={(e) => e.stopPropagation()}  // ✅ ADD THIS
+  onClick={() => {
+    addText();
+    closeToolbar();
+    setPenMode(false);
+  }}
+>
+  {t("Text")}
+</button>
 
     {/* Font size */}
     <select
@@ -933,29 +928,27 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
       <option value="italic">{t("Italic")}</option>
     </select>
 
-    {/* Pen */}
     <button
-      onClick={() => {
-        setPenMode(true);
-        setEraserMode(false);
-        closeToolbar();
-      }}
-      className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
-    >
-      ✏️
-    </button>
+  onMouseDown={(e) => e.stopPropagation()}  // ✅ ADD THIS
+  onClick={() => {
+    setPenMode(true);
+    setEraserMode(false);
+    closeToolbar();
+  }}
+>
+  ✏️
+</button>
 
-    {/* Eraser */}
     <button
-      onClick={() => {
-        setPenMode(true);
-        setEraserMode(true);
-        closeToolbar();;
-      }}
-      className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
-    >
-      🧽
-    </button>
+  onMouseDown={(e) => e.stopPropagation()}  // ✅ ADD THIS
+  onClick={() => {
+    setPenMode(true);
+    setEraserMode(true);
+    closeToolbar();
+  }}
+>
+  🧽
+</button>
   </div>
 )}
 

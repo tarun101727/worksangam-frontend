@@ -103,8 +103,8 @@ const isPartialScreen = () => {
   const tolerance = 10;
 
   // True if browser is FULLSCREEN
-  const isFullWidth = Math.abs(window.innerWidth - window.screen.width) <= tolerance;
-  const isFullHeight = Math.abs(window.innerHeight - window.screen.height) <= tolerance;
+  const isFullWidth = Math.abs(window.innerWidth - window.screen.width) >= tolerance;
+  const isFullHeight = Math.abs(window.innerHeight - window.screen.height) >= tolerance;
 
   const isFullScreen = isFullWidth && isFullHeight;
 

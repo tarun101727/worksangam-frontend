@@ -100,31 +100,32 @@ const closeToolbar = () => {
 
 useEffect(() => {
   const checkFullscreen = () => {
-    const isDesktop = window.innerWidth >= 768;
+    const isDesktop = window.innerWidth >= 768; // medium+ screen
+    // Consider not fullscreen if window width or height is significantly smaller than screen
+    const notFullScreen =
+      window.innerWidth < window.screen.width * 0.95 ||
+      window.innerHeight < window.screen.height * 0.95;
 
-    const isFullScreen =
-      window.innerWidth >= window.screen.width * 0.9 &&
-      window.innerHeight >= window.screen.height * 0.9;
-
-    if (isDesktop && !isFullScreen) {
-      setIsFullscreenAllowed(false);
+    if (isDesktop && notFullScreen) {
+      setIsFullscreenAllowed(false); // ❌ not allowed
     } else {
-      setIsFullscreenAllowed(true);
+      setIsFullscreenAllowed(true);  // ✅ allowed
     }
   };
 
   checkFullscreen();
-
   window.addEventListener("resize", checkFullscreen);
   return () => window.removeEventListener("resize", checkFullscreen);
 }, []);
 
 const handleRestrictedAction = () => {
   if (!isFullscreenAllowed) {
-    alert("You can’t use this feature in partial screen. Please switch to fullscreen mode to continue.");
-    return true;
+    alert(
+      "You can’t use this feature in partial screen. Please switch to fullscreen mode to continue."
+    );
+    return true; // block action
   }
-  return false;
+  return false; // allow action
 };
 
 
@@ -906,13 +907,12 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
   >
     {/* Text */}
     <button
-      onClick={() => {
-  if (handleRestrictedAction()) return;
-
-  addText();
-  closeToolbar();
-  setPenMode(false); 
-}}
+       onClick={() => {
+    if (handleRestrictedAction()) return;
+    addText();
+    closeToolbar();
+    setPenMode(false);
+  }}
       className="px-4 py-1 bg-[#020617]/90  rounded-lg transition"
     >
       {t("Text")}

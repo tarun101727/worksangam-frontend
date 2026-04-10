@@ -759,6 +759,9 @@ const handleBoxClick = (id) => {
 };
 
 const startDrawing = (clientX, clientY) => {
+  if (checkFullscreenRestriction()) return;
+
+  
   if (isEditingText) return;
   if (!editMode || !penMode) return;
 
@@ -1211,7 +1214,7 @@ onClick={(e) => e.stopPropagation()}
    onMouseDown={(e) => {
     if (checkFullscreenRestriction()) return;
 
-    
+
   if (isEditingText) return; // ❌ prevent drawing when editing text
  if (!editMode || !penMode) return;
 

@@ -129,15 +129,6 @@ const sendMessage = () => {
   // ✅ STOP TYPING WHEN SENT
   socket.emit("stop-typing", { chatId, userId });
 
-  socket.emit("send-message", {
-    chatId,
-    message: messageText,
-    sender: {
-      _id: userId,
-      profileImage: user?.profileImage
-    }
-  });
-
   axios.post(
     `${BASE_URL}/api/chat/send/${chatId}`,
     { message: messageText },
@@ -319,30 +310,54 @@ className="w-8 h-8 rounded-full object-cover"
 
 <div className="flex flex-col max-w-xs">
 
-{/* IMAGE / VIDEO (NO BACKGROUND) */}
-{m.image && (
-<div
-  className="relative mb-1 max-w-xs cursor-pointer group"
-  onClick={() => openMedia(getImageUrl(m.image))}
->
-  {m.image.match(/\.(mp4|webm|ogg)$/i) ? (
-    <video
-      src={getImageUrl(m.image)}
-      className="rounded-lg max-w-xs"
-    />
-  ) : (
-    <img
-      src={getImageUrl(m.image)}
-      className="rounded-lg max-w-xs"
-    />
-  )}
+{m.image ? (
+  <div
+    className={`rounded-xl overflow-hidden max-w-xs ${
+      isSender ? "bg-indigo-500" : "bg-gray-700"
+    }`}
+  >
+    {/* IMAGE */}
+    <div
+      className="cursor-pointer"
+      onClick={() => openMedia(getImageUrl(m.image))}
+    >
+      {m.image.match(/\.(mp4|webm|ogg)$/i) ? (
+        <video src={getImageUrl(m.image)} className="w-full" />
+      ) : (
+        <img src={getImageUrl(m.image)} className="w-full" />
+      )}
+    </div>
 
-  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition rounded-lg pointer-events-none">
-    <span className="text-white text-sm font-semibold">
-      {t("View")}
-    </span>
+    {/* CAPTION */}
+    {m.message && (
+      <div className="px-3 py-2 text-white break-words">
+        {m.message}
+      </div>
+    )}
   </div>
-</div>
+) : (
+  m.message && (
+    <div
+      className={`px-3 py-2 rounded-xl max-w-xs break-words ${
+        isSender
+          ? "bg-indigo-500 text-white"
+          : "bg-gray-700 text-white"
+      }`}
+    >
+      {m.message.startsWith("📍 Location:") ? (
+        <a
+          href={m.message.replace("📍 Location:", "").trim()}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline"
+        >
+          {t("Shared a location(click to see location)")}
+        </a>
+      ) : (
+        m.message
+      )}
+    </div>
+  )
 )}
 
 {/* TEXT MESSAGE */}
@@ -382,30 +397,54 @@ className="w-8 h-8 rounded-full object-cover"
 
 <div className="flex flex-col items-end max-w-xs">
 
-{/* IMAGE / VIDEO (NO BACKGROUND) */}
-{m.image && (
+{m.image ? (
   <div
-  className="relative mb-1 max-w-xs cursor-pointer group"
-  onClick={() => openMedia(getImageUrl(m.image))}
->
-  {m.image.match(/\.(mp4|webm|ogg)$/i) ? (
-    <video
-      src={getImageUrl(m.image)}
-      className="rounded-lg max-w-xs"
-    />
-  ) : (
-    <img
-      src={getImageUrl(m.image)}
-      className="rounded-lg max-w-xs"
-    />
-  )}
+    className={`rounded-xl overflow-hidden max-w-xs ${
+      isSender ? "bg-indigo-500" : "bg-gray-700"
+    }`}
+  >
+    {/* IMAGE */}
+    <div
+      className="cursor-pointer"
+      onClick={() => openMedia(getImageUrl(m.image))}
+    >
+      {m.image.match(/\.(mp4|webm|ogg)$/i) ? (
+        <video src={getImageUrl(m.image)} className="w-full" />
+      ) : (
+        <img src={getImageUrl(m.image)} className="w-full" />
+      )}
+    </div>
 
-  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition rounded-lg pointer-events-none">
-    <span className="text-white text-sm font-semibold">
-      {t("View")}
-    </span>
+    {/* CAPTION */}
+    {m.message && (
+      <div className="px-3 py-2 text-white break-words">
+        {m.message}
+      </div>
+    )}
   </div>
-</div>
+) : (
+  m.message && (
+    <div
+      className={`px-3 py-2 rounded-xl max-w-xs break-words ${
+        isSender
+          ? "bg-indigo-500 text-white"
+          : "bg-gray-700 text-white"
+      }`}
+    >
+      {m.message.startsWith("📍 Location:") ? (
+        <a
+          href={m.message.replace("📍 Location:", "").trim()}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline"
+        >
+          {t("Shared a location(click to see location)")}
+        </a>
+      ) : (
+        m.message
+      )}
+    </div>
+  )
 )}
 
 {/* TEXT MESSAGE */}

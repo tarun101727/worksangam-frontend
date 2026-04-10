@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
@@ -92,6 +93,7 @@ const [currentBoxId, setCurrentBoxId] = useState(null); // current editing box
 const [toolbarVisible, setToolbarVisible] = useState(false);
 const [undoStack, setUndoStack] = useState([]);
 const [redoStack, setRedoStack] = useState([]);
+const { t } = useTranslation();
 
 const saveState = () => {
   setUndoStack(prev => [
@@ -757,7 +759,7 @@ return(
 onClick={()=>navigate(-1)}
 className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
 >
-Cancel
+{t("Cancel")}
 </button>
 
 <div className="flex gap-3">
@@ -794,7 +796,7 @@ Cancel
   }}
   className="px-3 py-1 rounded-lg bg-white/10"
 >
-  Crop
+  {t("Crop")}
 </button>
 
 {!isVideo && (
@@ -805,7 +807,7 @@ Cancel
   }}
   className="px-3 py-1 rounded-lg bg-white/10"
 >
-  Edit
+  {t("Edit")}
 </button>
 )}
 
@@ -859,7 +861,7 @@ Cancel
       }}
       className="px-4 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
     >
-      Text
+      {t("Text")}
     </button>
 
     {/* Font size */}
@@ -889,9 +891,9 @@ Cancel
       onChange={(e) => setFontStyle(e.target.value)}
       className="bg-[#020617]/90 border border-white/20 rounded-lg px-2 py-1 text-sm hover:border-white/40 transition"
     >
-      <option value="normal">Normal</option>
-      <option value="bold">Bold</option>
-      <option value="italic">Italic</option>
+      <option value="normal">{t("Normal")}</option>
+      <option value="bold">{t("Bold")}</option>
+      <option value="italic">{t("Italic")}</option>
     </select>
 
     {/* Pen */}

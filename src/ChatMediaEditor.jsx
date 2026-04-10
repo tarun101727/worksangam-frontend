@@ -109,7 +109,7 @@ const isFullscreenDesktop = () => {
 };
 
 const handleRestrictedClick = (callback) => {
-  if (!isFullscreenDesktop()) {
+  if (isFullscreenDesktop()) {
     alert("You can’t use this feature in partial screen. Please switch to fullscreen mode to continue.");
     return;
   }

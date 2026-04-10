@@ -253,8 +253,7 @@ const handleSentenceChange = (value, field) => {
           />
 
         </div>
-        </>
-       )}
+        
 
         {/* ================= PRICE ================= */}
 
@@ -431,7 +430,8 @@ const handleSentenceChange = (value, field) => {
     ? t("Please wait...")
     : `${t("Search for online")}${form.profession ? ` ${form.profession}` : ""}`}
 </button>
-
+</>
+       )}
       </div>
 
     </div>

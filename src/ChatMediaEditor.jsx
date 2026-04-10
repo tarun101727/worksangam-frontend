@@ -1,3 +1,4 @@
+
 import { useTranslation } from "react-i18next";
 
 import { useLocation, useNavigate } from "react-router-dom";
@@ -98,23 +99,6 @@ const closeToolbar = () => {
   setToolbarVisible(false);
 };
 
-const isPartialScreen = () => {
-  const minDesktopWidth = 768; // medium screens
-  const screenWidth = window.screen.availWidth; // use available width
-  const screenHeight = window.screen.availHeight; // use available height
-  const windowWidth = window.innerWidth;
-  const windowHeight = window.innerHeight;
-
-  // Only apply on desktop/laptop
-  if (windowWidth >= minDesktopWidth) {
-    // If window width or height is significantly smaller than available screen, treat as partial
-    const widthThreshold = 10; // pixels of tolerance
-    const heightThreshold = 50; // allow for browser bar height
-    return (screenWidth - windowWidth > widthThreshold) || (screenHeight - windowHeight > heightThreshold);
-  }
-
-  return false; // mobile always false
-};
 
 useEffect(() => {
   const handleGlobalClick = (e) => {
@@ -895,14 +879,11 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Text */}
     <button
       onClick={() => {
-    if (isPartialScreen()) {
-      alert("You can’t use this feature in partial screen. Please switch to fullscreen mode to continue.");
-      return;
-    }
-    addText();
-    closeToolbar();
-    setPenMode(false);
-  }}
+        addText();
+       closeToolbar();
+        setPenMode(false); 
+        
+      }}
       className="px-4 py-1 bg-[#020617]/90  rounded-lg transition"
     >
       {t("Text")}

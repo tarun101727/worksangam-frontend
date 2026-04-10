@@ -1,5 +1,4 @@
 import { useTranslation } from "react-i18next";
-
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
@@ -7,6 +6,8 @@ import { BASE_URL } from "./config";
 import ReactCrop from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 import getCroppedImg from "./utils/cropImage";
+ import { socket } from "./utils/socket";
+
 
 // Paint brush style cursor
 const BRUSH_CURSOR = `url('data:image/svg+xml;base64,${btoa(`
@@ -626,13 +627,20 @@ const sendMedia = async () => {
   formData.append("image", finalFile);
   formData.append("caption", caption);
 
-  await axios.post(
-    `${BASE_URL}/api/chat/send-media/${chatId}`,
-    formData,
-    { withCredentials: true }
-  );
+const res = await axios.post(
+  `${BASE_URL}/api/chat/send-media/${chatId}`,
+  formData,
+  { withCredentials: true }
+);
 
-  navigate(-1);
+// ✅ EMIT TO SOCKET (IMPORTANT)
+socket.emit("send-message", {
+  chatId,
+  ...res.data // backend should return message object
+});
+
+// ✅ GO BACK
+navigate(-1);
 };
 
 const previewHeight = "70vh"; // keep constant

@@ -869,10 +869,6 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
    id="editor-toolbar" 
     className="absolute z-[9999] flex flex-wrap gap-3 items-center bg-black/30 p-3 rounded-xl shadow-lg backdrop-blur-sm"
         onMouseDown={(e)=>e.stopPropagation()}
-  onClick={() => {
-  addText();
-  setPenMode(false);
-}}
     style={{
       top: "10%", // slightly higher above the image
       left: "50%",

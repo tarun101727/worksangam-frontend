@@ -80,6 +80,17 @@ const urgentPriceOptions = [
     fetchProfessions();
   }, []);
 
+  useEffect(() => {
+  const handleClickOutside = (e) => {
+    if (!e.target.closest(".profession-dropdown")) {
+      setShowSuggestions(false);
+    }
+  };
+
+  document.addEventListener("click", handleClickOutside);
+  return () => document.removeEventListener("click", handleClickOutside);
+}, []);
+
   /* ================= FILTER ================= */
 
   const filteredProfessions = onlineProfessions.filter((p) =>
@@ -145,7 +156,7 @@ const submit = async () => {
 
         {/* ================= PROFESSION SEARCH ================= */}
 
-        <div className="relative">
+        <div className="relative profession-dropdown">
 
           <input
             type="text"
@@ -190,7 +201,8 @@ const submit = async () => {
         </div>
 
         {/* ================= DESCRIPTION ================= */}
-
+         {form.profession && (
+  <>
         <div className="space-y-2">
 
           <p className="text-sm font-medium text-red-400">
@@ -382,7 +394,8 @@ const submit = async () => {
     ? t("Please wait...")
     : `${t("Search for online")}${form.profession ? ` ${form.profession}` : ""}`}
 </button>
-
+</>
+         )}
       </div>
 
     </div>

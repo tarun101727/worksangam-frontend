@@ -146,6 +146,23 @@ const handleRedo = () => {
 };
 
 useEffect(() => {
+  const handleOutsideClick = (e) => {
+    if (!toolbarVisible) return;
+
+    // If click is inside toolbar → ignore
+    const toolbar = document.getElementById("editor-toolbar");
+    if (toolbar && toolbar.contains(e.target)) return;
+
+    // Otherwise hide toolbar
+    setToolbarVisible(false);
+  };
+
+  window.addEventListener("mousedown", handleOutsideClick);
+
+  return () => window.removeEventListener("mousedown", handleOutsideClick);
+}, [toolbarVisible]);
+
+useEffect(() => {
   const handleClickOutside = (e) => {
     if (!textActive) return;
 
@@ -841,6 +858,7 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
 {/* TOOLBAR */}
 {editMode && toolbarVisible && !isVideo && (
   <div
+   id="editor-toolbar" 
     className="absolute z-[9999] flex flex-wrap gap-3 items-center bg-black/30 p-3 rounded-xl shadow-lg backdrop-blur-sm"
         onMouseDown={(e)=>e.stopPropagation()}
     onClick={(e)=>e.stopPropagation()}

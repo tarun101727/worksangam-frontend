@@ -71,7 +71,7 @@ width:200,
 height:200
 });
 // Add this with other useState hooks
-const [buttonLabel, setButtonLabel] = useState("Send");
+const [buttonLabel, setButtonLabel] = useState(t("Send"));
 // Store the current image file (original or cropped)
 const [currentFile, setCurrentFile] = useState(file); 
 const [currentImageUrl, setCurrentImageUrl] = useState(imageUrl);
@@ -635,7 +635,7 @@ const handleButtonClick = async () => {
 
       // Reset crop mode and button
       setCropMode(false);
-      setButtonLabel(t("Send"));
+      setButtonLabel("Send");
 
       setCurrentFile(croppedFile);
 setCurrentImageUrl(newUrl);

@@ -71,7 +71,7 @@ width:200,
 height:200
 });
 // Add this with other useState hooks
-const [buttonLabel, setButtonLabel] = useState(t("Send"));
+const [buttonLabel, setButtonLabel] = useState("Send");
 // Store the current image file (original or cropped)
 const [currentFile, setCurrentFile] = useState(file); 
 const [currentImageUrl, setCurrentImageUrl] = useState(imageUrl);
@@ -832,7 +832,7 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
   onClick={handleButtonClick}
   className="bg-indigo-500 hover:bg-indigo-600 px-4 py-2 rounded-lg"
 >
-  {buttonLabel}
+  {t(buttonLabel)}
 </button>
 
 </div>

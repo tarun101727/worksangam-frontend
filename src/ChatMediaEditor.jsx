@@ -99,6 +99,50 @@ const closeToolbar = () => {
 };
 
 
+useEffect(() => {
+  const handleGlobalClick = (e) => {
+    const toolbar = document.getElementById("editor-toolbar");
+
+    // ✅ Close toolbar if clicked outside
+    if (toolbarVisible) {
+      if (!toolbar || !toolbar.contains(e.target)) {
+        setToolbarVisible(false);
+      }
+    }
+
+    // ✅ Handle text box behavior
+    if (textActive) {
+      let clickedInsideBox = false;
+
+      textBoxes.forEach(box => {
+        const el = document.getElementById(`textbox-${box.id}`);
+
+        if (el && (el === e.target || el.contains(e.target))) {
+          clickedInsideBox = true;
+        }
+      });
+
+      // ❌ Clicked outside
+      if (!clickedInsideBox) {
+        const currentBox = textBoxes.find(b => b.id === currentBoxId);
+
+        // 🔥 DELETE if empty
+        if (currentBox && (!currentBox.text || currentBox.text.trim() === "")) {
+          setTextBoxes(prev => prev.filter(b => b.id !== currentBoxId));
+        }
+
+        // ✅ Stop editing
+        setIsEditingText(false);
+        setCurrentBoxId(null);
+        setTextActive(false);
+      }
+    }
+  };
+
+  window.addEventListener("mousedown", handleGlobalClick);
+  return () => window.removeEventListener("mousedown", handleGlobalClick);
+}, [toolbarVisible, textActive, textBoxes, currentBoxId]);
+
 const saveState = () => {
   setUndoStack(prev => [
     ...prev,
@@ -886,7 +930,7 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
       onClick={() => {
         setPenMode(true);
         setEraserMode(false);
-        closeToolbar();
+        
       }}
       className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
     >
@@ -898,7 +942,7 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
       onClick={() => {
         setPenMode(true);
         setEraserMode(true);
-        closeToolbar();;
+        
       }}
       className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
     >

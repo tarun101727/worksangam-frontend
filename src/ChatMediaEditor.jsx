@@ -1,4 +1,3 @@
-
 import { useTranslation } from "react-i18next";
 
 import { useLocation, useNavigate } from "react-router-dom";
@@ -99,53 +98,6 @@ const closeToolbar = () => {
   setToolbarVisible(false);
 };
 
-
-useEffect(() => {
-  const handleGlobalClick = (e) => {
-    const toolbar = document.getElementById("editor-toolbar");
-    const canvas = canvasRef.current;
-
-    // ✅ 1. Ignore clicks inside toolbar
-    if (toolbar && toolbar.contains(e.target)) return;
-
-    // ✅ 2. Ignore clicks on canvas (pen/eraser)
-    if (canvas && canvas.contains(e.target)) return;
-
-    // ===== EXISTING LOGIC BELOW =====
-
-    if (toolbarVisible) {
-      if (!toolbar || !toolbar.contains(e.target)) {
-        setToolbarVisible(false);
-      }
-    }
-
-    if (textActive) {
-      let clickedInsideBox = false;
-
-      textBoxes.forEach(box => {
-        const el = document.getElementById(`textbox-${box.id}`);
-        if (el && (el === e.target || el.contains(e.target))) {
-          clickedInsideBox = true;
-        }
-      });
-
-      if (!clickedInsideBox) {
-        const currentBox = textBoxes.find(b => b.id === currentBoxId);
-
-        if (currentBox && (!currentBox.text || currentBox.text.trim() === "")) {
-          setTextBoxes(prev => prev.filter(b => b.id !== currentBoxId));
-        }
-
-        setIsEditingText(false);
-        setCurrentBoxId(null);
-        setTextActive(false);
-      }
-    }
-  };
-
-  window.addEventListener("mousedown", handleGlobalClick);
-  return () => window.removeEventListener("mousedown", handleGlobalClick);
-}, [toolbarVisible, textActive, textBoxes, currentBoxId]);
 
 const saveState = () => {
   setUndoStack(prev => [
@@ -886,15 +838,16 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
   >
     {/* Text */}
     <button
-  onMouseDown={(e) => e.stopPropagation()}  // ✅ ADD THIS
-  onClick={() => {
-    addText();
-    closeToolbar();
-    setPenMode(false);
-  }}
->
-  {t("Text")}
-</button>
+      onClick={() => {
+        addText();
+       closeToolbar();
+        setPenMode(false); 
+        
+      }}
+      className="px-4 py-1 bg-[#020617]/90  rounded-lg transition"
+    >
+      {t("Text")}
+    </button>
 
     {/* Font size */}
     <select
@@ -928,27 +881,29 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
       <option value="italic">{t("Italic")}</option>
     </select>
 
+    {/* Pen */}
     <button
-  onMouseDown={(e) => e.stopPropagation()}  // ✅ ADD THIS
-  onClick={() => {
-    setPenMode(true);
-    setEraserMode(false);
-    closeToolbar();
-  }}
->
-  ✏️
-</button>
+      onClick={() => {
+        setPenMode(true);
+        setEraserMode(false);
+        closeToolbar();
+      }}
+      className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
+    >
+      ✏️
+    </button>
 
+    {/* Eraser */}
     <button
-  onMouseDown={(e) => e.stopPropagation()}  // ✅ ADD THIS
-  onClick={() => {
-    setPenMode(true);
-    setEraserMode(true);
-    closeToolbar();
-  }}
->
-  🧽
-</button>
+      onClick={() => {
+        setPenMode(true);
+        setEraserMode(true);
+        closeToolbar();;
+      }}
+      className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
+    >
+      🧽
+    </button>
   </div>
 )}
 

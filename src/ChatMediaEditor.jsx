@@ -897,7 +897,7 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
         setPenMode(false); 
         
       }}
-      className="px-4 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
+      className="px-4 py-1 bg-[#020617]/90  rounded-lg transition"
     >
       {t("Text")}
     </button>

@@ -94,6 +94,41 @@ const [toolbarVisible, setToolbarVisible] = useState(false);
 const [undoStack, setUndoStack] = useState([]);
 const [redoStack, setRedoStack] = useState([]);
 
+useEffect(() => {
+  const handleGlobalClick = (e) => {
+    const toolbar = document.getElementById("editor-toolbar");
+
+    // ✅ 1. Handle toolbar close
+    if (toolbarVisible) {
+      if (!toolbar || !toolbar.contains(e.target)) {
+        setToolbarVisible(false);
+      }
+    }
+
+    // ✅ 2. Handle text box close
+    if (textActive) {
+      let clickedInsideBox = false;
+
+      textBoxes.forEach(box => {
+        const el = document.getElementById(`textbox-${box.id}`);
+        if (el && el.contains(e.target)) {
+          clickedInsideBox = true;
+        }
+      });
+
+      if (!clickedInsideBox) {
+        setIsEditingText(false);
+        setCurrentBoxId(null);
+        setTextActive(false);
+      }
+    }
+  };
+
+  window.addEventListener("mousedown", handleGlobalClick);
+
+  return () => window.removeEventListener("mousedown", handleGlobalClick);
+}, [toolbarVisible, textActive, textBoxes]);
+
 const saveState = () => {
   setUndoStack(prev => [
     ...prev,
@@ -144,23 +179,6 @@ const handleRedo = () => {
 
   setRedoStack(prev => prev.slice(0, -1));
 };
-
-useEffect(() => {
-  const handleOutsideClick = (e) => {
-    if (!toolbarVisible) return;
-
-    // If click is inside toolbar → ignore
-    const toolbar = document.getElementById("editor-toolbar");
-    if (toolbar && toolbar.contains(e.target)) return;
-
-    // Otherwise hide toolbar
-    setToolbarVisible(false);
-  };
-
-  window.addEventListener("mousedown", handleOutsideClick);
-
-  return () => window.removeEventListener("mousedown", handleOutsideClick);
-}, [toolbarVisible]);
 
 useEffect(() => {
   const handleClickOutside = (e) => {
@@ -861,7 +879,10 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
    id="editor-toolbar" 
     className="absolute z-[9999] flex flex-wrap gap-3 items-center bg-black/30 p-3 rounded-xl shadow-lg backdrop-blur-sm"
         onMouseDown={(e)=>e.stopPropagation()}
-    onClick={(e)=>e.stopPropagation()}
+   onClick={() => {
+  setEditMode(true);
+  setToolbarVisible(prev => !prev); // ✅ toggle
+}}
     style={{
       top: "10%", // slightly higher above the image
       left: "50%",

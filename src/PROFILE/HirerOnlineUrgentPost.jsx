@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
-import i18n from "../i18n";
-import { useRef } from "react";
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -42,8 +41,7 @@ const HirerOnlineUrgentPost = () => {
   const [languages, setLanguages] = useState([]);
   const [languageSuggestions, setLanguageSuggestions] = useState([]);
   const { t } = useTranslation();
-const translateTimer = useRef(null);
-const latestTypedValue = useRef({});
+
   /* ================= PRICE OPTIONS ================= */
 
 const urgentPriceOptions = [
@@ -58,18 +56,6 @@ const urgentPriceOptions = [
   const selectedCurrency = currencies.find(
     (c) => c.code === form.currency
   );
-
-  useEffect(() => {
-  const handleClickOutside = (e) => {
-    if (!e.target.closest(".profession-dropdown")) {
-      setShowSuggestions(false);
-    }
-  };
-
-  document.addEventListener("click", handleClickOutside);
-  return () => document.removeEventListener("click", handleClickOutside);
-}, []);
-
 
   /* ================= HANDLE CHANGE ================= */
 
@@ -142,49 +128,6 @@ const submit = async () => {
   }
 };
 
-const translateText = async (text, field) => {
-  const lang = i18n.language || "en";
-  if (lang === "en") return;
-
-  try {
-    const res = await fetch(
-      `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${lang}&dt=t&q=${encodeURIComponent(text)}`
-    );
-
-    const data = await res.json();
-
-    let translated = data[0].map((item) => item[0]).join("");
-
-    const trailingSpaces = text.match(/\s+$/);
-    if (trailingSpaces) {
-      translated += trailingSpaces[0];
-    }
-
-    if (latestTypedValue.current[field] !== text) return;
-
-    handleChange(field, translated);
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-const handleSentenceChange = (value, field) => {
-  latestTypedValue.current[field] = value;
-
-  handleChange(field, value);
-
-  const lang = i18n.language || "en";
-  if (lang === "en") return;
-
-  clearTimeout(translateTimer.current);
-
-  translateTimer.current = setTimeout(() => {
-    if (latestTypedValue.current[field] !== value) return;
-
-    translateText(value, field);
-  }, 800);
-};
-
   return (
     <div className="max-w-2xl mx-auto px-4 py-10 ">
 
@@ -202,7 +145,7 @@ const handleSentenceChange = (value, field) => {
 
         {/* ================= PROFESSION SEARCH ================= */}
 
-        <div className="relative profession-dropdown">
+        <div className="relative">
 
           <input
             type="text"
@@ -247,8 +190,7 @@ const handleSentenceChange = (value, field) => {
         </div>
 
         {/* ================= DESCRIPTION ================= */}
-     {form.profession && (
-  <>
+
         <div className="space-y-2">
 
           <p className="text-sm font-medium text-red-400">
@@ -260,9 +202,7 @@ const handleSentenceChange = (value, field) => {
             placeholder={t("Example: Need a React developer to fix login authentication bug...")}
             value={form.description}
             maxLength={250}
-            onChange={(e) =>
-  handleSentenceChange(e.target.value, "description")
-}
+            onChange={(e) => handleChange("description", e.target.value)}
           />
 
         </div>
@@ -344,8 +284,7 @@ const handleSentenceChange = (value, field) => {
 
 
         </div>
-        </>
-     )}
+        
       
 <div className="space-y-2 relative">
   <p className="text-sm font-medium text-red-400">🗣 {t("Languages Required")}</p>

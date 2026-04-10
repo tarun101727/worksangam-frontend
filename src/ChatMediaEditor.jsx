@@ -1121,43 +1121,46 @@ onClick={(e) => e.stopPropagation()}
     ))}
 
     {/* Drag handle button under the box */}
-    {currentBoxId === boxItem.id && (
-      <div
-  onMouseDown={(e) => startDrag(e, boxItem)}
-  onTouchStart={(e) => {
-  const touch = e.touches[0];
-
-  startDrag(
-    {
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-      preventDefault(){},
-      stopPropagation(){}
-    },
-    boxItem
-  );
-}}
-  style={{
-    position: "absolute",
-    bottom: -20,
-    left: "50%",
-    transform: "translateX(-50%)",
-    width: "30px",
-    height: "10px",
-    cursor: "grab",
-    zIndex: 50,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  }}
-  title="Drag to move"
- >
-    <svg width="18" height="18" viewBox="0 0 24 24">
-    <line x1="12" y1="5" x2="12" y2="19" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-    <line x1="5" y1="12" x2="19" y2="12" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-  </svg>
+{currentBoxId === boxItem.id && (
+  <div
+    onMouseDown={(e) => startDrag(e, boxItem)}
+    onTouchStart={(e) => {
+      const touch = e.touches[0];
+      startDrag(
+        {
+          clientX: touch.clientX,
+          clientY: touch.clientY,
+          preventDefault(){},
+          stopPropagation(){}
+        },
+        boxItem
+      );
+    }}
+    style={{
+      position: "absolute",
+      bottom: -28,
+      left: "50%",
+      transform: "translateX(-50%)",
+      width: "34px",
+      height: "34px",
+      borderRadius: "50%",
+      background: "rgba(0,0,0,0.7)",
+      border: "2px solid white",
+      cursor: "grab",
+      zIndex: 50,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      backdropFilter: "blur(6px)",
+    }}
+    title="Drag to move"
+  >
+    <svg width="16" height="16" viewBox="0 0 24 24">
+      <line x1="12" y1="5" x2="12" y2="19" stroke="white" strokeWidth="2"/>
+      <line x1="5" y1="12" x2="19" y2="12" stroke="white" strokeWidth="2"/>
+    </svg>
   </div>
-    )}
+)}
   </div>
 ))}
 

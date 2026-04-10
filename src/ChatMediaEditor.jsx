@@ -106,12 +106,12 @@ const [isBlocked, setIsBlocked] = useState(false);
 
 useEffect(() => {
   const checkScreen = () => {
-    const isDesktop = window.innerWidth >= 768; // md screens
-    const isFullScreen =
-      window.innerWidth === window.screen.width &&
-      window.innerHeight === window.screen.height;
+    const isDesktop = window.innerWidth >= 768; // md+
 
-    if (isDesktop && !isFullScreen) {
+    // 🔥 THIS IS THE REAL FIX
+    const isTooSmall = window.innerWidth < 1200; 
+
+    if (isDesktop && isTooSmall) {
       setIsBlocked(true);
     } else {
       setIsBlocked(false);

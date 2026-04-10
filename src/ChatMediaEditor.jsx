@@ -98,18 +98,18 @@ const closeToolbar = () => {
   setToolbarVisible(false);
 };
 
-const isFullscreenDesktop = () => {
-  if (window.innerWidth < 768) return true; // mobile always allowed
 
+const isPartialDesktop = () => {
+  if (window.innerWidth < 768) return false; // mobile always allowed
   const widthDiff = Math.abs(window.innerWidth - window.screen.width);
   const heightDiff = Math.abs(window.innerHeight - window.screen.height);
 
-  return widthDiff < 10 && heightDiff < 10;
+  return widthDiff > 10 || heightDiff > 10;
 };
 
 const handleRestrictedClick = (callback) => {
-  if (!isFullscreenDesktop()) {
-    alert("You can’t use this feature in partial screen...");
+  if (isPartialDesktop()) {
+    alert("You can’t use this feature in partial screen. Please switch to fullscreen.");
     return;
   }
   callback?.();

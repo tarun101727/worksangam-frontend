@@ -1138,7 +1138,7 @@ onClick={(e) => e.stopPropagation()}
     }}
     style={{
       position: "absolute",
-      bottom: -28,
+      bottom: -45,
       left: "50%",
       transform: "translateX(-50%)",
       width: "34px",

@@ -42,7 +42,6 @@ const HirerOnlineUrgentPost = () => {
   const [languages, setLanguages] = useState([]);
   const [languageSuggestions, setLanguageSuggestions] = useState([]);
   const { t } = useTranslation();
-
 const translateTimer = useRef(null);
 const latestTypedValue = useRef({});
   /* ================= PRICE OPTIONS ================= */
@@ -59,6 +58,18 @@ const urgentPriceOptions = [
   const selectedCurrency = currencies.find(
     (c) => c.code === form.currency
   );
+
+  useEffect(() => {
+  const handleClickOutside = (e) => {
+    if (!e.target.closest(".profession-dropdown")) {
+      setShowSuggestions(false);
+    }
+  };
+
+  document.addEventListener("click", handleClickOutside);
+  return () => document.removeEventListener("click", handleClickOutside);
+}, []);
+
 
   /* ================= HANDLE CHANGE ================= */
 
@@ -141,10 +152,13 @@ const translateText = async (text, field) => {
     );
 
     const data = await res.json();
+
     let translated = data[0].map((item) => item[0]).join("");
 
     const trailingSpaces = text.match(/\s+$/);
-    if (trailingSpaces) translated += trailingSpaces[0];
+    if (trailingSpaces) {
+      translated += trailingSpaces[0];
+    }
 
     if (latestTypedValue.current[field] !== text) return;
 
@@ -166,6 +180,7 @@ const handleSentenceChange = (value, field) => {
 
   translateTimer.current = setTimeout(() => {
     if (latestTypedValue.current[field] !== value) return;
+
     translateText(value, field);
   }, 800);
 };
@@ -187,7 +202,7 @@ const handleSentenceChange = (value, field) => {
 
         {/* ================= PROFESSION SEARCH ================= */}
 
-        <div className="relative">
+        <div className="relative profession-dropdown">
 
           <input
             type="text"
@@ -211,10 +226,10 @@ const handleSentenceChange = (value, field) => {
                     key={profession._id || profession.id}
                     className="px-4 py-2 text-sm text-slate-200 hover:bg-indigo-500/20 cursor-pointer"
                     onClick={() => {
-  handleChange("profession", profession.name);
-  setSearch(profession.name);
-  setShowSuggestions(false);
-}}
+                      handleChange("profession", profession.name);
+                      setSearch(profession.name);
+                      setShowSuggestions(false);
+                    }}
                   >
                     {profession.name}
                   </div>
@@ -232,7 +247,8 @@ const handleSentenceChange = (value, field) => {
         </div>
 
         {/* ================= DESCRIPTION ================= */}
-
+     {form.profession && (
+  <>
         <div className="space-y-2">
 
           <p className="text-sm font-medium text-red-400">
@@ -250,7 +266,6 @@ const handleSentenceChange = (value, field) => {
           />
 
         </div>
-        
 
         {/* ================= PRICE ================= */}
 
@@ -329,7 +344,8 @@ const handleSentenceChange = (value, field) => {
 
 
         </div>
-        
+        </>
+     )}
       
 <div className="space-y-2 relative">
   <p className="text-sm font-medium text-red-400">🗣 {t("Languages Required")}</p>

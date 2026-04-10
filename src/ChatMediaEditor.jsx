@@ -104,18 +104,16 @@ const isFullscreenDesktop = () => {
   const widthDiff = Math.abs(window.innerWidth - window.screen.width);
   const heightDiff = Math.abs(window.innerHeight - window.screen.height);
 
-  // Consider fullscreen if difference is small
   return widthDiff < 10 && heightDiff < 10;
 };
 
 const handleRestrictedClick = (callback) => {
   if (!isFullscreenDesktop()) {
-    alert("You can’t use this feature in partial screen. Please switch to fullscreen mode to continue.");
+    alert("You can’t use this feature in partial screen...");
     return;
   }
   callback?.();
 };
-
 
 useEffect(() => {
   const handleGlobalClick = (e) => {

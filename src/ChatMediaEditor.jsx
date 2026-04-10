@@ -93,7 +93,26 @@ const [currentBoxId, setCurrentBoxId] = useState(null); // current editing box
 const [toolbarVisible, setToolbarVisible] = useState(false);
 const [undoStack, setUndoStack] = useState([]);
 const [redoStack, setRedoStack] = useState([]);
+// Check if user is on medium/large screen (desktop) and not in fullscreen
+const isPartialScreen = () => {
+  const minDesktopWidth = 768; // adjust if needed
+  const isDesktop = window.innerWidth >= minDesktopWidth;
+  if (!isDesktop) return false;
 
+  const tolerance = 10; // allow 10px difference
+  const isFullScreen =
+    Math.abs(window.innerWidth - window.screen.width) < tolerance &&
+    Math.abs(window.innerHeight - window.screen.height) < tolerance;
+
+  return isDesktop && !isFullScreen;
+};
+
+// Show warning message
+const showFullscreenWarning = () => {
+  alert(
+    "You can’t use this feature in partial screen. Please switch to fullscreen mode to continue."
+  );
+};
 
 const closeToolbar = () => {
   setToolbarVisible(false);
@@ -879,11 +898,12 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Text */}
     <button
       onClick={() => {
-        addText();
-       closeToolbar();
-        setPenMode(false); 
-        
-      }}
+    if (isPartialScreen()) return showFullscreenWarning(); // 🔥 Block on partial screen
+
+    addText();
+    closeToolbar();
+    setPenMode(false);
+  }}
       className="px-4 py-1 bg-[#020617]/90  rounded-lg transition"
     >
       {t("Text")}
@@ -924,10 +944,12 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Pen */}
     <button
       onClick={() => {
-        setPenMode(true);
-        setEraserMode(false);
-        closeToolbar();
-      }}
+    if (isPartialScreen()) return showFullscreenWarning();
+
+    setPenMode(true);
+    setEraserMode(false);
+    closeToolbar();
+  }}
       className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
     >
       ✏️
@@ -936,10 +958,12 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Eraser */}
     <button
       onClick={() => {
-        setPenMode(true);
-        setEraserMode(true);
-        closeToolbar();;
-      }}
+    if (isPartialScreen()) return showFullscreenWarning();
+
+    setPenMode(true);
+    setEraserMode(true);
+    closeToolbar();
+  }}
       className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
     >
       🧽

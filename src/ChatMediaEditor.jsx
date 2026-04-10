@@ -8,7 +8,6 @@ import ReactCrop from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 import getCroppedImg from "./utils/cropImage";
 
-
 // Paint brush style cursor
 const BRUSH_CURSOR = `url('data:image/svg+xml;base64,${btoa(`
 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32">
@@ -93,6 +92,12 @@ const [currentBoxId, setCurrentBoxId] = useState(null); // current editing box
 const [toolbarVisible, setToolbarVisible] = useState(false);
 const [undoStack, setUndoStack] = useState([]);
 const [redoStack, setRedoStack] = useState([]);
+
+
+const closeToolbar = () => {
+  setToolbarVisible(false);
+};
+
 
 useEffect(() => {
   const handleGlobalClick = (e) => {
@@ -879,9 +884,10 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
    id="editor-toolbar" 
     className="absolute z-[9999] flex flex-wrap gap-3 items-center bg-black/30 p-3 rounded-xl shadow-lg backdrop-blur-sm"
         onMouseDown={(e)=>e.stopPropagation()}
-   onClick={() => {
-  setEditMode(true);
-  setToolbarVisible(prev => !prev); // ✅ toggle
+  onClick={() => {
+  addText();
+  setPenMode(false);
+  closeToolbar(); // ✅
 }}
     style={{
       top: "10%", // slightly higher above the image
@@ -893,7 +899,7 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     <button
       onClick={() => {
         addText();
-        setToolbarVisible(false);
+       closeToolbar();
         setPenMode(false); 
         
       }}
@@ -939,7 +945,7 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
       onClick={() => {
         setPenMode(true);
         setEraserMode(false);
-        setToolbarVisible(false);
+        closeToolbar();
       }}
       className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
     >
@@ -951,7 +957,7 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
       onClick={() => {
         setPenMode(true);
         setEraserMode(true);
-        setToolbarVisible(false);
+        closeToolbar();;
       }}
       className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
     >

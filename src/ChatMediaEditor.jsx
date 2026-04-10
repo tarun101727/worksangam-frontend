@@ -103,25 +103,35 @@ useEffect(() => {
   const handleGlobalClick = (e) => {
     const toolbar = document.getElementById("editor-toolbar");
 
-    // ✅ 1. Handle toolbar close
+    // ✅ Close toolbar if clicked outside
     if (toolbarVisible) {
       if (!toolbar || !toolbar.contains(e.target)) {
         setToolbarVisible(false);
       }
     }
 
-    // ✅ 2. Handle text box close
+    // ✅ Handle text box behavior
     if (textActive) {
       let clickedInsideBox = false;
 
       textBoxes.forEach(box => {
         const el = document.getElementById(`textbox-${box.id}`);
-        if (el && el.contains(e.target)) {
+
+        if (el && (el === e.target || el.contains(e.target))) {
           clickedInsideBox = true;
         }
       });
 
+      // ❌ Clicked outside
       if (!clickedInsideBox) {
+        const currentBox = textBoxes.find(b => b.id === currentBoxId);
+
+        // 🔥 DELETE if empty
+        if (currentBox && (!currentBox.text || currentBox.text.trim() === "")) {
+          setTextBoxes(prev => prev.filter(b => b.id !== currentBoxId));
+        }
+
+        // ✅ Stop editing
         setIsEditingText(false);
         setCurrentBoxId(null);
         setTextActive(false);
@@ -130,9 +140,8 @@ useEffect(() => {
   };
 
   window.addEventListener("mousedown", handleGlobalClick);
-
   return () => window.removeEventListener("mousedown", handleGlobalClick);
-}, [toolbarVisible, textActive, textBoxes]);
+}, [toolbarVisible, textActive, textBoxes, currentBoxId]);
 
 const saveState = () => {
   setUndoStack(prev => [
@@ -184,30 +193,6 @@ const handleRedo = () => {
 
   setRedoStack(prev => prev.slice(0, -1));
 };
-
-useEffect(() => {
-  const handleClickOutside = (e) => {
-    if (!textActive) return;
-
-    let clickedInsideBox = false;
-
-    textBoxes.forEach(box => {
-      const boxEl = document.getElementById(`textbox-${box.id}`);
-      if (boxEl && boxEl.contains(e.target)) {
-        clickedInsideBox = true;
-      }
-    });
-
-    if (!clickedInsideBox) {
-      setIsEditingText(false);
-      setCurrentBoxId(null);
-      setTextActive(false);
-    }
-  };
-
-  window.addEventListener("mousedown", handleClickOutside);
-  return () => window.removeEventListener("mousedown", handleClickOutside);
-}, [textActive, textBoxes]);
 
 const addText = () => {
   saveState();
@@ -1067,6 +1052,8 @@ objectFit:"contain"
         ref={textRef}
         value={text}
         onChange={handleTextChange}
+        onMouseDown={(e) => e.stopPropagation()}
+onClick={(e) => e.stopPropagation()}
         style={{
           width: "100%",
           height: "100%",

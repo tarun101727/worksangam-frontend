@@ -161,7 +161,7 @@ const submit = async () => {
 
         {/* ================= PROFESSION SEARCH ================= */}
 
-        <div className="relative" ref={wrapperRef}>
+        <div className="relative profession-dropdown">
 
           <input
             type="text"

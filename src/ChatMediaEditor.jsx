@@ -1,4 +1,3 @@
-
 import { useTranslation } from "react-i18next";
 
 import { useLocation, useNavigate } from "react-router-dom";
@@ -94,17 +93,23 @@ const [toolbarVisible, setToolbarVisible] = useState(false);
 const [undoStack, setUndoStack] = useState([]);
 const [redoStack, setRedoStack] = useState([]);
 
-// Corrected: Detect partial screen properly
+// Returns true only if desktop AND screen is not fullscreen
 const isPartialScreen = () => {
-  const minDesktopWidth = 768;
-  if (window.innerWidth > minDesktopWidth) return false; // mobile always allow
+  const minDesktopWidth = 768; // consider >=768px as desktop
+  const isDesktop = window.innerWidth >= minDesktopWidth;
 
-  // Treat anything smaller than screen (minus tolerance) as partial
-  const widthPartial = window.innerWidth < window.screen.width - 10;
-  const heightPartial = window.innerHeight < window.screen.height - 10;
+  if (!isDesktop) return false; // mobile always allowed
 
-  // Return true only if either width or height is smaller than screen
-  return widthPartial || heightPartial;
+  const tolerance = 10;
+
+  // True if browser is FULLSCREEN
+  const isFullWidth = Math.abs(window.innerWidth - window.screen.width) <= tolerance;
+  const isFullHeight = Math.abs(window.innerHeight - window.screen.height) <= tolerance;
+
+  const isFullScreen = isFullWidth && isFullHeight;
+
+  // Return true if NOT fullscreen (i.e., partial screen)
+  return isDesktop && !isFullScreen;
 };
 
 const showFullscreenWarning = () => {

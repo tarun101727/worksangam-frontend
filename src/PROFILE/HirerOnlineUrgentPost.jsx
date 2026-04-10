@@ -459,14 +459,14 @@ const handleSentenceChange = (value, field) => {
           key={lang._id}
           className="px-4 py-2 text-sm text-slate-200 hover:bg-indigo-500/20 cursor-pointer"
           onClick={() => {
-            if (!languages.includes(lang.name)) {
-              setLanguages(prev => [...prev, lang.name]);
-            }
+            if (!languages.includes(lang.nativeName)) {
+  setLanguages(prev => [...prev, lang.nativeName]);
+}
             setLanguageInput("");
             setLanguageSuggestions([]);
           }}
         >
-          {lang.name} ({lang.code})
+          {lang.nativeName} ({lang.name})
         </div>
       ))}
     </div>

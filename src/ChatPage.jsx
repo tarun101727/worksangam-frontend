@@ -6,6 +6,7 @@ import { BASE_URL } from "./config";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "./AuthContext";
+import { useTranslation } from "react-i18next";
 
 
 const getImageUrl = (img) => {
@@ -35,6 +36,7 @@ const [selectedMedia, setSelectedMedia] = useState(null);
 const messagesContainerRef = useRef(null);
 const [isTyping, setIsTyping] = useState(false);
 const isTypingRef = useRef(false);
+const { t } = useTranslation();
 
 
 
@@ -280,7 +282,7 @@ src={getImageUrl(receiver.profileImage)}
 className="w-14 h-14 rounded-full object-cover mb-2"
 />
 <p className="text-gray-400 text-sm">
-This is the beginning of your conversation with
+{t("This is the beginning of your conversation with")}
 </p>
 
 <p className="text-white font-semibold">
@@ -337,7 +339,7 @@ className="w-8 h-8 rounded-full object-cover"
 
   <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition rounded-lg pointer-events-none">
     <span className="text-white text-sm font-semibold">
-      View
+      {t("View")}
     </span>
   </div>
 </div>
@@ -353,7 +355,7 @@ className="w-8 h-8 rounded-full object-cover"
         rel="noopener noreferrer"
         className="underline text-white hover:text-gray-200"
       >
-        Shared a location(click to see location)
+        {t("Shared a location(click to see location)")}
       </a>
     ) : (
       m.message
@@ -400,7 +402,7 @@ className="w-8 h-8 rounded-full object-cover"
 
   <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition rounded-lg pointer-events-none">
     <span className="text-white text-sm font-semibold">
-      View
+      {t("View")}
     </span>
   </div>
 </div>
@@ -416,7 +418,7 @@ className="w-8 h-8 rounded-full object-cover"
         rel="noopener noreferrer"
         className="underline text-white hover:text-gray-100"
       >
-         Shared a location(click to see location)
+         {t("Shared a location(click to see location)")}
       </a>
     ) : (
       m.message
@@ -437,7 +439,7 @@ className="w-8 h-8 rounded-full object-cover"
 })}
 {isTyping && (
   <div className="text-gray-400 text-sm px-2 mb-2">
-    Typing . . .
+    {t("Typing . . .")}
   </div>
 )}
 <div ref={messagesEndRef}></div>
@@ -499,7 +501,7 @@ className="w-8 h-8"
 <path d="M21 15l-5-5L5 21"/>
 </svg>
 
-Gallery
+{t("Gallery")}
 
 </button>
 
@@ -522,7 +524,7 @@ className="w-8 h-8"
 <circle cx="12" cy="13" r="4"/>
 </svg>
 
-Camera
+{t("Camera")}
 
 </button>
 {/* LOCATION */}
@@ -541,7 +543,7 @@ Camera
     <path d="M12 2C8 8 4 12 12 22c8-10 4-14 0-20z" />
     <circle cx="12" cy="12" r="3" />
   </svg>
-  Location
+  {t("Location")}
 </button>
 </div>
 
@@ -582,7 +584,7 @@ className="flex-1 p-2 bg-gradient-to-br from-[#020617] via-[#020617] to-[#020617
 onClick={sendMessage}
 className="bg-indigo-500 px-4 h-10 flex items-center justify-center rounded hover:bg-indigo-600 transition flex-shrink-0"
 >
-Send
+{t("Send")}
 </button> 
 
 </div>

@@ -93,39 +93,9 @@ const [toolbarVisible, setToolbarVisible] = useState(false);
 const [undoStack, setUndoStack] = useState([]);
 const [redoStack, setRedoStack] = useState([]);
 
+
 const closeToolbar = () => {
   setToolbarVisible(false);
-};
-
-const [isFullscreenAllowed, setIsFullscreenAllowed] = useState(true);
-
-useEffect(() => {
-  const checkFullscreen = () => {
-    const isDesktop = window.innerWidth >= 768;
-
-    const isFullscreen =
-      window.innerWidth === window.screen.width &&
-      window.innerHeight === window.screen.height;
-
-    if (!isDesktop) {
-      setIsFullscreenAllowed(true); // mobile always allowed
-    } else {
-      setIsFullscreenAllowed(isFullscreen);
-    }
-  };
-
-  checkFullscreen();
-
-  window.addEventListener("resize", checkFullscreen);
-  return () => window.removeEventListener("resize", checkFullscreen);
-}, []);
-
-const blockIfNotFullscreen = () => {
-  if (!isFullscreenAllowed) {
-    alert("You can’t use this feature in partial screen. Please switch to fullscreen mode to continue.");
-    return true;
-  }
-  return false;
 };
 
 
@@ -856,11 +826,9 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
 {!isVideo && (
 <button
   onClick={() => {
-  if (blockIfNotFullscreen()) return;
-
-  setEditMode(true);
-  setToolbarVisible(true);
-}}
+    setEditMode(true);       // keep editMode on
+    setToolbarVisible(true);  // always show toolbar on click
+  }}
   className="px-3 py-1 rounded-lg bg-white/10"
 >
   {t("Edit")}
@@ -910,7 +878,6 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Text */}
     <button
       onClick={() => {
-        if (blockIfNotFullscreen()) return;
         addText();
        closeToolbar();
         setPenMode(false); 
@@ -956,9 +923,6 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Pen */}
     <button
       onClick={() => {
-        if (blockIfNotFullscreen()) return;
-
-
         setPenMode(true);
         setEraserMode(false);
         closeToolbar();
@@ -971,9 +935,6 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Eraser */}
     <button
       onClick={() => {
-        if (blockIfNotFullscreen()) return;
-
-
         setPenMode(true);
         setEraserMode(true);
         closeToolbar();;
@@ -1215,9 +1176,6 @@ onClick={(e) => e.stopPropagation()}
       zIndex: 30,
     }}
    onMouseDown={(e) => {
-      if (blockIfNotFullscreen()) return;
-
-
   if (isEditingText) return; // ❌ prevent drawing when editing text
  if (!editMode || !penMode) return;
 

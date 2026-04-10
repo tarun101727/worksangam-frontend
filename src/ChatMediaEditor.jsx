@@ -100,7 +100,7 @@ const closeToolbar = () => {
 
 
 const isPartialDesktop = () => {
-  if (window.innerWidth < 768) return false; // mobile always allowed
+  if (window.innerWidth > 768) return false; // mobile always allowed
   const widthDiff = Math.abs(window.innerWidth - window.screen.width);
   const heightDiff = Math.abs(window.innerHeight - window.screen.height);
 

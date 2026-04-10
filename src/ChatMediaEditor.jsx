@@ -24,7 +24,7 @@ const ERASER_CURSOR = `url('data:image/svg+xml;base64,${btoa(`
 `)}') 12 12, crosshair`;
 
 export default function ChatMediaEditor() {
-
+const { t } = useTranslation();
 const { state } = useLocation();
 const navigate = useNavigate();
 
@@ -93,7 +93,6 @@ const [currentBoxId, setCurrentBoxId] = useState(null); // current editing box
 const [toolbarVisible, setToolbarVisible] = useState(false);
 const [undoStack, setUndoStack] = useState([]);
 const [redoStack, setRedoStack] = useState([]);
-const { t } = useTranslation();
 
 const saveState = () => {
   setUndoStack(prev => [

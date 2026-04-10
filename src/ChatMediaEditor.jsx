@@ -98,6 +98,24 @@ const closeToolbar = () => {
   setToolbarVisible(false);
 };
 
+/* ---------------- FULLSCREEN CHECK ---------------- */
+const isFullscreenDesktop = () => {
+  // Only check medium+ screens (desktop/laptop)
+  if (window.innerWidth < 768) return true; // mobile always allowed
+
+  // Compare viewport size with full screen
+  return window.innerWidth === window.screen.width &&
+         window.innerHeight === window.screen.height;
+};
+
+const handleRestrictedClick = (callback) => {
+  if (!isFullscreenDesktop()) {
+    alert("You can’t use this feature in partial screen. Please switch to fullscreen mode to continue.");
+    return;
+  }
+  callback?.();
+};
+
 
 useEffect(() => {
   const handleGlobalClick = (e) => {
@@ -877,12 +895,11 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
   >
     {/* Text */}
     <button
-      onClick={() => {
-        addText();
-       closeToolbar();
-        setPenMode(false); 
-        
-      }}
+        onClick={() => handleRestrictedClick(() => {
+    addText();
+    closeToolbar();
+    setPenMode(false); 
+  })}
       className="px-4 py-1 bg-[#020617]/90  rounded-lg transition"
     >
       {t("Text")}
@@ -891,7 +908,8 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Font size */}
     <select
       value={fontSize}
-      onChange={(e) => setFontSize(Number(e.target.value))}
+        onChange={(e) => handleRestrictedClick(() => setFontSize(Number(e.target.value)))}
+
       className="bg-[#020617]/90 border border-white/20 rounded-lg px-2 py-1 text-sm hover:border-white/40 transition"
     >
       <option value={16}>16</option>
@@ -912,7 +930,7 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Font style */}
     <select
       value={fontStyle}
-      onChange={(e) => setFontStyle(e.target.value)}
+  onChange={(e) => handleRestrictedClick(() => setFontStyle(e.target.value))}
       className="bg-[#020617]/90 border border-white/20 rounded-lg px-2 py-1 text-sm hover:border-white/40 transition"
     >
       <option value="normal">{t("Normal")}</option>
@@ -922,11 +940,11 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
 
     {/* Pen */}
     <button
-      onClick={() => {
-        setPenMode(true);
-        setEraserMode(false);
-        closeToolbar();
-      }}
+       onClick={() => handleRestrictedClick(() => {
+    setPenMode(true);
+    setEraserMode(false);
+    closeToolbar();
+  })}
       className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
     >
       ✏️
@@ -934,11 +952,11 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
 
     {/* Eraser */}
     <button
-      onClick={() => {
-        setPenMode(true);
-        setEraserMode(true);
-        closeToolbar();;
-      }}
+      onClick={() => handleRestrictedClick(() => {
+    setPenMode(true);
+    setEraserMode(true);
+    closeToolbar();
+  })}
       className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
     >
       🧽

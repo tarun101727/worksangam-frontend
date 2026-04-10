@@ -43,6 +43,9 @@ const HirerOnlineUrgentPost = () => {
   const [languageSuggestions, setLanguageSuggestions] = useState([]);
   const { t } = useTranslation();
 const wrapperRef = useRef(null);
+const translateTimer = useRef(null);
+const latestTypedValue = useRef({});
+
 
 useEffect(() => {
   const handleClickOutside = (e) => {
@@ -159,6 +162,52 @@ const submit = async () => {
   }
 };
 
+const translateText = async (text, field) => {
+  const lang = i18n.language || "en";
+  if (lang === "en") return;
+
+  try {
+    const res = await fetch(
+      `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${lang}&dt=t&q=${encodeURIComponent(text)}`
+    );
+
+    const data = await res.json();
+
+    let translated = data[0].map((item) => item[0]).join("");
+
+    // preserve trailing spaces
+    const trailingSpaces = text.match(/\s+$/);
+    if (trailingSpaces) {
+      translated += trailingSpaces[0];
+    }
+
+    // prevent overwrite race condition
+    if (latestTypedValue.current[field] !== text) return;
+
+    handleChange(field, translated);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const handleSentenceChange = (value, field) => {
+  latestTypedValue.current[field] = value;
+
+  // instant UI update
+  handleChange(field, value);
+
+  const lang = i18n.language || "en";
+  if (lang === "en") return;
+
+  clearTimeout(translateTimer.current);
+
+  translateTimer.current = setTimeout(() => {
+    if (latestTypedValue.current[field] !== value) return;
+
+    translateText(value, field);
+  }, 800);
+};
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-10 ">
 
@@ -233,7 +282,9 @@ const submit = async () => {
             placeholder={t("Example: Need a React developer to fix login authentication bug...")}
             value={form.description}
             maxLength={250}
-            onChange={(e) => handleChange("description", e.target.value)}
+            onChange={(e) =>
+  handleSentenceChange(e.target.value, "description")
+}
           />
 
         </div>

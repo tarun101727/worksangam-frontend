@@ -92,7 +92,40 @@ const [currentBoxId, setCurrentBoxId] = useState(null); // current editing box
 const [toolbarVisible, setToolbarVisible] = useState(false);
 const [undoStack, setUndoStack] = useState([]);
 const [redoStack, setRedoStack] = useState([]);
+const [imageMetrics, setImageMetrics] = useState({
+  displayedWidth: 0,
+  displayedHeight: 0,
+  offsetX: 0,
+  offsetY: 0
+});
 
+useEffect(() => {
+  const updateMetrics = () => {
+    const img = imgRef.current;
+    const container = containerRef.current;
+
+    if (!img || !container) return;
+
+    const displayedWidth = img.width;
+    const displayedHeight = img.height;
+
+    const offsetX = (container.clientWidth - displayedWidth) / 2;
+    const offsetY = (container.clientHeight - displayedHeight) / 2;
+
+    setImageMetrics({
+      displayedWidth,
+      displayedHeight,
+      offsetX,
+      offsetY
+    });
+  };
+
+  updateMetrics();
+
+  window.addEventListener("resize", updateMetrics);
+
+  return () => window.removeEventListener("resize", updateMetrics);
+}, [currentImageUrl]);
 
 const closeToolbar = () => {
   setToolbarVisible(false);
@@ -204,17 +237,32 @@ const addText = () => {
 
   const newId = textBoxes.length + 1;
 
-  const initialBox = {
-      id: newId,
-  x: 0.5, // ✅ center in %
-  y: 0.5,
-    width: 260,
-    height: 120,
-    text: "",
-    color: "#000000",
-    fontSize: fontSize,
-    fontStyle: fontStyle
-  };
+  const img = imgRef.current;
+
+if (!img || !container) return;
+
+const displayedWidth = img.width;
+const displayedHeight = img.height;
+
+const offsetX = (container.clientWidth - displayedWidth) / 2;
+const offsetY = (container.clientHeight - displayedHeight) / 2;
+
+const x = offsetX + displayedWidth / 2;
+const y = offsetY + displayedHeight / 2;
+
+const initialBox = {
+  id: newId,
+  x,
+  y,
+  relX: 0.5,
+  relY: 0.5,
+  width: 260,
+  height: 120,
+  text: "",
+  color: "#000000",
+  fontSize: fontSize,
+  fontStyle: fontStyle
+};
 
   setTextBoxes(prev => [...prev, initialBox]);
   setCurrentBoxId(newId);
@@ -293,6 +341,8 @@ if (dragRef.current && currentBoxId !== null) {
   const img = imgRef.current;
   if (!img) return;
 
+  const imgRect = img.getBoundingClientRect();
+
   let newX = e.clientX - offset.current.x;
   let newY = e.clientY - offset.current.y;
 
@@ -315,16 +365,15 @@ if (dragRef.current && currentBoxId !== null) {
       if (newY < minY) newY = minY;
       if (newY > maxY) newY = maxY;
 
-      const img = imgRef.current;
-const imgRect = img.getBoundingClientRect();
-
-const relX = (newX - (imgRect.left - rect.left)) / imgRect.width;
+      const relX = (newX - (imgRect.left - rect.left)) / imgRect.width;
 const relY = (newY - (imgRect.top - rect.top)) / imgRect.height;
 
 return {
   ...box,
-  x: relX,
-  y: relY
+  x: newX,
+  y: newY,
+  relX,
+  relY
 };
     })
   );
@@ -1026,14 +1075,22 @@ objectFit:"contain"
 
 )}
 
-{textBoxes.map(boxItem => (
+{textBoxes.map(boxItem => {
+
+  const { displayedWidth, displayedHeight, offsetX, offsetY } = imageMetrics;
+
+  if (!displayedWidth || !displayedHeight) return null;
+
+  const x = offsetX + boxItem.relX * displayedWidth;
+  const y = offsetY + boxItem.relY * displayedHeight;
+  return(
   <div
     id={`textbox-${boxItem.id}`}
     key={boxItem.id}
     style={{
       position: "absolute",
-      top: boxItem.y - boxItem.height / 2,
-      left: boxItem.x - boxItem.width / 2,
+      top: y - boxItem.height / 2,
+      left: x - boxItem.width / 2,
       width: boxItem.width,
       height: boxItem.height,
       cursor: currentBoxId === boxItem.id ? cursorStyle : "text",
@@ -1161,7 +1218,7 @@ onClick={(e) => e.stopPropagation()}
   </div>
 )}
   </div>
-))}
+)})}
 
 {!isVideo && (
   <canvas

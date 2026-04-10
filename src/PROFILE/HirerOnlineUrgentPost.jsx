@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 import { BASE_URL } from "../config";
 import { currencies } from "../constants/currencies";
-
+import i18n from "../i18n";
 /* ================= EMPTY FORM ================= */
 
 const emptyForm = () => ({
@@ -81,18 +81,23 @@ const urgentPriceOptions = [
   /* ================= FETCH PROFESSIONS ================= */
 
   useEffect(() => {
-    const fetchProfessions = async () => {
-      try {
-        const res = await axios.get(`${BASE_URL}/api/online-professions`);
-        setOnlineProfessions(res.data.professions || []);
-      } catch (err) {
-        console.error("Failed to fetch professions", err);
-        setOnlineProfessions([]);
-      }
-    };
+  const fetchProfessions = async () => {
+    try {
+      const lang = i18n.language || "en";
 
-    fetchProfessions();
-  }, []);
+      const res = await axios.get(
+        `${BASE_URL}/api/online-professions?lang=${lang}`
+      );
+
+      setOnlineProfessions(res.data.professions || []);
+    } catch (err) {
+      console.error("Failed to fetch professions", err);
+      setOnlineProfessions([]);
+    }
+  };
+
+  fetchProfessions();
+}, [i18n.language]); // ✅ important
 
  /* ================= FILTER ================= */
 

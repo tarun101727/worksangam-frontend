@@ -95,21 +95,21 @@ const [undoStack, setUndoStack] = useState([]);
 const [redoStack, setRedoStack] = useState([]);
 // Check if user is on medium/large screen (desktop) and not in fullscreen
 const isPartialScreen = () => {
-  const minDesktopWidth = 768; // adjust if needed
+  const minDesktopWidth = 768; // treat >=768px as desktop
   const isDesktop = window.innerWidth >= minDesktopWidth;
-  if (!isDesktop) return false;
+  if (!isDesktop) return false; // allow mobile always
 
   const tolerance = 10; // allow 10px difference
-  const isFullScreen =
-    Math.abs(window.innerWidth - window.screen.width) < tolerance &&
-    Math.abs(window.innerHeight - window.screen.height) < tolerance;
+  const fullWidth = Math.abs(window.innerWidth - window.screen.width) <= tolerance;
+  const fullHeight = Math.abs(window.innerHeight - window.screen.height) <= tolerance;
 
-  return isDesktop && !isFullScreen;
+  // Block if desktop and NOT fullscreen
+  return isDesktop && !(fullWidth && fullHeight);
 };
 
-// Show warning message
 const showFullscreenWarning = () => {
   alert(
+    t("fullscreen_warning") || 
     "You can’t use this feature in partial screen. Please switch to fullscreen mode to continue."
   );
 };

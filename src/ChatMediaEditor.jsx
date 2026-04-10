@@ -92,40 +92,10 @@ const [currentBoxId, setCurrentBoxId] = useState(null); // current editing box
 const [toolbarVisible, setToolbarVisible] = useState(false);
 const [undoStack, setUndoStack] = useState([]);
 const [redoStack, setRedoStack] = useState([]);
-const [isFullscreenAllowed, setIsFullscreenAllowed] = useState(true);
+
 
 const closeToolbar = () => {
   setToolbarVisible(false);
-};
-
-useEffect(() => {
-  const checkFullscreen = () => {
-    const isDesktop = window.innerWidth >= 768; // medium+ screen
-    // Consider not fullscreen if window width or height is significantly smaller than screen
-    const notFullScreen =
-      window.innerWidth < window.screen.width * 0.95 ||
-      window.innerHeight < window.screen.height * 0.95;
-
-    if (isDesktop && notFullScreen) {
-      setIsFullscreenAllowed(false); // ❌ not allowed
-    } else {
-      setIsFullscreenAllowed(true);  // ✅ allowed
-    }
-  };
-
-  checkFullscreen();
-  window.addEventListener("resize", checkFullscreen);
-  return () => window.removeEventListener("resize", checkFullscreen);
-}, []);
-
-const handleRestrictedAction = () => {
-  if (!isFullscreenAllowed) {
-    alert(
-      "You can’t use this feature in partial screen. Please switch to fullscreen mode to continue."
-    );
-    return true; // block action
-  }
-  return false; // allow action
 };
 
 
@@ -907,12 +877,12 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
   >
     {/* Text */}
     <button
-       onClick={() => {
-    if (handleRestrictedAction()) return;
-    addText();
-    closeToolbar();
-    setPenMode(false);
-  }}
+      onClick={() => {
+        addText();
+       closeToolbar();
+        setPenMode(false); 
+        
+      }}
       className="px-4 py-1 bg-[#020617]/90  rounded-lg transition"
     >
       {t("Text")}
@@ -953,12 +923,10 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Pen */}
     <button
       onClick={() => {
-  if (handleRestrictedAction()) return;
-
-  setPenMode(true);
-  setEraserMode(false);
-  closeToolbar();
-}}
+        setPenMode(true);
+        setEraserMode(false);
+        closeToolbar();
+      }}
       className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
     >
       ✏️
@@ -966,13 +934,11 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
 
     {/* Eraser */}
     <button
-     onClick={() => {
-  if (handleRestrictedAction()) return;
-
-  setPenMode(true);
-  setEraserMode(true);
-  closeToolbar();
-}}
+      onClick={() => {
+        setPenMode(true);
+        setEraserMode(true);
+        closeToolbar();;
+      }}
       className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
     >
       🧽

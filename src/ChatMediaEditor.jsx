@@ -93,18 +93,18 @@ const [currentBoxId, setCurrentBoxId] = useState(null); // current editing box
 const [toolbarVisible, setToolbarVisible] = useState(false);
 const [undoStack, setUndoStack] = useState([]);
 const [redoStack, setRedoStack] = useState([]);
-// Check if user is on medium/large screen (desktop) and not in fullscreen
+
+// Corrected: Detect partial screen properly
 const isPartialScreen = () => {
-  const minDesktopWidth = 768; // treat >=768px as desktop
-  const isDesktop = window.innerWidth >= minDesktopWidth;
-  if (!isDesktop) return false; // allow mobile always
+  const minDesktopWidth = 768;
+  if (window.innerWidth < minDesktopWidth) return false; // mobile always allow
 
-  const tolerance = 10; // allow 10px difference
-  const fullWidth = Math.abs(window.innerWidth - window.screen.width) <= tolerance;
-  const fullHeight = Math.abs(window.innerHeight - window.screen.height) <= tolerance;
+  // Treat anything smaller than screen (minus tolerance) as partial
+  const widthPartial = window.innerWidth < window.screen.width - 10;
+  const heightPartial = window.innerHeight < window.screen.height - 10;
 
-  // Block if desktop and NOT fullscreen
-  return isDesktop && !(fullWidth && fullHeight);
+  // Return true only if either width or height is smaller than screen
+  return widthPartial || heightPartial;
 };
 
 const showFullscreenWarning = () => {

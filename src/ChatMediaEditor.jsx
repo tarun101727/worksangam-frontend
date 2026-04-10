@@ -1,4 +1,3 @@
-
 import { useTranslation } from "react-i18next";
 
 import { useLocation, useNavigate } from "react-router-dom";
@@ -94,34 +93,41 @@ const [toolbarVisible, setToolbarVisible] = useState(false);
 const [undoStack, setUndoStack] = useState([]);
 const [redoStack, setRedoStack] = useState([]);
 
-const showFullScreenAlert = () => {
-  alert("You can't use editing tools in half screen. Please make the website full screen.");
-};
-
 const closeToolbar = () => {
   setToolbarVisible(false);
 };
 
-const [isBlocked, setIsBlocked] = useState(false);
+const [isFullscreenAllowed, setIsFullscreenAllowed] = useState(true);
 
 useEffect(() => {
-  const checkScreen = () => {
-    const isDesktop = window.innerWidth >= 768; // md+
+  const checkFullscreen = () => {
+    const isDesktop = window.innerWidth >= 768;
 
-    // 🔥 THIS IS THE REAL FIX
-    const isTooSmall = window.innerWidth < 1200; 
+    const isFullscreen =
+      window.innerWidth === window.screen.width &&
+      window.innerHeight === window.screen.height;
 
-    if (isDesktop && isTooSmall) {
-      setIsBlocked(true);
+    if (!isDesktop) {
+      setIsFullscreenAllowed(true); // mobile always allowed
     } else {
-      setIsBlocked(false);
+      setIsFullscreenAllowed(isFullscreen);
     }
   };
 
-  checkScreen();
-  window.addEventListener("resize", checkScreen);
-  return () => window.removeEventListener("resize", checkScreen);
+  checkFullscreen();
+
+  window.addEventListener("resize", checkFullscreen);
+  return () => window.removeEventListener("resize", checkFullscreen);
 }, []);
+
+const blockIfNotFullscreen = () => {
+  if (!isFullscreenAllowed) {
+    alert("You can’t use this feature in partial screen. Please switch to fullscreen mode to continue.");
+    return true;
+  }
+  return false;
+};
+
 
 useEffect(() => {
   const handleGlobalClick = (e) => {
@@ -850,7 +856,7 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
 {!isVideo && (
 <button
   onClick={() => {
-  if (isBlocked) return showFullScreenAlert();
+  if (blockIfNotFullscreen()) return;
 
   setEditMode(true);
   setToolbarVisible(true);
@@ -904,12 +910,12 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Text */}
     <button
       onClick={() => {
-  if (isBlocked) return showFullScreenAlert();
-
-  addText();
-  closeToolbar();
-  setPenMode(false);
-}}
+        if (blockIfNotFullscreen()) return;
+        addText();
+       closeToolbar();
+        setPenMode(false); 
+        
+      }}
       className="px-4 py-1 bg-[#020617]/90  rounded-lg transition"
     >
       {t("Text")}
@@ -950,12 +956,13 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Pen */}
     <button
       onClick={() => {
-  if (isBlocked) return showFullScreenAlert();
+        if (blockIfNotFullscreen()) return;
 
-  setPenMode(true);
-  setEraserMode(false);
-  closeToolbar();
-}}
+
+        setPenMode(true);
+        setEraserMode(false);
+        closeToolbar();
+      }}
       className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
     >
       ✏️
@@ -964,12 +971,13 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Eraser */}
     <button
       onClick={() => {
-  if (isBlocked) return showFullScreenAlert();
+        if (blockIfNotFullscreen()) return;
 
-  setPenMode(true);
-  setEraserMode(true);
-  closeToolbar();
-}}
+
+        setPenMode(true);
+        setEraserMode(true);
+        closeToolbar();;
+      }}
       className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
     >
       🧽
@@ -1207,7 +1215,9 @@ onClick={(e) => e.stopPropagation()}
       zIndex: 30,
     }}
    onMouseDown={(e) => {
-    if (isBlocked) return showFullScreenAlert();
+      if (blockIfNotFullscreen()) return;
+
+
   if (isEditingText) return; // ❌ prevent drawing when editing text
  if (!editMode || !penMode) return;
 

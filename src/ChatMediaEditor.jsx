@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useLayoutEffect } from "react";
+
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
@@ -92,29 +92,30 @@ const [currentBoxId, setCurrentBoxId] = useState(null); // current editing box
 const [toolbarVisible, setToolbarVisible] = useState(false);
 const [undoStack, setUndoStack] = useState([]);
 const [redoStack, setRedoStack] = useState([]);
-const [imgMetrics, setImgMetrics] = useState(null);
 
+const [isRestrictedScreen, setIsRestrictedScreen] = useState(false);
 
+useEffect(() => {
+  const checkScreen = () => {
+    const isDesktop = window.innerWidth >= 768;
+    const isHalfScreen = window.innerWidth < window.screen.width * 0.9;
 
-useLayoutEffect(() => {
-  const updateMetrics = () => {
-    if (!imgRef.current || !containerRef.current) return;
-
-    const rect = imgRef.current.getBoundingClientRect();
-    const containerRect = containerRef.current.getBoundingClientRect();
-
-    setImgMetrics({
-      rect,
-      containerRect
-    });
+    setIsRestrictedScreen(isDesktop && isHalfScreen);
   };
 
-  updateMetrics();
+  checkScreen();
+  window.addEventListener("resize", checkScreen);
 
-  window.addEventListener("resize", updateMetrics);
-  return () => window.removeEventListener("resize", updateMetrics);
-}, [currentImageUrl]);
+  return () => window.removeEventListener("resize", checkScreen);
+}, []);
 
+const blockIfNeeded = () => {
+  if (isRestrictedScreen) {
+    alert("⚠️ Please full screen the website to use editing tools");
+    return true;
+  }
+  return false;
+};
 
 const closeToolbar = () => {
   setToolbarVisible(false);
@@ -217,6 +218,10 @@ const handleRedo = () => {
 };
 
 const addText = () => {
+  if (isRestrictedScreen) {
+    alert("⚠️ Please full screen the website to add text");
+    return;
+  }
   saveState();
   const container = containerRef.current;
   if (!container) return;
@@ -226,29 +231,17 @@ const addText = () => {
 
   const newId = textBoxes.length + 1;
 
-  const img = imgRef.current;
-const rect = img.getBoundingClientRect();
-const containerRect = container.getBoundingClientRect();
-
-// center of image
-const centerX = rect.left - containerRect.left + rect.width / 2;
-const centerY = rect.top - containerRect.top + rect.height / 2;
-
-// convert to relative %
-const relX = (centerX - (rect.left - containerRect.left)) / rect.width;
-const relY = (centerY - (rect.top - containerRect.top)) / rect.height;
-
-const initialBox = {
-  id: newId,
-  x: relX,
-  y: relY,
-  width: 260 / rect.width,
-  height: 120 / rect.height,
-  text: "",
-  color: "#000000",
-  fontSize: fontSize,
-  fontStyle: fontStyle
-};
+  const initialBox = {
+    id: newId,
+    x: container.clientWidth / 2,
+    y: container.clientHeight / 2,
+    width: 260,
+    height: 120,
+    text: "",
+    color: "#000000",
+    fontSize: fontSize,
+    fontStyle: fontStyle
+  };
 
   setTextBoxes(prev => [...prev, initialBox]);
   setCurrentBoxId(newId);
@@ -351,14 +344,11 @@ if (dragRef.current && currentBoxId !== null) {
       if (newY < minY) newY = minY;
       if (newY > maxY) newY = maxY;
 
-      const relX = (newX - (imgRect.left - rect.left)) / imgRect.width;
-const relY = (newY - (imgRect.top - rect.top)) / imgRect.height;
-
-return {
-  ...box,
-  x: relX,
-  y: relY
-};
+      return {
+        ...box,
+        x: newX,
+        y: newY
+      };
     })
   );
 
@@ -914,12 +904,13 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
   >
     {/* Text */}
     <button
-      onClick={() => {
-        addText();
-       closeToolbar();
-        setPenMode(false); 
-        
-      }}
+  onClick={() => {
+    if (blockIfNeeded()) return;
+
+    addText();
+    closeToolbar();
+    setPenMode(false); 
+  }}
       className="px-4 py-1 bg-[#020617]/90  rounded-lg transition"
     >
       {t("Text")}
@@ -960,10 +951,12 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Pen */}
     <button
       onClick={() => {
-        setPenMode(true);
-        setEraserMode(false);
-        closeToolbar();
-      }}
+  if (blockIfNeeded()) return;
+
+  setPenMode(true);
+  setEraserMode(false);
+  closeToolbar();
+}}
       className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
     >
       ✏️
@@ -972,10 +965,12 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Eraser */}
     <button
       onClick={() => {
-        setPenMode(true);
-        setEraserMode(true);
-        closeToolbar();;
-      }}
+  if (blockIfNeeded()) return;
+
+  setPenMode(true);
+  setEraserMode(true);
+  closeToolbar();
+}}
       className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
     >
       🧽
@@ -1059,33 +1054,21 @@ objectFit:"contain"
 
 )}
 
-
-{textBoxes.map(boxItem => {
-  if (!imgMetrics) return null;
-
-  const { rect, containerRect } = imgMetrics;
-
-  const px = boxItem.x * rect.width + (rect.left - containerRect.left);
-  const py = boxItem.y * rect.height + (rect.top - containerRect.top);
-
-  const w = boxItem.width * rect.width;
-  const h = boxItem.height * rect.height;
-
-  return (
-    <div
-      id={`textbox-${boxItem.id}`}
-      key={boxItem.id}
-      style={{
-        position: "absolute",
-        top: py - h / 2,
-        left: px - w / 2,
-        width: w,
-        height: h,
-        cursor: currentBoxId === boxItem.id ? cursorStyle : "text",
-        userSelect: "text",
-        pointerEvents: penMode ? "none" : "auto",
-        zIndex: 50
-      }}
+{textBoxes.map(boxItem => (
+  <div
+    id={`textbox-${boxItem.id}`}
+    key={boxItem.id}
+    style={{
+      position: "absolute",
+      top: boxItem.y - boxItem.height / 2,
+      left: boxItem.x - boxItem.width / 2,
+      width: boxItem.width,
+      height: boxItem.height,
+      cursor: currentBoxId === boxItem.id ? cursorStyle : "text",
+      userSelect: "text",
+      pointerEvents: penMode ? "none" : "auto",
+      zIndex: 50
+    }}
     className={`${currentBoxId === boxItem.id ? 'border-2 border-indigo-500 shadow-lg rounded-md' : ''}`}
     onClick={() => {
   if (editMode) handleBoxClick(boxItem.id);
@@ -1206,8 +1189,7 @@ onClick={(e) => e.stopPropagation()}
   </div>
 )}
   </div>
-)
-})}
+))}
 
 {!isVideo && (
   <canvas
@@ -1226,6 +1208,7 @@ onClick={(e) => e.stopPropagation()}
       zIndex: 30,
     }}
    onMouseDown={(e) => {
+      if (blockIfNeeded()) return;
   if (isEditingText) return; // ❌ prevent drawing when editing text
  if (!editMode || !penMode) return;
 

@@ -93,36 +93,24 @@ const [toolbarVisible, setToolbarVisible] = useState(false);
 const [undoStack, setUndoStack] = useState([]);
 const [redoStack, setRedoStack] = useState([]);
 
-// Returns true only if desktop AND screen is not fullscreen
-const isPartialScreen = () => {
-  const minDesktopWidth = 768; // consider >=768px as desktop
-  const isDesktop = window.innerWidth >= minDesktopWidth;
-
-  if (!isDesktop) return false; // mobile always allowed
-
-  const tolerance = 10;
-
-  // True if browser is FULLSCREEN
-  const isFullWidth = Math.abs(window.innerWidth - window.screen.width) >= tolerance;
-  const isFullHeight = Math.abs(window.innerHeight - window.screen.height) >= tolerance;
-
-  const isFullScreen = isFullWidth && isFullHeight;
-
-  // Return true if NOT fullscreen (i.e., partial screen)
-  return isDesktop && !isFullScreen;
-};
-
-const showFullscreenWarning = () => {
-  alert(
-    t("fullscreen_warning") || 
-    "You can’t use this feature in partial screen. Please switch to fullscreen mode to continue."
-  );
-};
 
 const closeToolbar = () => {
   setToolbarVisible(false);
 };
-
+// Returns true if the user is on desktop/laptop and NOT in fullscreen
+const isPartialScreen = () => {
+  const minDesktopWidth = 768; // Tailwind md breakpoint
+  const screenWidth = window.screen.width;
+  const windowWidth = window.innerWidth;
+  const windowHeight = window.innerHeight;
+  
+  // Only check for medium/larger screens
+  if (screenWidth >= minDesktopWidth) {
+    // If window size is smaller than full screen, show warning
+    return windowWidth < screenWidth || windowHeight < window.screen.height;
+  }
+  return false; // mobile always returns false
+};
 
 useEffect(() => {
   const handleGlobalClick = (e) => {
@@ -903,7 +891,10 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Text */}
     <button
       onClick={() => {
-    if (isPartialScreen()) return showFullscreenWarning(); // 🔥 Block on partial screen
+    if (isPartialScreen()) {
+      alert("You can’t use this feature in partial screen. Please switch to fullscreen mode to continue.");
+      return;
+    }
 
     addText();
     closeToolbar();
@@ -949,12 +940,10 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Pen */}
     <button
       onClick={() => {
-    if (isPartialScreen()) return showFullscreenWarning();
-
-    setPenMode(true);
-    setEraserMode(false);
-    closeToolbar();
-  }}
+        setPenMode(true);
+        setEraserMode(false);
+        closeToolbar();
+      }}
       className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
     >
       ✏️
@@ -963,12 +952,10 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Eraser */}
     <button
       onClick={() => {
-    if (isPartialScreen()) return showFullscreenWarning();
-
-    setPenMode(true);
-    setEraserMode(true);
-    closeToolbar();
-  }}
+        setPenMode(true);
+        setEraserMode(true);
+        closeToolbar();;
+      }}
       className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
     >
       🧽

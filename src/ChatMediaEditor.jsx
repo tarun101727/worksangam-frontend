@@ -872,7 +872,6 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
   onClick={() => {
   addText();
   setPenMode(false);
-  closeToolbar(); // ✅
 }}
     style={{
       top: "10%", // slightly higher above the image
@@ -930,7 +929,7 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
       onClick={() => {
         setPenMode(true);
         setEraserMode(false);
-        
+        closeToolbar();
       }}
       className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
     >
@@ -942,7 +941,7 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
       onClick={() => {
         setPenMode(true);
         setEraserMode(true);
-        
+        closeToolbar();;
       }}
       className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
     >

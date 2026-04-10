@@ -55,6 +55,16 @@ useEffect(() => {
   return () => document.removeEventListener("mousedown", handleClickOutside);
 }, []);
 
+  useEffect(() => {
+  const handleClickOutside = (e) => {
+    if (!e.target.closest(".profession-dropdown")) {
+      setShowSuggestions(false);
+    }
+  };
+
+  document.addEventListener("click", handleClickOutside);
+  return () => document.removeEventListener("click", handleClickOutside);
+}, []);
 
   /* ================= PRICE OPTIONS ================= */
 
@@ -166,7 +176,7 @@ const submit = async () => {
 
         {/* ================= PROFESSION SEARCH ================= */}
 
-        <div className="relative profession-dropdown">
+        <div ref={wrapperRef} className="relative profession-dropdown">
 
           <input
             type="text"

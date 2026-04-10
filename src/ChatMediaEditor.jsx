@@ -97,19 +97,23 @@ const [redoStack, setRedoStack] = useState([]);
 const closeToolbar = () => {
   setToolbarVisible(false);
 };
-// Returns true if the user is on desktop/laptop and NOT in fullscreen
+
 const isPartialScreen = () => {
-  const minDesktopWidth = 768; // Tailwind md breakpoint
-  const screenWidth = window.screen.width;
+  const minDesktopWidth = 768; // medium screens
+  const screenWidth = window.screen.availWidth; // use available width
+  const screenHeight = window.screen.availHeight; // use available height
   const windowWidth = window.innerWidth;
   const windowHeight = window.innerHeight;
-  
-  // Only check for medium/larger screens
-  if (screenWidth >= minDesktopWidth) {
-    // If window size is smaller than full screen, show warning
-    return windowWidth < screenWidth || windowHeight < window.screen.height;
+
+  // Only apply on desktop/laptop
+  if (windowWidth >= minDesktopWidth) {
+    // If window width or height is significantly smaller than available screen, treat as partial
+    const widthThreshold = 10; // pixels of tolerance
+    const heightThreshold = 50; // allow for browser bar height
+    return (screenWidth - windowWidth > widthThreshold) || (screenHeight - windowHeight > heightThreshold);
   }
-  return false; // mobile always returns false
+
+  return false; // mobile always false
 };
 
 useEffect(() => {
@@ -895,7 +899,6 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
       alert("You can’t use this feature in partial screen. Please switch to fullscreen mode to continue.");
       return;
     }
-
     addText();
     closeToolbar();
     setPenMode(false);

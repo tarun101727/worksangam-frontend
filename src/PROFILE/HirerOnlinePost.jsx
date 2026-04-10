@@ -29,13 +29,6 @@ const emptyForm = () => ({
   },
 });
 
-/* ================= PRICE OPTIONS ================= */
-
-const urgentPriceOptions = [
-  { label: "Fixed Price", value: "fixed" },
-  { label: "Negotiable", value: "negotiable" },
-];
-
 const HirerOnlinePost = () => {
   const navigate = useNavigate();
 
@@ -53,6 +46,11 @@ const [languageSuggestions, setLanguageSuggestions] = useState([]);
     const { t } = useTranslation();
 const translateTimer = useRef(null);
 const latestTypedValue = useRef({});
+
+const urgentPriceOptions = [
+  { label: t("Fixed Price"), value: "fixed" },
+  { label: t("Negotiable"), value: "negotiable" },
+];
 
   const inputBase =
     "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700/60 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition";

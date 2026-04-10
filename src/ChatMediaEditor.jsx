@@ -92,12 +92,38 @@ const [currentBoxId, setCurrentBoxId] = useState(null); // current editing box
 const [toolbarVisible, setToolbarVisible] = useState(false);
 const [undoStack, setUndoStack] = useState([]);
 const [redoStack, setRedoStack] = useState([]);
+const [isDesktop, setIsDesktop] = useState(false);
+const [isFullscreen, setIsFullscreen] = useState(true);
 
+useEffect(() => {
+  const checkScreen = () => {
+    const isDesktopScreen = window.innerWidth >= 768;
+
+    const isFull =
+      Math.abs(window.innerWidth - window.screen.width) < 10 &&
+      Math.abs(window.innerHeight - window.screen.height) < 10;
+
+    setIsDesktop(isDesktopScreen);
+    setIsFullscreen(isFull);
+  };
+
+  checkScreen();
+
+  window.addEventListener("resize", checkScreen);
+  return () => window.removeEventListener("resize", checkScreen);
+}, []);
 
 const closeToolbar = () => {
   setToolbarVisible(false);
 };
 
+const checkFullscreenRestriction = () => {
+  if (isDesktop && !isFullscreen) {
+    alert("You can’t use this feature in partial screen. Please switch to fullscreen mode to continue.");
+    return true;
+  }
+  return false;
+};
 
 useEffect(() => {
   const handleGlobalClick = (e) => {
@@ -825,9 +851,11 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
 
 {!isVideo && (
 <button
-  onClick={() => {
-    setEditMode(true);       // keep editMode on
-    setToolbarVisible(true);  // always show toolbar on click
+    onClick={() => {
+    if (checkFullscreenRestriction()) return;
+
+    setEditMode(true);
+    setToolbarVisible(true);
   }}
   className="px-3 py-1 rounded-lg bg-white/10"
 >
@@ -878,11 +906,12 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Text */}
     <button
       onClick={() => {
-        addText();
-       closeToolbar();
-        setPenMode(false); 
-        
-      }}
+  if (checkFullscreenRestriction()) return;
+
+  addText();
+  closeToolbar();
+  setPenMode(false);
+}}
       className="px-4 py-1 bg-[#020617]/90  rounded-lg transition"
     >
       {t("Text")}
@@ -923,10 +952,12 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Pen */}
     <button
       onClick={() => {
-        setPenMode(true);
-        setEraserMode(false);
-        closeToolbar();
-      }}
+  if (checkFullscreenRestriction()) return;
+
+  setPenMode(true);
+  setEraserMode(false);
+  closeToolbar();
+}}
       className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
     >
       ✏️
@@ -935,10 +966,12 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Eraser */}
     <button
       onClick={() => {
-        setPenMode(true);
-        setEraserMode(true);
-        closeToolbar();;
-      }}
+  if (checkFullscreenRestriction()) return;
+
+  setPenMode(true);
+  setEraserMode(true);
+  closeToolbar();
+}}
       className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
     >
       🧽
@@ -1176,6 +1209,9 @@ onClick={(e) => e.stopPropagation()}
       zIndex: 30,
     }}
    onMouseDown={(e) => {
+    if (checkFullscreenRestriction()) return;
+
+    
   if (isEditingText) return; // ❌ prevent drawing when editing text
  if (!editMode || !penMode) return;
 

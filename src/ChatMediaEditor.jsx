@@ -97,7 +97,7 @@ const [redoStack, setRedoStack] = useState([]);
 // Corrected: Detect partial screen properly
 const isPartialScreen = () => {
   const minDesktopWidth = 768;
-  if (window.innerWidth < minDesktopWidth) return false; // mobile always allow
+  if (window.innerWidth > minDesktopWidth) return false; // mobile always allow
 
   // Treat anything smaller than screen (minus tolerance) as partial
   const widthPartial = window.innerWidth < window.screen.width - 10;

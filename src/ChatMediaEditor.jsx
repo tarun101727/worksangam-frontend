@@ -635,7 +635,7 @@ const handleButtonClick = async () => {
 
       // Reset crop mode and button
       setCropMode(false);
-      setButtonLabel("Send");
+      setButtonLabel(t("Send"));
 
       setCurrentFile(croppedFile);
 setCurrentImageUrl(newUrl);

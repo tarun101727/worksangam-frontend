@@ -42,7 +42,6 @@ const HirerOnlineUrgentPost = () => {
   const [languages, setLanguages] = useState([]);
   const [languageSuggestions, setLanguageSuggestions] = useState([]);
   const { t } = useTranslation();
-  const [showForm, setShowForm] = useState(false);
 
 const translateTimer = useRef(null);
 const latestTypedValue = useRef({});
@@ -215,7 +214,6 @@ const handleSentenceChange = (value, field) => {
   handleChange("profession", profession.name);
   setSearch(profession.name);
   setShowSuggestions(false);
-  setShowForm(true); // ✅ important
 }}
                   >
                     {profession.name}
@@ -234,8 +232,7 @@ const handleSentenceChange = (value, field) => {
         </div>
 
         {/* ================= DESCRIPTION ================= */}
-       {showForm && (
-  <>
+
         <div className="space-y-2">
 
           <p className="text-sm font-medium text-red-400">
@@ -430,8 +427,7 @@ const handleSentenceChange = (value, field) => {
     ? t("Please wait...")
     : `${t("Search for online")}${form.profession ? ` ${form.profession}` : ""}`}
 </button>
-</>
-       )}
+
       </div>
 
     </div>

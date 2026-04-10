@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-
+import { useLayoutEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
@@ -92,40 +92,29 @@ const [currentBoxId, setCurrentBoxId] = useState(null); // current editing box
 const [toolbarVisible, setToolbarVisible] = useState(false);
 const [undoStack, setUndoStack] = useState([]);
 const [redoStack, setRedoStack] = useState([]);
-const [imageMetrics, setImageMetrics] = useState({
-  displayedWidth: 0,
-  displayedHeight: 0,
-  offsetX: 0,
-  offsetY: 0
-});
+const [imgMetrics, setImgMetrics] = useState(null);
 
-useEffect(() => {
+
+
+useLayoutEffect(() => {
   const updateMetrics = () => {
-    const img = imgRef.current;
-    const container = containerRef.current;
+    if (!imgRef.current || !containerRef.current) return;
 
-    if (!img || !container) return;
+    const rect = imgRef.current.getBoundingClientRect();
+    const containerRect = containerRef.current.getBoundingClientRect();
 
-    const displayedWidth = img.width;
-    const displayedHeight = img.height;
-
-    const offsetX = (container.clientWidth - displayedWidth) / 2;
-    const offsetY = (container.clientHeight - displayedHeight) / 2;
-
-    setImageMetrics({
-      displayedWidth,
-      displayedHeight,
-      offsetX,
-      offsetY
+    setImgMetrics({
+      rect,
+      containerRect
     });
   };
 
   updateMetrics();
 
   window.addEventListener("resize", updateMetrics);
-
   return () => window.removeEventListener("resize", updateMetrics);
 }, [currentImageUrl]);
+
 
 const closeToolbar = () => {
   setToolbarVisible(false);
@@ -238,26 +227,23 @@ const addText = () => {
   const newId = textBoxes.length + 1;
 
   const img = imgRef.current;
+const rect = img.getBoundingClientRect();
+const containerRect = container.getBoundingClientRect();
 
-if (!img || !container) return;
+// center of image
+const centerX = rect.left - containerRect.left + rect.width / 2;
+const centerY = rect.top - containerRect.top + rect.height / 2;
 
-const displayedWidth = img.width;
-const displayedHeight = img.height;
-
-const offsetX = (container.clientWidth - displayedWidth) / 2;
-const offsetY = (container.clientHeight - displayedHeight) / 2;
-
-const x = offsetX + displayedWidth / 2;
-const y = offsetY + displayedHeight / 2;
+// convert to relative %
+const relX = (centerX - (rect.left - containerRect.left)) / rect.width;
+const relY = (centerY - (rect.top - containerRect.top)) / rect.height;
 
 const initialBox = {
   id: newId,
-  x,
-  y,
-  relX: 0.5,
-  relY: 0.5,
-  width: 260,
-  height: 120,
+  x: relX,
+  y: relY,
+  width: 260 / rect.width,
+  height: 120 / rect.height,
   text: "",
   color: "#000000",
   fontSize: fontSize,
@@ -370,10 +356,8 @@ const relY = (newY - (imgRect.top - rect.top)) / imgRect.height;
 
 return {
   ...box,
-  x: newX,
-  y: newY,
-  relX,
-  relY
+  x: relX,
+  y: relY
 };
     })
   );
@@ -1075,29 +1059,33 @@ objectFit:"contain"
 
 )}
 
+
 {textBoxes.map(boxItem => {
+  if (!imgMetrics) return null;
 
-  const { displayedWidth, displayedHeight, offsetX, offsetY } = imageMetrics;
+  const { rect, containerRect } = imgMetrics;
 
-  if (!displayedWidth || !displayedHeight) return null;
+  const px = boxItem.x * rect.width + (rect.left - containerRect.left);
+  const py = boxItem.y * rect.height + (rect.top - containerRect.top);
 
-  const x = offsetX + boxItem.relX * displayedWidth;
-  const y = offsetY + boxItem.relY * displayedHeight;
-  return(
-  <div
-    id={`textbox-${boxItem.id}`}
-    key={boxItem.id}
-    style={{
-      position: "absolute",
-      top: y - boxItem.height / 2,
-      left: x - boxItem.width / 2,
-      width: boxItem.width,
-      height: boxItem.height,
-      cursor: currentBoxId === boxItem.id ? cursorStyle : "text",
-      userSelect: "text",
-      pointerEvents: penMode ? "none" : "auto",
-      zIndex: 50
-    }}
+  const w = boxItem.width * rect.width;
+  const h = boxItem.height * rect.height;
+
+  return (
+    <div
+      id={`textbox-${boxItem.id}`}
+      key={boxItem.id}
+      style={{
+        position: "absolute",
+        top: py - h / 2,
+        left: px - w / 2,
+        width: w,
+        height: h,
+        cursor: currentBoxId === boxItem.id ? cursorStyle : "text",
+        userSelect: "text",
+        pointerEvents: penMode ? "none" : "auto",
+        zIndex: 50
+      }}
     className={`${currentBoxId === boxItem.id ? 'border-2 border-indigo-500 shadow-lg rounded-md' : ''}`}
     onClick={() => {
   if (editMode) handleBoxClick(boxItem.id);
@@ -1218,7 +1206,8 @@ onClick={(e) => e.stopPropagation()}
   </div>
 )}
   </div>
-)})}
+)
+})}
 
 {!isVideo && (
   <canvas

@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 
 import React, { useState, useEffect } from "react";
@@ -41,6 +42,19 @@ const HirerOnlineUrgentPost = () => {
   const [languages, setLanguages] = useState([]);
   const [languageSuggestions, setLanguageSuggestions] = useState([]);
   const { t } = useTranslation();
+const wrapperRef = useRef(null);
+
+useEffect(() => {
+  const handleClickOutside = (e) => {
+    if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+      setShowSuggestions(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => document.removeEventListener("mousedown", handleClickOutside);
+}, []);
+
 
   /* ================= PRICE OPTIONS ================= */
 
@@ -80,22 +94,13 @@ const urgentPriceOptions = [
     fetchProfessions();
   }, []);
 
-  useEffect(() => {
-  const handleClickOutside = (e) => {
-    if (!e.target.closest(".profession-dropdown")) {
-      setShowSuggestions(false);
-    }
-  };
+ /* ================= FILTER ================= */
 
-  document.addEventListener("click", handleClickOutside);
-  return () => document.removeEventListener("click", handleClickOutside);
-}, []);
-
-  /* ================= FILTER ================= */
-
-  const filteredProfessions = onlineProfessions.filter((p) =>
-    p?.name?.toLowerCase().includes(search.toLowerCase())
-  );
+const filteredProfessions = search
+  ? onlineProfessions.filter((p) =>
+      p?.name?.toLowerCase().includes(search.toLowerCase())
+    )
+  : onlineProfessions;
 
   /* ================= SUBMIT ================= */
 
@@ -156,7 +161,7 @@ const submit = async () => {
 
         {/* ================= PROFESSION SEARCH ================= */}
 
-        <div className="relative profession-dropdown">
+        <div className="relative" ref={wrapperRef}>
 
           <input
             type="text"
@@ -170,7 +175,7 @@ const submit = async () => {
             onFocus={() => setShowSuggestions(true)}
           />
 
-          {showSuggestions && search && (
+          {showSuggestions && (
             <div className="absolute z-20 w-full mt-2 max-h-60 overflow-auto rounded-xl bg-slate-900 border border-slate-700 shadow-lg">
 
               {filteredProfessions.length > 0 ? (
@@ -201,8 +206,7 @@ const submit = async () => {
         </div>
 
         {/* ================= DESCRIPTION ================= */}
-         {form.profession && (
-  <>
+
         <div className="space-y-2">
 
           <p className="text-sm font-medium text-red-400">
@@ -394,8 +398,7 @@ const submit = async () => {
     ? t("Please wait...")
     : `${t("Search for online")}${form.profession ? ` ${form.profession}` : ""}`}
 </button>
-</>
-         )}
+
       </div>
 
     </div>

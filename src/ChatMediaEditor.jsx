@@ -205,9 +205,9 @@ const addText = () => {
   const newId = textBoxes.length + 1;
 
   const initialBox = {
-    id: newId,
-    x: container.clientWidth / 2,
-    y: container.clientHeight / 2,
+      id: newId,
+  x: 0.5, // ✅ center in %
+  y: 0.5,
     width: 260,
     height: 120,
     text: "",
@@ -293,8 +293,6 @@ if (dragRef.current && currentBoxId !== null) {
   const img = imgRef.current;
   if (!img) return;
 
-  const imgRect = img.getBoundingClientRect();
-
   let newX = e.clientX - offset.current.x;
   let newY = e.clientY - offset.current.y;
 
@@ -317,11 +315,17 @@ if (dragRef.current && currentBoxId !== null) {
       if (newY < minY) newY = minY;
       if (newY > maxY) newY = maxY;
 
-      return {
-        ...box,
-        x: newX,
-        y: newY
-      };
+      const img = imgRef.current;
+const imgRect = img.getBoundingClientRect();
+
+const relX = (newX - (imgRect.left - rect.left)) / imgRect.width;
+const relY = (newY - (imgRect.top - rect.top)) / imgRect.height;
+
+return {
+  ...box,
+  x: relX,
+  y: relY
+};
     })
   );
 

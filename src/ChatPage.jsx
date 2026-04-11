@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef ,useLayoutEffect  } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -106,17 +105,6 @@ const sendMessage = () => {
   if (!text.trim()) return;
 
   const messageText = text;
-
-  const tempMessage = {
-    _id: Date.now(),
-    message: messageText,
-    sender: {
-      _id: userId,
-      profileImage: user?.profileImage
-    }
-  };
-
-  setMessages(prev => [...prev, tempMessage]);
 
   setText("");
   isTypingRef.current = false;

@@ -390,72 +390,12 @@ if (resizeRef.current && currentBoxId !== null) {
 
 };
 
-// UPDATE BOX DURING TYPING
 const handleTextChange = (e) => {
-  saveState();
-  const el = e.target;
-  const container = containerRef.current;
-  const img = imgRef.current;
-  if (!el || !container || !img || currentBoxId === null) return;
-
-  setText(el.value);
-
-  // Existing expansion logic (do not change)
-  el.style.height = "auto";
-  const imgRect = img.getBoundingClientRect();
-  const maxWidth = imgRect.width - 10;
-  const maxHeight = imgRect.height - 10;
-
-  const ctx = document.createElement("canvas").getContext("2d");
-  ctx.font = `${fontStyle === "italic" ? "italic" : ""} ${fontStyle === "bold" ? "bold" : ""} ${fontSize}px sans-serif`;
-
-  const words = el.value.split(" ");
-  let lines = [];
-  let currentLine = "";
-
-  words.forEach(word => {
-    const testLine = currentLine ? currentLine + " " + word : word;
-    if (ctx.measureText(testLine).width > maxWidth) {
-      if (currentLine) lines.push(currentLine);
-      currentLine = word;
-    } else {
-      currentLine = testLine;
-    }
-  });
-  if (currentLine) lines.push(currentLine);
-
-  const buffer = 10;
-  let widest = 0;
-  lines.forEach(line => {
-    const w = ctx.measureText(line).width + 2 * buffer;
-    if (w > widest) widest = w;
-  });
-  const newWidth = Math.min(Math.max(originalBox.current.width, widest), maxWidth);
-  const lineHeight = fontSize * 1.2;
-  let contentHeight = lineHeight * lines.length + 2 * buffer;
-  let newHeight = Math.min(Math.max(originalBox.current.height, contentHeight, el.scrollHeight), maxHeight);
-
-  setBox(prev => ({
-    ...prev,
-    width: newWidth,
-    height: newHeight,
-  }));
-  el.style.height = `${newHeight}px`;
+  const value = e.target.value;
 
   setTextBoxes(prev =>
-  prev.map(b => {
-    if (b.id !== currentBoxId) return b;
-
-    return {
-      ...b,
-      text: el.value,
-      width: newWidth,
-      height: newHeight,
-      x: b.x, // keep same position
-      y: b.y
-    };
-  })
-);
+    prev.map(b => b.id === currentBoxId ? { ...b, text: value } : b)
+  );
 };
 
 
@@ -1046,7 +986,7 @@ objectFit:"contain"
     {currentBoxId === boxItem.id ? (
       <textarea
         ref={textRef}
-        value={text}
+        value={textBoxes.find(b => b.id === currentBoxId)?.text || ""}
           placeholder="Enter text..."
   onFocus={(e) => {
     if (!text) e.target.placeholder = "";
@@ -1218,7 +1158,6 @@ onClick={(e) => e.stopPropagation()}
     const halfH = activeBox.height / 2;
     if (x >= activeBox.x - halfW && x <= activeBox.x + halfW &&
         y >= activeBox.y - halfH && y <= activeBox.y + halfH) {
-      setText("");
       setTextBoxes(prev =>
         prev.map(b => b.id === currentBoxId ? { ...b, text: "" } : b)
       );

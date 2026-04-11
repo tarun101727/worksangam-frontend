@@ -58,24 +58,12 @@ useEffect(() => {
   // Join chat once
   socket.emit("join-chat", chatId);
 
-  // Load chat messages
-  axios.get(`${BASE_URL}/api/chat/messages/${chatId}`, { withCredentials: true })
-    .then(res => {
-      setMessages(res.data.messages);
-
-      const otherUser = res.data.participants.find(
-        p => p._id.toString() !== userId?.toString()
-      );
-      setReceiver(otherUser);
-    });
-
   // ✅ Stable listener functions
   const handleReceiveMessage = (msg) => {
     setMessages(prev => {
-      const exists = prev.some(
-        m => m.message === msg.message && m.sender?._id === msg.sender?._id
-      );
-      if (exists) return prev; // prevent duplicate
+      // Prevent duplicate messages
+      const exists = prev.some(m => m._id === msg._id || (m.message === msg.message && m.sender?._id === msg.sender?._id));
+      if (exists) return prev;
       return [...prev, msg];
     });
   };
@@ -99,7 +87,8 @@ useEffect(() => {
     socket.off("user-typing", handleUserTyping);
     socket.off("user-stop-typing", handleUserStopTyping);
   };
-}, [chatId, userId]);
+  // ⚠️ Only depend on chatId, not userId
+}, [chatId]);
 
 const sendMessage = () => {
   if (!text.trim()) return;
@@ -107,7 +96,7 @@ const sendMessage = () => {
   const messageText = text;
 
   const tempMessage = {
-    _id: Date.now(),
+    _id: "temp-" + Date.now(),
     message: messageText,
     sender: {
       _id: userId,
@@ -319,6 +308,13 @@ className="w-8 h-8 rounded-full object-cover"
         <img src={getImageUrl(m.image)} className="w-full" />
       )}
     </div>
+
+    {/* CAPTION */}
+    {m.message && (
+      <div className="px-3 py-2 text-white break-words">
+        {m.message}
+      </div>
+    )}
   </div>
 ) : (
   m.message && (

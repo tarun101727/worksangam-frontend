@@ -69,15 +69,16 @@ useEffect(() => {
       setReceiver(otherUser);
     });
 
+  // ✅ Stable listener functions
   const handleReceiveMessage = (msg) => {
-  setMessages(prev => {
-    const exists = prev.some(
-      m => m._id === msg._id || (m.message === msg.message && m.sender?._id === msg.sender?._id)
-    );
-    if (exists) return prev; // ignore duplicate
-    return [...prev, msg];
-  });
-};
+    setMessages(prev => {
+      const exists = prev.some(
+        m => m.message === msg.message && m.sender?._id === msg.sender?._id
+      );
+      if (exists) return prev; // prevent duplicate
+      return [...prev, msg];
+    });
+  };
 
   const handleUserTyping = ({ userId: typingUserId }) => {
     if (typingUserId !== userId) setIsTyping(true);
@@ -105,9 +106,8 @@ const sendMessage = () => {
 
   const messageText = text;
 
-  // TEMP message only for sender
   const tempMessage = {
-    _id: "temp-" + Date.now(), // temporary ID
+    _id: Date.now(),
     message: messageText,
     sender: {
       _id: userId,
@@ -115,23 +115,17 @@ const sendMessage = () => {
     }
   };
 
-  setMessages(prev => [...prev, tempMessage]); // append temp message
+  setMessages(prev => [...prev, tempMessage]);
 
   setText("");
   isTypingRef.current = false;
   socket.emit("stop-typing", { chatId, userId });
 
-  // Send to backend
   axios.post(
     `${BASE_URL}/api/chat/send/${chatId}`,
     { message: messageText },
     { withCredentials: true }
-  ).then(res => {
-    // Replace temp message with actual backend message
-    setMessages(prev =>
-      prev.map(m => (m._id === tempMessage._id ? res.data : m))
-    );
-  }).catch(console.error);
+  ).catch(console.error);
 };
 
 const openGallery = () => {
@@ -443,24 +437,6 @@ className="w-8 h-8 rounded-full object-cover"
       )}
     </div>
   )
-)}
-
-{/* TEXT MESSAGE */}
-{m.message && (
-  <div className={`px-3 py-2 rounded-xl max-w-xs break-words ${isSender ? 'bg-indigo-500 text-white' : 'bg-gray-700 text-white'}`}>
-    {m.message.startsWith("📍 Location:") ? (
-      <a
-        href={m.message.replace("📍 Location:", "").trim()}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="underline text-white hover:text-gray-100"
-      >
-         {t("Shared a location(click to see location)")}
-      </a>
-    ) : (
-      m.message
-    )}
-  </div>
 )}
 
 </div>

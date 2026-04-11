@@ -113,41 +113,22 @@ const sendMessage = () => {
 
   const messageText = text;
 
-  // TEMP MESSAGE for immediate UI
   const tempMessage = {
-    _id: "temp-" + Date.now(), // unique temporary ID
+    _id: Date.now(),
     message: messageText,
     sender: {
       _id: userId,
-      profileImage: user?.profileImage,
-      firstName: user?.firstName,
-      lastName: user?.lastName
+      profileImage: user?.profileImage
     }
   };
 
-  // Add to messages state immediately
   setMessages(prev => [...prev, tempMessage]);
 
-  // Clear input
   setText("");
   isTypingRef.current = false;
-
-  // Stop typing
+  // ✅ STOP TYPING WHEN SENT
   socket.emit("stop-typing", { chatId, userId });
 
-  // ✅ SEND LIVE VIA SOCKET
-  socket.emit("send-message", {
-    chatId,
-    message: messageText,
-    sender: {
-      _id: userId,
-      profileImage: user?.profileImage,
-      firstName: user?.firstName,
-      lastName: user?.lastName
-    }
-  });
-
-  // Optional: still save to backend
   axios.post(
     `${BASE_URL}/api/chat/send/${chatId}`,
     { message: messageText },

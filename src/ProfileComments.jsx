@@ -78,8 +78,8 @@ const CommentItem = React.memo(function CommentItem({
     ?.split("=")[1];
 
   const isLiked = comment.likes?.includes(userId);
-  const isOwner = comment.user?._id === userId;
-  const isProfileOwner = comment.user?._id === profileId;
+const isOwner = String(comment.user?._id) === String(userId);
+const isProfileOwner = comment.user?._id === profileId;
 
   const visibleCount = visibleReplies[comment._id] || 5;
 
@@ -176,14 +176,14 @@ const CommentItem = React.memo(function CommentItem({
                 </button>
               )}
 
-              {isOwner && comment.user && (
-                <button
-                  onClick={() => deleteComment(comment._id)}
-                  className="text-xs text-red-400"
-                >
-                  Delete
-                </button>
-              )}
+              {isOwner && (
+  <button
+    onClick={() => deleteComment(comment._id)}
+    className="text-xs text-red-400"
+  >
+    Delete
+  </button>
+)}
             </div>
 
             {showReply[comment._id] && (

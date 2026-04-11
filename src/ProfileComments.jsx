@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useMemo ,useRef } from "react";
 import axios from "axios";
 import { BASE_URL } from "./config";
@@ -78,7 +79,7 @@ const CommentItem = React.memo(function CommentItem({
     ?.split("=")[1];
 
   const isLiked = comment.likes?.includes(userId);
-  const isOwner = comment.user?._id === userId;
+  const isOwner = String(comment.user?._id) === String(userId);
   const isProfileOwner = comment.user?._id === profileId;
 
   const visibleCount = visibleReplies[comment._id] || 5;

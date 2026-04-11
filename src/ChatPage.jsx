@@ -54,59 +54,52 @@ useLayoutEffect(() => {
   messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
 }, [messages]);
 
-/* LOAD CHAT + SOCKET */
-useEffect(()=>{
+useEffect(() => {
+  // Join chat once
+  socket.emit("join-chat", chatId);
 
-socket.emit("join-chat",chatId);
+  // Load chat messages
+  axios.get(`${BASE_URL}/api/chat/messages/${chatId}`, { withCredentials: true })
+    .then(res => {
+      setMessages(res.data.messages);
 
-axios.get(`${BASE_URL}/api/chat/messages/${chatId}`,{
-withCredentials:true
-})
-.then(res=>{
+      const otherUser = res.data.participants.find(
+        p => p._id.toString() !== userId?.toString()
+      );
+      setReceiver(otherUser);
+    });
 
-setMessages(res.data.messages);
+  // ✅ Stable listener functions
+  const handleReceiveMessage = (msg) => {
+    setMessages(prev => {
+      const exists = prev.some(
+        m => m.message === msg.message && m.sender?._id === msg.sender?._id
+      );
+      if (exists) return prev; // prevent duplicate
+      return [...prev, msg];
+    });
+  };
 
-const otherUser = res.data.participants.find(
-  (p) => p._id.toString() !== userId?.toString()
-);
+  const handleUserTyping = ({ userId: typingUserId }) => {
+    if (typingUserId !== userId) setIsTyping(true);
+  };
 
-setReceiver(otherUser);
+  const handleUserStopTyping = ({ userId: typingUserId }) => {
+    if (typingUserId !== userId) setIsTyping(false);
+  };
 
-});
+  // Attach listeners
+  socket.on("receive-message", handleReceiveMessage);
+  socket.on("user-typing", handleUserTyping);
+  socket.on("user-stop-typing", handleUserStopTyping);
 
-socket.off("receive-message").on("receive-message", (msg) => {
-  setMessages(prev => {
-    // ❌ prevent duplicate (important)
-    const exists = prev.some(
-      m =>
-        m.message === msg.message &&
-        m.sender?._id === msg.sender?._id
-    );
-
-    if (exists) return prev;
-
-    return [...prev, msg];
-  });
-});
-
-socket.off("user-typing").on("user-typing", ({ userId: typingUserId }) => {
-  if (typingUserId !== userId) {
-    setIsTyping(true);
-  }
-});
-
-socket.off("user-stop-typing").on("user-stop-typing", ({ userId: typingUserId }) => {
-  if (typingUserId !== userId) {
-    setIsTyping(false);
-  }
-});
-
-return () => {
-  socket.off("receive-message");
-  socket.off("user-typing");
-  socket.off("user-stop-typing");
-};
-},[chatId]);
+  // Cleanup on unmount
+  return () => {
+    socket.off("receive-message", handleReceiveMessage);
+    socket.off("user-typing", handleUserTyping);
+    socket.off("user-stop-typing", handleUserStopTyping);
+  };
+}, [chatId, userId]);
 
 const sendMessage = () => {
   if (!text.trim()) return;
@@ -126,7 +119,6 @@ const sendMessage = () => {
 
   setText("");
   isTypingRef.current = false;
-  // ✅ STOP TYPING WHEN SENT
   socket.emit("stop-typing", { chatId, userId });
 
   axios.post(

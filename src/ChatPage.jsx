@@ -54,52 +54,59 @@ useLayoutEffect(() => {
   messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
 }, [messages]);
 
-useEffect(() => {
-  // Join chat once
-  socket.emit("join-chat", chatId);
+/* LOAD CHAT + SOCKET */
+useEffect(()=>{
 
-  // Load chat messages
-  axios.get(`${BASE_URL}/api/chat/messages/${chatId}`, { withCredentials: true })
-    .then(res => {
-      setMessages(res.data.messages);
+socket.emit("join-chat",chatId);
 
-      const otherUser = res.data.participants.find(
-        p => p._id.toString() !== userId?.toString()
-      );
-      setReceiver(otherUser);
-    });
+axios.get(`${BASE_URL}/api/chat/messages/${chatId}`,{
+withCredentials:true
+})
+.then(res=>{
 
-  // ✅ Stable listener functions
-  const handleReceiveMessage = (msg) => {
-    setMessages(prev => {
-      const exists = prev.some(
-        m => m.message === msg.message && m.sender?._id === msg.sender?._id
-      );
-      if (exists) return prev; // prevent duplicate
-      return [...prev, msg];
-    });
-  };
+setMessages(res.data.messages);
 
-  const handleUserTyping = ({ userId: typingUserId }) => {
-    if (typingUserId !== userId) setIsTyping(true);
-  };
+const otherUser = res.data.participants.find(
+  (p) => p._id.toString() !== userId?.toString()
+);
 
-  const handleUserStopTyping = ({ userId: typingUserId }) => {
-    if (typingUserId !== userId) setIsTyping(false);
-  };
+setReceiver(otherUser);
 
-  // Attach listeners
-  socket.on("receive-message", handleReceiveMessage);
-  socket.on("user-typing", handleUserTyping);
-  socket.on("user-stop-typing", handleUserStopTyping);
+});
 
-  // Cleanup on unmount
-  return () => {
-    socket.off("receive-message", handleReceiveMessage);
-    socket.off("user-typing", handleUserTyping);
-    socket.off("user-stop-typing", handleUserStopTyping);
-  };
-}, [chatId, userId]);
+socket.off("receive-message").on("receive-message", (msg) => {
+  setMessages(prev => {
+    // ❌ prevent duplicate (important)
+    const exists = prev.some(
+      m =>
+        m.message === msg.message &&
+        m.sender?._id === msg.sender?._id
+    );
+
+    if (exists) return prev;
+
+    return [...prev, msg];
+  });
+});
+
+socket.off("user-typing").on("user-typing", ({ userId: typingUserId }) => {
+  if (typingUserId !== userId) {
+    setIsTyping(true);
+  }
+});
+
+socket.off("user-stop-typing").on("user-stop-typing", ({ userId: typingUserId }) => {
+  if (typingUserId !== userId) {
+    setIsTyping(false);
+  }
+});
+
+return () => {
+  socket.off("receive-message");
+  socket.off("user-typing");
+  socket.off("user-stop-typing");
+};
+},[chatId]);
 
 const sendMessage = () => {
   if (!text.trim()) return;
@@ -119,6 +126,7 @@ const sendMessage = () => {
 
   setText("");
   isTypingRef.current = false;
+  // ✅ STOP TYPING WHEN SENT
   socket.emit("stop-typing", { chatId, userId });
 
   axios.post(
@@ -350,24 +358,6 @@ className="w-8 h-8 rounded-full object-cover"
       )}
     </div>
   )
-)}
-
-{/* TEXT MESSAGE */}
-{m.message && (
-  <div className={`px-3 py-2 rounded-xl max-w-xs break-words ${isSender ? 'bg-indigo-500 text-white' : 'bg-gray-700 text-white'}`}>
-    {m.message.startsWith("📍 Location:") ? (
-      <a
-        href={m.message.replace("📍 Location:", "").trim()}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="underline text-white hover:text-gray-200"
-      >
-        {t("Shared a location(click to see location)")}
-      </a>
-    ) : (
-      m.message
-    )}
-  </div>
 )}
 
 </div>

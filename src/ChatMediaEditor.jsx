@@ -1,4 +1,3 @@
-
 import { useTranslation } from "react-i18next";
 
 import { useLocation, useNavigate } from "react-router-dom";
@@ -93,7 +92,7 @@ const [currentBoxId, setCurrentBoxId] = useState(null); // current editing box
 const [toolbarVisible, setToolbarVisible] = useState(false);
 const [undoStack, setUndoStack] = useState([]);
 const [redoStack, setRedoStack] = useState([]);
-
+const [sending, setSending] = useState(false); 
 
 const closeToolbar = () => {
   setToolbarVisible(false);
@@ -390,12 +389,72 @@ if (resizeRef.current && currentBoxId !== null) {
 
 };
 
+// UPDATE BOX DURING TYPING
 const handleTextChange = (e) => {
-  const value = e.target.value;
+  saveState();
+  const el = e.target;
+  const container = containerRef.current;
+  const img = imgRef.current;
+  if (!el || !container || !img || currentBoxId === null) return;
+
+  setText(el.value);
+
+  // Existing expansion logic (do not change)
+  el.style.height = "auto";
+  const imgRect = img.getBoundingClientRect();
+  const maxWidth = imgRect.width - 10;
+  const maxHeight = imgRect.height - 10;
+
+  const ctx = document.createElement("canvas").getContext("2d");
+  ctx.font = `${fontStyle === "italic" ? "italic" : ""} ${fontStyle === "bold" ? "bold" : ""} ${fontSize}px sans-serif`;
+
+  const words = el.value.split(" ");
+  let lines = [];
+  let currentLine = "";
+
+  words.forEach(word => {
+    const testLine = currentLine ? currentLine + " " + word : word;
+    if (ctx.measureText(testLine).width > maxWidth) {
+      if (currentLine) lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  });
+  if (currentLine) lines.push(currentLine);
+
+  const buffer = 10;
+  let widest = 0;
+  lines.forEach(line => {
+    const w = ctx.measureText(line).width + 2 * buffer;
+    if (w > widest) widest = w;
+  });
+  const newWidth = Math.min(Math.max(originalBox.current.width, widest), maxWidth);
+  const lineHeight = fontSize * 1.2;
+  let contentHeight = lineHeight * lines.length + 2 * buffer;
+  let newHeight = Math.min(Math.max(originalBox.current.height, contentHeight, el.scrollHeight), maxHeight);
+
+  setBox(prev => ({
+    ...prev,
+    width: newWidth,
+    height: newHeight,
+  }));
+  el.style.height = `${newHeight}px`;
 
   setTextBoxes(prev =>
-    prev.map(b => b.id === currentBoxId ? { ...b, text: value } : b)
-  );
+  prev.map(b => {
+    if (b.id !== currentBoxId) return b;
+
+    return {
+      ...b,
+      text: el.value,
+      width: newWidth,
+      height: newHeight,
+      x: b.x, // keep same position
+      y: b.y
+    };
+  })
+);
 };
 
 
@@ -579,35 +638,44 @@ const sendMedia = async () => {
 const previewHeight = "70vh"; // keep constant
 
 const handleButtonClick = async () => {
-  if(buttonLabel === "Save" && cropMode){
-    // --- Save the cropped image ---
-    const image = imgRef.current;
-    if(image && crop.width && crop.height){
-      const scaleX = image.naturalWidth / image.width;
-      const scaleY = image.naturalHeight / image.height;
+  if (sending) return; // ❌ prevent double click
+  setSending(true);
 
-      const croppedBlob = await getCroppedImg(image, {
-        x: crop.x * scaleX,
-        y: crop.y * scaleY,
-        width: crop.width * scaleX,
-        height: crop.height * scaleY
-      });
+  try {
+    if (buttonLabel === "Save" && cropMode) {
+      // --- Save the cropped image ---
+      const image = imgRef.current;
+      if (image && crop.width && crop.height) {
+        const scaleX = image.naturalWidth / image.width;
+        const scaleY = image.naturalHeight / image.height;
 
-      // Replace original image with cropped one
-      const croppedFile = new File([croppedBlob], "cropped.jpg", { type: "image/jpeg" });
-      const newUrl = URL.createObjectURL(croppedFile);
-      imgRef.current.src = newUrl; // update preview
+        const croppedBlob = await getCroppedImg(image, {
+          x: crop.x * scaleX,
+          y: crop.y * scaleY,
+          width: crop.width * scaleX,
+          height: crop.height * scaleY
+        });
 
-      // Reset crop mode and button
-      setCropMode(false);
-      setButtonLabel("Send");
+        // Replace original image with cropped one
+        const croppedFile = new File([croppedBlob], "cropped.jpg", { type: "image/jpeg" });
+        const newUrl = URL.createObjectURL(croppedFile);
+        imgRef.current.src = newUrl; // update preview
 
-      setCurrentFile(croppedFile);
-setCurrentImageUrl(newUrl);
+        setCurrentFile(croppedFile);
+        setCurrentImageUrl(newUrl);
+
+        // Reset crop mode and button
+        setCropMode(false);
+        setButtonLabel("Send");
+      }
+    } else {
+      // Normal send
+      await sendMedia();
     }
-  } else {
-    // Normal send
-    await sendMedia();
+  } catch (err) {
+    console.error("Send failed", err);
+  } finally {
+    setSending(false); // release lock
   }
 };
 
@@ -986,7 +1054,7 @@ objectFit:"contain"
     {currentBoxId === boxItem.id ? (
       <textarea
         ref={textRef}
-        value={textBoxes.find(b => b.id === currentBoxId)?.text || ""}
+        value={text}
           placeholder="Enter text..."
   onFocus={(e) => {
     if (!text) e.target.placeholder = "";
@@ -1158,6 +1226,7 @@ onClick={(e) => e.stopPropagation()}
     const halfH = activeBox.height / 2;
     if (x >= activeBox.x - halfW && x <= activeBox.x + halfW &&
         y >= activeBox.y - halfH && y <= activeBox.y + halfH) {
+      setText("");
       setTextBoxes(prev =>
         prev.map(b => b.id === currentBoxId ? { ...b, text: "" } : b)
       );

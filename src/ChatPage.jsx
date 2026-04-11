@@ -69,16 +69,15 @@ useEffect(() => {
       setReceiver(otherUser);
     });
 
-  // ✅ Stable listener functions
   const handleReceiveMessage = (msg) => {
-    setMessages(prev => {
-      const exists = prev.some(
-        m => m.message === msg.message && m.sender?._id === msg.sender?._id
-      );
-      if (exists) return prev; // prevent duplicate
-      return [...prev, msg];
-    });
-  };
+  setMessages(prev => {
+    const exists = prev.some(
+      m => m._id === msg._id || (m.message === msg.message && m.sender?._id === msg.sender?._id)
+    );
+    if (exists) return prev; // prevent duplicate
+    return [...prev, msg];
+  });
+};
 
   const handleUserTyping = ({ userId: typingUserId }) => {
     if (typingUserId !== userId) setIsTyping(true);
@@ -101,31 +100,39 @@ useEffect(() => {
   };
 }, [chatId, userId]);
 
-const sendMessage = () => {
+const sendMessage = async () => {
   if (!text.trim()) return;
 
   const messageText = text;
+  setText("");
 
+  const tempId = Date.now(); // temporary ID
   const tempMessage = {
-    _id: Date.now(),
+    _id: tempId,
     message: messageText,
-    sender: {
-      _id: userId,
-      profileImage: user?.profileImage
-    }
+    sender: { _id: userId, profileImage: user?.profileImage }
   };
 
   setMessages(prev => [...prev, tempMessage]);
 
-  setText("");
+  try {
+    const { data } = await axios.post(
+      `${BASE_URL}/api/chat/send/${chatId}`,
+      { message: messageText },
+      { withCredentials: true }
+    );
+
+    // Replace temp message with server message (prevents duplicates)
+    setMessages(prev => prev.map(m => m._id === tempId ? data : m));
+
+  } catch (err) {
+    console.error(err);
+    // Remove temp message if sending fails
+    setMessages(prev => prev.filter(m => m._id !== tempId));
+  }
+
   isTypingRef.current = false;
   socket.emit("stop-typing", { chatId, userId });
-
-  axios.post(
-    `${BASE_URL}/api/chat/send/${chatId}`,
-    { message: messageText },
-    { withCredentials: true }
-  ).catch(console.error);
 };
 
 const openGallery = () => {

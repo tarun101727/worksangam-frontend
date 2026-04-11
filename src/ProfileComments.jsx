@@ -72,10 +72,12 @@ const CommentItem = React.memo(function CommentItem({
   const [showButton, setShowButton] = useState(false);
   const textRef = useRef(null);
   const hasReplies = comment.replies.length > 0;
-  const userId = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("userId="))
-    ?.split("=")[1];
+  const getCookie = (name) => {
+  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  return match ? match[2] : null;
+};
+
+const userId = getCookie("userId");
 
   const isLiked = comment.likes?.includes(userId);
 const isOwner = String(comment.user?._id) === String(userId);

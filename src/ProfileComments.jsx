@@ -176,7 +176,7 @@ const CommentItem = React.memo(function CommentItem({
                 </button>
               )}
 
-              {isOwner && (
+              {isOwner && comment.user && (
                 <button
                   onClick={() => deleteComment(comment._id)}
                   className="text-xs text-red-400"

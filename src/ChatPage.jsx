@@ -71,9 +71,10 @@ useEffect(() => {
 
   const handleReceiveMessage = (msg) => {
   setMessages(prev => {
-    // prevent duplication by checking _id
-    const exists = prev.some(m => m._id === msg._id);
-    if (exists) return prev;
+    const exists = prev.some(
+      m => m._id === msg._id || (m.message === msg.message && m.sender?._id === msg.sender?._id)
+    );
+    if (exists) return prev; // ignore duplicate
     return [...prev, msg];
   });
 };
@@ -99,48 +100,38 @@ useEffect(() => {
   };
 }, [chatId, userId]);
 
-const sendMessage = async () => {
+const sendMessage = () => {
   if (!text.trim()) return;
 
   const messageText = text;
 
-  // 1️⃣ create temp message with a unique tempId
-  const tempId = "temp-" + Date.now();
+  // TEMP message only for sender
   const tempMessage = {
-    _id: tempId,
+    _id: "temp-" + Date.now(), // temporary ID
     message: messageText,
-    sender: { _id: userId, profileImage: user?.profileImage },
-    pending: true // optional flag for UI
+    sender: {
+      _id: userId,
+      profileImage: user?.profileImage
+    }
   };
 
-  // 2️⃣ add temp message
-  setMessages(prev => [...prev, tempMessage]);
+  setMessages(prev => [...prev, tempMessage]); // append temp message
 
   setText("");
   isTypingRef.current = false;
   socket.emit("stop-typing", { chatId, userId });
 
-  try {
-    // 3️⃣ send to backend
-    const res = await axios.post(
-      `${BASE_URL}/api/chat/send/${chatId}`,
-      { message: messageText },
-      { withCredentials: true }
-    );
-
-    const serverMessage = res.data;
-
-    // 4️⃣ Replace temp message with server message
+  // Send to backend
+  axios.post(
+    `${BASE_URL}/api/chat/send/${chatId}`,
+    { message: messageText },
+    { withCredentials: true }
+  ).then(res => {
+    // Replace temp message with actual backend message
     setMessages(prev =>
-      prev.map(m => (m._id === tempId ? serverMessage : m))
+      prev.map(m => (m._id === tempMessage._id ? res.data : m))
     );
-  } catch (err) {
-    console.error(err);
-    // mark temp message as failed if needed
-    setMessages(prev =>
-      prev.map(m => (m._id === tempId ? { ...m, failed: true } : m))
-    );
-  }
+  }).catch(console.error);
 };
 
 const openGallery = () => {

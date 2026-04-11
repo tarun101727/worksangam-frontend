@@ -509,131 +509,35 @@ useEffect(() => {
 }, [paths, penMode, currentImageUrl]);
 
 const sendMedia = async () => {
-  let finalFile = currentFile; // fallback if no edits
+  let finalFile = currentFile; // edited image/video
 
-  if (textBoxes.length > 0 || paths.length > 0) {
-    const img = imgRef.current;
-    const container = containerRef.current;
-    if (!img || !container) return;
-
-    // 1️⃣ Create canvas matching original image pixels (base layer)
-    const canvas = document.createElement("canvas");
-    canvas.width = img.naturalWidth;
-    canvas.height = img.naturalHeight;
-    const ctx = canvas.getContext("2d");
-
-    // Draw original image
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-    // 2️⃣ Create temporary canvas for drawings (pen & eraser)
-    const drawCanvas = document.createElement("canvas");
-    drawCanvas.width = canvas.width;
-    drawCanvas.height = canvas.height;
-    const drawCtx = drawCanvas.getContext("2d");
-
-    const displayedWidth = img.width;
-    const displayedHeight = img.height;
-    const offsetX = (container.clientWidth - displayedWidth) / 2;
-    const offsetY = (container.clientHeight - displayedHeight) / 2;
-
-    const scaleX = canvas.width / displayedWidth;
-    const scaleY = canvas.height / displayedHeight;
-
-    // Draw pen/eraser paths on drawCanvas only
-    paths.forEach(path => {
-      if (!path.points || path.points.length === 0) return;
-
-      drawCtx.beginPath();
-      path.points.forEach((p, i) => {
-        const x = (p.x - offsetX) * scaleX;
-        const y = (p.y - offsetY) * scaleY;
-        if (i === 0) drawCtx.moveTo(x, y);
-        else drawCtx.lineTo(x, y);
-      });
-
-      drawCtx.lineWidth = path.type === "eraser" ? 15 * scaleX : 3 * scaleX;
-      drawCtx.strokeStyle = path.type === "eraser" ? "rgba(0,0,0,1)" : "#ff0000";
-      drawCtx.globalCompositeOperation = path.type === "eraser" ? "destination-out" : "source-over";
-      drawCtx.stroke();
-      drawCtx.globalCompositeOperation = "source-over";
-    });
-
-    // Draw text boxes on drawCanvas
-    textBoxes.forEach(box => {
-      if (!box.text) return;
-
-      const relX = (box.x - offsetX - box.width / 2) / displayedWidth;
-      const relY = (box.y - offsetY - box.height / 2) / displayedHeight;
-      const relWidth = box.width / displayedWidth;
-
-      const realX = relX * canvas.width;
-      const realY = relY * canvas.height;
-      const realWidth = relWidth * canvas.width;
-
-      drawCtx.fillStyle = box.color || "#fff";
-      drawCtx.font = `${box.fontStyle === "italic" ? "italic " : ""}${box.fontStyle === "bold" ? "bold " : ""}${box.fontSize * scaleX}px sans-serif`;
-      drawCtx.textAlign = "left";
-      drawCtx.textBaseline = "top";
-
-      const inputLines = box.text.split("\n");
-      const lines = [];
-      inputLines.forEach(rawLine => {
-        let currentLine = "";
-        rawLine.split(" ").forEach(word => {
-          const testLine = currentLine ? currentLine + " " + word : word;
-          if (drawCtx.measureText(testLine).width > realWidth && currentLine !== "") {
-            lines.push(currentLine);
-            currentLine = word;
-          } else currentLine = testLine;
-        });
-        lines.push(currentLine);
-      });
-
-      const lineHeight = box.fontSize * 1.2 * scaleY;
-      const padding = 5 * scaleX;
-      const startY = realY + padding;
-
-      lines.forEach((line, i) => {
-        drawCtx.fillText(line.trim(), realX + padding, startY + i * lineHeight);
-      });
-    });
-
-    // 3️⃣ Merge drawing layer onto base image
-    ctx.drawImage(drawCanvas, 0, 0, canvas.width, canvas.height);
-
-    // 4️⃣ Export final image
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.95));
-    finalFile = new File([blob], "edited.jpg", { type: "image/jpeg" });
-  }
-
-  // 5️⃣ Apply crop if needed
-  if (cropMode && crop.width && crop.height) {
-    const scaleX = imgRef.current.naturalWidth / imgRef.current.width;
-    const scaleY = imgRef.current.naturalHeight / imgRef.current.height;
-
-    const croppedBlob = await getCroppedImg(imgRef.current, {
-      x: crop.x * scaleX,
-      y: crop.y * scaleY,
-      width: crop.width * scaleX,
-      height: crop.height * scaleY
-    });
-
-    finalFile = new File([croppedBlob], "cropped.jpg", { type: "image/jpeg" });
-  }
-
-  // 6️⃣ Send to backend
   const formData = new FormData();
-  formData.append("image", finalFile);
+  formData.append("image", finalFile); // must match multer.single("image")
   formData.append("caption", caption);
 
-  await axios.post(
-    `${BASE_URL}/api/chat/send-media/${chatId}`,
-    formData,
-    { withCredentials: true }
-  );
+  try {
+    const res = await axios.post(
+      `${BASE_URL}/api/chat/send-media/${chatId}`,
+      formData,
+      {
+        withCredentials: true,
+        headers: { "Content-Type": "multipart/form-data" } // important
+      }
+    );
 
-  // Navigate to the correct chat page
-navigate(`/chat/${chatId}`);
+    // Optional: emit socket to show message immediately
+    socket.emit("send-message", {
+      chatId,
+      message: caption,
+      image: res.data.image
+    });
+
+    // ✅ Navigate to ChatPage immediately
+    navigate(`/chat/${chatId}`);
+  } catch (err) {
+    console.error("Media send failed:", err);
+    alert("Failed to send media. Please try again.");
+  }
 };
 
 const previewHeight = "70vh"; // keep constant

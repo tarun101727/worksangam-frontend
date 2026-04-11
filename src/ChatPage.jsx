@@ -55,19 +55,22 @@ useLayoutEffect(() => {
 }, [messages]);
 
 useEffect(() => {
-  // Join chat once
+  // Join the chat room
   socket.emit("join-chat", chatId);
 
-  // ✅ Stable listener functions
+  // Listener for incoming messages
   const handleReceiveMessage = (msg) => {
     setMessages(prev => {
-      // Prevent duplicate messages
-      const exists = prev.some(m => m._id === msg._id || (m.message === msg.message && m.sender?._id === msg.sender?._id));
+      // Prevent duplicates (including temp messages)
+      const exists = prev.some(
+        m => m._id === msg._id || (m._id?.toString().startsWith("temp-") && m.message === msg.message)
+      );
       if (exists) return prev;
       return [...prev, msg];
     });
   };
 
+  // Typing indicators
   const handleUserTyping = ({ userId: typingUserId }) => {
     if (typingUserId !== userId) setIsTyping(true);
   };
@@ -87,16 +90,16 @@ useEffect(() => {
     socket.off("user-typing", handleUserTyping);
     socket.off("user-stop-typing", handleUserStopTyping);
   };
-  // ⚠️ Only depend on chatId, not userId
-}, [chatId]);
+}, [chatId]); // only depend on chatId
 
 const sendMessage = () => {
   if (!text.trim()) return;
 
   const messageText = text;
 
+  // Create temporary message
   const tempMessage = {
-    _id: "temp-" + Date.now(),
+    _id: "temp-" + Date.now(), // unique temporary ID
     message: messageText,
     sender: {
       _id: userId,
@@ -104,17 +107,28 @@ const sendMessage = () => {
     }
   };
 
+  // Add temp message to state
   setMessages(prev => [...prev, tempMessage]);
 
+  // Clear input & stop typing
   setText("");
   isTypingRef.current = false;
   socket.emit("stop-typing", { chatId, userId });
 
-  axios.post(
-    `${BASE_URL}/api/chat/send/${chatId}`,
-    { message: messageText },
-    { withCredentials: true }
-  ).catch(console.error);
+  // Send to backend
+  axios
+    .post(
+      `${BASE_URL}/api/chat/send/${chatId}`,
+      { message: messageText },
+      { withCredentials: true }
+    )
+    .then(res => {
+      // Replace temp message with backend-confirmed message
+      setMessages(prev =>
+        prev.map(m => (m._id === tempMessage._id ? res.data : m))
+      );
+    })
+    .catch(console.error);
 };
 
 const openGallery = () => {

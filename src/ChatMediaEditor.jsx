@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { initSocket } from "../utils/socket";
 
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
@@ -92,11 +93,29 @@ const [currentBoxId, setCurrentBoxId] = useState(null); // current editing box
 const [toolbarVisible, setToolbarVisible] = useState(false);
 const [undoStack, setUndoStack] = useState([]);
 const [redoStack, setRedoStack] = useState([]);
-const [sending, setSending] = useState(false); 
+
 
 const closeToolbar = () => {
   setToolbarVisible(false);
 };
+
+useEffect(() => {
+  const socket = initSocket();
+
+  // Join the chat room
+  socket.emit("join-chat", chatId);
+
+  const handleReceiveMessage = (msg) => {
+    // update your messages state here
+    console.log("Received message:", msg);
+  };
+
+  socket.on("receive-message", handleReceiveMessage);
+
+  return () => {
+    socket.off("receive-message", handleReceiveMessage); // cleanup on unmount
+  };
+}, [chatId]); // run once per chat
 
 
 useEffect(() => {
@@ -638,44 +657,35 @@ const sendMedia = async () => {
 const previewHeight = "70vh"; // keep constant
 
 const handleButtonClick = async () => {
-  if (sending) return; // ❌ prevent double click
-  setSending(true);
+  if(buttonLabel === "Save" && cropMode){
+    // --- Save the cropped image ---
+    const image = imgRef.current;
+    if(image && crop.width && crop.height){
+      const scaleX = image.naturalWidth / image.width;
+      const scaleY = image.naturalHeight / image.height;
 
-  try {
-    if (buttonLabel === "Save" && cropMode) {
-      // --- Save the cropped image ---
-      const image = imgRef.current;
-      if (image && crop.width && crop.height) {
-        const scaleX = image.naturalWidth / image.width;
-        const scaleY = image.naturalHeight / image.height;
+      const croppedBlob = await getCroppedImg(image, {
+        x: crop.x * scaleX,
+        y: crop.y * scaleY,
+        width: crop.width * scaleX,
+        height: crop.height * scaleY
+      });
 
-        const croppedBlob = await getCroppedImg(image, {
-          x: crop.x * scaleX,
-          y: crop.y * scaleY,
-          width: crop.width * scaleX,
-          height: crop.height * scaleY
-        });
+      // Replace original image with cropped one
+      const croppedFile = new File([croppedBlob], "cropped.jpg", { type: "image/jpeg" });
+      const newUrl = URL.createObjectURL(croppedFile);
+      imgRef.current.src = newUrl; // update preview
 
-        // Replace original image with cropped one
-        const croppedFile = new File([croppedBlob], "cropped.jpg", { type: "image/jpeg" });
-        const newUrl = URL.createObjectURL(croppedFile);
-        imgRef.current.src = newUrl; // update preview
+      // Reset crop mode and button
+      setCropMode(false);
+      setButtonLabel("Send");
 
-        setCurrentFile(croppedFile);
-        setCurrentImageUrl(newUrl);
-
-        // Reset crop mode and button
-        setCropMode(false);
-        setButtonLabel("Send");
-      }
-    } else {
-      // Normal send
-      await sendMedia();
+      setCurrentFile(croppedFile);
+setCurrentImageUrl(newUrl);
     }
-  } catch (err) {
-    console.error("Send failed", err);
-  } finally {
-    setSending(false); // release lock
+  } else {
+    // Normal send
+    await sendMedia();
   }
 };
 

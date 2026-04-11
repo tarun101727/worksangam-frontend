@@ -1,5 +1,5 @@
+
 import { useTranslation } from "react-i18next";
-import { initSocket } from "../utils/socket";
 
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
@@ -98,24 +98,6 @@ const [redoStack, setRedoStack] = useState([]);
 const closeToolbar = () => {
   setToolbarVisible(false);
 };
-
-useEffect(() => {
-  const socket = initSocket();
-
-  // Join the chat room
-  socket.emit("join-chat", chatId);
-
-  const handleReceiveMessage = (msg) => {
-    // update your messages state here
-    console.log("Received message:", msg);
-  };
-
-  socket.on("receive-message", handleReceiveMessage);
-
-  return () => {
-    socket.off("receive-message", handleReceiveMessage); // cleanup on unmount
-  };
-}, [chatId]); // run once per chat
 
 
 useEffect(() => {

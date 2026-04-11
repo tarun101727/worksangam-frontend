@@ -55,22 +55,29 @@ useLayoutEffect(() => {
 }, [messages]);
 
 useEffect(() => {
-  // Join the chat room
+  // Join chat once
   socket.emit("join-chat", chatId);
 
-  // Listener for incoming messages
-  const handleReceiveMessage = (msg) => {
-    setMessages(prev => {
-      // Prevent duplicates (including temp messages)
-      const exists = prev.some(
-        m => m._id === msg._id || (m._id?.toString().startsWith("temp-") && m.message === msg.message)
-      );
-      if (exists) return prev;
-      return [...prev, msg];
-    });
-  };
+  // Load chat messages
+  axios.get(`${BASE_URL}/api/chat/messages/${chatId}`, { withCredentials: true })
+    .then(res => {
+      setMessages(res.data.messages);
 
-  // Typing indicators
+      const otherUser = res.data.participants.find(
+        p => p._id.toString() !== userId?.toString()
+      );
+      setReceiver(otherUser);
+    });
+
+  const handleReceiveMessage = (msg) => {
+  setMessages(prev => {
+    // prevent duplication by checking _id
+    const exists = prev.some(m => m._id === msg._id);
+    if (exists) return prev;
+    return [...prev, msg];
+  });
+};
+
   const handleUserTyping = ({ userId: typingUserId }) => {
     if (typingUserId !== userId) setIsTyping(true);
   };
@@ -90,45 +97,50 @@ useEffect(() => {
     socket.off("user-typing", handleUserTyping);
     socket.off("user-stop-typing", handleUserStopTyping);
   };
-}, [chatId]); // only depend on chatId
+}, [chatId, userId]);
 
-const sendMessage = () => {
+const sendMessage = async () => {
   if (!text.trim()) return;
 
   const messageText = text;
 
-  // Create temporary message
+  // 1️⃣ create temp message with a unique tempId
+  const tempId = "temp-" + Date.now();
   const tempMessage = {
-    _id: "temp-" + Date.now(), // unique temporary ID
+    _id: tempId,
     message: messageText,
-    sender: {
-      _id: userId,
-      profileImage: user?.profileImage
-    }
+    sender: { _id: userId, profileImage: user?.profileImage },
+    pending: true // optional flag for UI
   };
 
-  // Add temp message to state
+  // 2️⃣ add temp message
   setMessages(prev => [...prev, tempMessage]);
 
-  // Clear input & stop typing
   setText("");
   isTypingRef.current = false;
   socket.emit("stop-typing", { chatId, userId });
 
-  // Send to backend
-  axios
-    .post(
+  try {
+    // 3️⃣ send to backend
+    const res = await axios.post(
       `${BASE_URL}/api/chat/send/${chatId}`,
       { message: messageText },
       { withCredentials: true }
-    )
-    .then(res => {
-      // Replace temp message with backend-confirmed message
-      setMessages(prev =>
-        prev.map(m => (m._id === tempMessage._id ? res.data : m))
-      );
-    })
-    .catch(console.error);
+    );
+
+    const serverMessage = res.data;
+
+    // 4️⃣ Replace temp message with server message
+    setMessages(prev =>
+      prev.map(m => (m._id === tempId ? serverMessage : m))
+    );
+  } catch (err) {
+    console.error(err);
+    // mark temp message as failed if needed
+    setMessages(prev =>
+      prev.map(m => (m._id === tempId ? { ...m, failed: true } : m))
+    );
+  }
 };
 
 const openGallery = () => {

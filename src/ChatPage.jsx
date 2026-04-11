@@ -106,6 +106,17 @@ const sendMessage = () => {
 
   const messageText = text;
 
+  const tempMessage = {
+    _id: Date.now(),
+    message: messageText,
+    sender: {
+      _id: userId,
+      profileImage: user?.profileImage
+    }
+  };
+
+  setMessages(prev => [...prev, tempMessage]);
+
   setText("");
   isTypingRef.current = false;
   socket.emit("stop-typing", { chatId, userId });
@@ -308,13 +319,6 @@ className="w-8 h-8 rounded-full object-cover"
         <img src={getImageUrl(m.image)} className="w-full" />
       )}
     </div>
-
-    {/* CAPTION */}
-    {m.message && (
-      <div className="px-3 py-2 text-white break-words">
-        {m.message}
-      </div>
-    )}
   </div>
 ) : (
   m.message && (

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useMemo ,useRef } from "react";
 import axios from "axios";
 import { BASE_URL } from "./config";
@@ -78,16 +77,7 @@ const CommentItem = React.memo(function CommentItem({
     .find((row) => row.startsWith("userId="))
     ?.split("=")[1];
 
-    // Add this near the top of the component
-const currentUserId = useMemo(() => {
-  return document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("userId="))
-    ?.split("=")[1];
-}, []);
-
   const isLiked = comment.likes?.includes(userId);
-  const isOwner = comment.user?._id === userId;
   const isProfileOwner = comment.user?._id === profileId;
 
   const visibleCount = visibleReplies[comment._id] || 5;
@@ -185,14 +175,16 @@ const currentUserId = useMemo(() => {
                 </button>
               )}
 
-              {isOwner && (
-                <button
-                  onClick={() => deleteComment(comment._id)}
-                  className="text-xs text-red-400"
-                >
-                  Delete
-                </button>
-              )}
+              
+               {comment.user?._id === userId && (
+  <button
+    onClick={() => deleteComment(comment._id)}
+    className="text-xs text-red-400"
+  >
+    Delete
+  </button>
+)}
+            
             </div>
 
             {showReply[comment._id] && (
@@ -248,7 +240,6 @@ const currentUserId = useMemo(() => {
             comment={r}
             depth={depth + 1}
             profileId={profileId}
-            currentUserId={currentUserId} 
             replyText={replyText}
             setReplyText={setReplyText}
             showReply={showReply}

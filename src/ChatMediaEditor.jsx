@@ -632,7 +632,8 @@ const sendMedia = async () => {
     { withCredentials: true }
   );
 
-  navigate(-1);
+  // Navigate to the correct chat page
+navigate(`/chat/${chatId}`);
 };
 
 const previewHeight = "70vh"; // keep constant

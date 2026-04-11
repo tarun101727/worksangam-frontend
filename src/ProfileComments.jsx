@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useMemo ,useRef } from "react";
 import axios from "axios";
 import { BASE_URL } from "./config";
@@ -282,12 +283,6 @@ export default function ProfileComments({ profileId }) {
   const [visibleComments, setVisibleComments] = useState(5);
   const [visibleReplies, setVisibleReplies] = useState({});
 
-  // 1️⃣ Get userId from cookie at the top of ProfileComments.jsx
-const userId = document.cookie
-  .split("; ")
-  .find((row) => row.startsWith("userId="))
-  ?.split("=")[1];
-   
   useEffect(() => {
 
     if (!profileId) return;
@@ -442,21 +437,20 @@ const totalCommentCount = useMemo(() => countComments(commentTree), [commentTree
         <div key={c._id}>
 
           <CommentItem
-             comment={c}
-  depth={0}
-  profileId={profileId}
-  userId={userId}   // ✅ ADD THIS LINE
-  replyText={replyText}
-  setReplyText={setReplyText}
-  showReply={showReply}
-  setShowReply={setShowReply}
-  showReplies={showReplies}
-  setShowReplies={setShowReplies}
-  sendReply={sendReply}
-  toggleLike={toggleLike}
-  deleteComment={deleteComment}
-  visibleReplies={visibleReplies}
-  setVisibleReplies={setVisibleReplies}
+            comment={c}
+            depth={0}
+            profileId={profileId}
+            replyText={replyText}
+            setReplyText={setReplyText}
+            showReply={showReply}
+            setShowReply={setShowReply}
+            showReplies={showReplies}
+            setShowReplies={setShowReplies}
+            sendReply={sendReply}
+            toggleLike={toggleLike}
+            deleteComment={deleteComment}
+            visibleReplies={visibleReplies}
+            setVisibleReplies={setVisibleReplies}
           />
 
           <div

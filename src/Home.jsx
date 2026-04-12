@@ -35,6 +35,21 @@ export default function Home() {
   const locationWatchIdRef = useRef(null);
   const lastCoordsRef = useRef(null);
   const { t } = useTranslation();
+  const searchRef = useRef(null);
+
+  useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (searchRef.current && !searchRef.current.contains(event.target)) {
+      setFilteredProfessions([]); // Hide the dropdown
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
 
 
   const formatPrice = (price) => {
@@ -286,7 +301,7 @@ export default function Home() {
 
       {/* ======================= SEARCH BAR ======================= */}
       {(selectedTab === "online" || selectedTab === "offline") && (
-        <div className="max-w-3xl mx-auto mb-4 relative">
+        <div ref={searchRef} className="max-w-3xl mx-auto mb-4 relative">
          <input
   type="text"
   placeholder={

@@ -39,6 +39,12 @@ const LanguageSelect = () => {
           >
             తెలుగు
           </button>
+          <button
+            onClick={() => handleLanguage("hi")}
+            className="py-3 rounded-xl bg-gray-800 hover:bg-gray-700 transition-all duration-200 shadow-md hover:scale-105 font-medium"
+          >
+            हिन्दी
+          </button>
 
         </div>
 

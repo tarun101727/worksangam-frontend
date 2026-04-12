@@ -79,7 +79,8 @@ const CommentItem = React.memo(function CommentItem({
     ?.split("=")[1];
 
   const isLiked = comment.likes?.includes(userId);
-  const isOwner = comment.user?._id === userId;
+  const isOwner = String(comment.user?._id) === String(userId);
+console.log("comment.user._id:", comment.user?._id, "userId:", userId, "isOwner:", isOwner);
   const isProfileOwner = comment.user?._id === profileId;
 
   const visibleCount = visibleReplies[comment._id] || 5;

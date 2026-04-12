@@ -1,3 +1,4 @@
+
 import { useTranslation } from "react-i18next";
 import React, { useState, useRef, Fragment, useCallback, useEffect } from "react";
 import axios from "axios";
@@ -48,6 +49,21 @@ const [showProfessionsDropdown, setShowProfessionsDropdown] = useState(false);
   const latestTypedValue = useRef({});
   const transliterateTimer = useRef(null);
   const latestTransliterateValue = useRef("");
+const [languagesList, setLanguagesList] = useState([]);
+
+useEffect(() => {
+  const fetchLanguages = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/api/languages`);
+      setLanguagesList(res.data.map(lang => lang.nativeName));
+    } catch (err) {
+      console.error("Failed to fetch languages", err);
+    }
+  };
+
+  fetchLanguages();
+}, []);
+
 
 const transliterate = async (value, field) => {
   const currentLang = i18n.language || "en";
@@ -93,7 +109,7 @@ const handleChange = (value, field) => {
     [field]: value,
   }));
 
-  if (!["te", "hi", "ta", "kn"].includes(currentLang)) return;
+ if (!["te","hi","ta","kn","as","bn","gu","mr","pa","ml","or","si","ur"].includes(currentLang)) return;
 
   clearTimeout(transliterateTimer.current);
 
@@ -175,8 +191,8 @@ const genders = [
   { id: "Female", name: t("Female") },
   { id: "Other", name: t("Other") },
 ];
-// Filtered languages based on search
-const filteredLanguages = indianLanguages.filter(
+
+const filteredLanguages = languagesList.filter(
   (lang) =>
     lang.toLowerCase().includes(languageSearch.toLowerCase()) &&
     !form.languages.includes(lang)

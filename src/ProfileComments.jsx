@@ -75,10 +75,20 @@ const CommentItem = React.memo(function CommentItem({
   const [showButton, setShowButton] = useState(false);
   const textRef = useRef(null);
   const hasReplies = comment.replies.length > 0;
-  const userId = Cookies.get("userId"); // now userId is reliably a string
+  const userId = Cookies.get("userId"); // current logged-in user
+
+// Debug logs to check why delete button might not appear
+console.log("=== CommentItem Debug ===");
+console.log("userId from cookies:", userId);
+console.log("comment userId:", comment.user?._id);
+console.log(
+  "isOwner:", 
+  String(comment.user?._id) === String(userId)
+);
 
   const isLiked = comment.likes?.includes(userId);
   const isProfileOwner = comment.user?._id === profileId;
+ 
 
   const visibleCount = visibleReplies[comment._id] || 5;
 
@@ -175,9 +185,13 @@ const CommentItem = React.memo(function CommentItem({
                 </button>
               )}
             
-            {String(comment.user?._id) === String(userId) && (
+
+{String(comment.user?._id) === String(userId) && (
   <button
-    onClick={() => deleteComment(comment._id)}
+    onClick={() => {
+      console.log("Deleting comment:", comment._id);
+      deleteComment(comment._id);
+    }}
     className="text-xs text-red-400"
   >
     Delete

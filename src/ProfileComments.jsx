@@ -59,6 +59,7 @@ const CommentItem = React.memo(function CommentItem({
   comment,
   depth,
   profileId,
+  userId,
   replyText,
   setReplyText,
   showReply,
@@ -75,17 +76,10 @@ const CommentItem = React.memo(function CommentItem({
   const [showButton, setShowButton] = useState(false);
   const textRef = useRef(null);
   const hasReplies = comment.replies.length > 0;
-  const userId = Cookies.get("userId"); // now userId is reliably a string
-
+  const isOwner = String(comment.user?._id) === String(userId);
   const isLiked = comment.likes?.includes(userId);
   const isProfileOwner = comment.user?._id === profileId;
-  const isOwner = String(comment.user?._id) === String(userId);
-
-// Debug values
-console.log("Comment ID:", comment._id);
-console.log("Comment user._id:", comment.user?._id);
-console.log("Logged-in userId:", userId);
-console.log("isOwner:", isOwner);
+  
 
 
   const visibleCount = visibleReplies[comment._id] || 5;
@@ -249,6 +243,7 @@ console.log("isOwner:", isOwner);
             comment={r}
             depth={depth + 1}
             profileId={profileId}
+            userId={userId}
             replyText={replyText}
             setReplyText={setReplyText}
             showReply={showReply}
@@ -280,7 +275,7 @@ console.log("isOwner:", isOwner);
   );
 });
 
-export default function ProfileComments({ profileId }) {
+export default function ProfileComments({ profileId , userId }) {
 
   const [comments, setComments] = useState([]);
   const [text, setText] = useState("");
@@ -449,6 +444,7 @@ const totalCommentCount = useMemo(() => countComments(commentTree), [commentTree
             comment={c}
             depth={0}
             profileId={profileId}
+            userId={userId}
             replyText={replyText}
             setReplyText={setReplyText}
             showReply={showReply}

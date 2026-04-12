@@ -16,6 +16,15 @@ const getImageUrl = (img) => {
   return `${BASE_URL}${clean}`;
 };
 
+
+function Loader() {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+      <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+}
+
 export default function Home() {
   const navigate = useNavigate();
 
@@ -114,23 +123,24 @@ export default function Home() {
 
   // ======================= FETCH EMPLOYEES =======================
   const fetchEmployees = async (status, professionType, profession = "") => {
-    try {
-      let url = "";
+  setLoading(true); // start spinner
+  try {
+    let url = "";
 
-      if (status === "offline" && !profession) {
-        url = `${BASE_URL}/api/auth/employees/nearby-offline`;
-      } else {
-        url = `${BASE_URL}/api/users/${status}?professionType=${professionType}&profession=${encodeURIComponent(
-          profession
-        )}`;
-      }
-
-      const res = await axios.get(url, { withCredentials: true });
-      setEmployees(res.data.employees || []);
-    } catch {
-      setError("Failed to fetch employees");
+    if (status === "offline" && !profession) {
+      url = `${BASE_URL}/api/auth/employees/nearby-offline`;
+    } else {
+      url = `${BASE_URL}/api/users/${status}?professionType=${professionType}&profession=${encodeURIComponent(profession)}`;
     }
-  };
+
+    const res = await axios.get(url, { withCredentials: true });
+    setEmployees(res.data.employees || []);
+  } catch {
+    setError("Failed to fetch employees");
+  } finally {
+    setLoading(false); // stop spinner
+  }
+};
 
   // ======================= FETCH JOBS =======================
   const fetchJobsByType = async (type) => {
@@ -181,27 +191,22 @@ export default function Home() {
   setSearch("");
   setFilteredProfessions([]);
   setEmployees([]);
-  let isActive = true; // <- track if this effect is still active
+  setJobs([]);
 
-  if (selectedTab === "online" || selectedTab === "offline") {
-    const professionType = selectedTab;
-
-    // fetch employees
-    fetchEmployees(selectedTab, professionType);
-
-    // fetch professions
-    fetchProfessions().then(() => {
-      if (!isActive) return; // ignore if tab changed
-    });
-  }
-
-  if (selectedTab === "online-jobs") fetchJobsByType("online");
-  if (selectedTab === "offline-jobs") fetchJobsByType("offline");
-  if (selectedTab === "my-job-posts" && user.role === "hirer") fetchMyHirerJobs();
-
-  return () => {
-    isActive = false; // mark previous effect as stale
+  const loadData = async () => {
+    setLoading(true);
+    if (selectedTab === "online" || selectedTab === "offline") {
+      const professionType = selectedTab;
+      await fetchEmployees(selectedTab, professionType);
+      await fetchProfessions();
+    }
+    if (selectedTab === "online-jobs") await fetchJobsByType("online");
+    if (selectedTab === "offline-jobs") await fetchJobsByType("offline");
+    if (selectedTab === "my-job-posts" && user.role === "hirer") await fetchMyHirerJobs();
+    setLoading(false);
   };
+
+  loadData();
 }, [user, selectedTab]);
 
   const handleSearch = (value) => {
@@ -258,10 +263,12 @@ export default function Home() {
   );
 };
 
+
   if (loading) return null;
 
   return (
     <div className="pt-16">
+      {loading && <Loader />}
       {error && <p className="text-red-400 text-center mb-6">{error}</p>}
 
       {/* ======================= TABS ======================= */}

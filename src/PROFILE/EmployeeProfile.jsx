@@ -6,6 +6,9 @@ import { BASE_URL } from "../config";
 import ProfileRow from "./ProfileRow";
 import { useNavigate } from "react-router-dom";
 import { socket } from "../utils/socket";
+import Cookies from "js-cookie";
+
+
 
 /* ⭐ STAR COMPONENT (memoized & fixed gradient bug) */
 const Star = memo(({ index, value, setRating, setHover }) => {
@@ -367,7 +370,7 @@ const EmployeeProfile = ({ user, notification, clear, readOnly }) => {
       )}
      {/* COMMENTS */}
 <div className="mt-12">
-  <ProfileComments profileId={user?._id} userId={user?._id}/>
+  <ProfileComments profileId={user?._id}  userId={Cookies.get("userId")}/>
 </div>
      
     </>

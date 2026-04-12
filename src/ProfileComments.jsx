@@ -174,7 +174,8 @@ const CommentItem = React.memo(function CommentItem({
                     : `View replies (${comment.replies.length})`}
                 </button>
               )}
-  {String(comment.user?._id) === String(userId) && (
+            
+            {String(comment.user?._id) === String(userId) && (
   <button
     onClick={() => deleteComment(comment._id)}
     className="text-xs text-red-400"

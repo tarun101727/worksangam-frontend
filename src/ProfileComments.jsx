@@ -68,20 +68,19 @@ const CommentItem = React.memo(function CommentItem({
   deleteComment,
   visibleReplies,
   setVisibleReplies,
+  loggedInUserId,
 }) {
   const [expanded, setExpanded] = useState(false); // track if comment is expanded
   const [showButton, setShowButton] = useState(false);
   const textRef = useRef(null);
   const hasReplies = comment.replies.length > 0;
-  const userId = document.cookie
-  .split("; ")
-  .find((row) => row.startsWith("userId="))
-  ?.split("=")[1];
+  // NEW: use prop from parent
+const userId = loggedInUserId;
 
 console.log("Logged-in userId:", userId, "Comment userId:", comment.user?._id);
 
   const isLiked = comment.likes?.includes(userId);
-  const isOwner = comment.user?._id === userId;
+const isOwner = String(comment.user?._id) === String(userId);
   const isProfileOwner = comment.user?._id === profileId;
 
   const visibleCount = visibleReplies[comment._id] || 5;
@@ -253,6 +252,7 @@ console.log("Logged-in userId:", userId, "Comment userId:", comment.user?._id);
             deleteComment={deleteComment}
             visibleReplies={visibleReplies}
             setVisibleReplies={setVisibleReplies}
+            loggedInUserId={loggedInUserId}
           />
         ))}
 
@@ -273,7 +273,7 @@ console.log("Logged-in userId:", userId, "Comment userId:", comment.user?._id);
   );
 });
 
-export default function ProfileComments({ profileId }) {
+export default function ProfileComments({ profileId , loggedInUserId  }) {
 
   const [comments, setComments] = useState([]);
   const [text, setText] = useState("");
@@ -453,6 +453,7 @@ const totalCommentCount = useMemo(() => countComments(commentTree), [commentTree
             deleteComment={deleteComment}
             visibleReplies={visibleReplies}
             setVisibleReplies={setVisibleReplies}
+            loggedInUserId={loggedInUserId}
           />
 
           <div

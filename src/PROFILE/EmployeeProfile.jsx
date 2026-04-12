@@ -367,7 +367,7 @@ const EmployeeProfile = ({ user, notification, clear, readOnly }) => {
       )}
      {/* COMMENTS */}
 <div className="mt-12">
-  <ProfileComments profileId={user?._id} />
+  <ProfileComments profileId={user?._id} userId={user?._id}/>
 </div>
      
     </>

@@ -183,9 +183,19 @@ const filteredLanguages = indianLanguages.filter(
 );
 
   useEffect(() => {
-  const filtered = professions.filter((p) =>
-    p.name.toLowerCase().includes(professionSearch.toLowerCase())
-  );
+  const search = professionSearch.toLowerCase();
+
+  const filtered = professions.filter((p) => {
+    const nameMatch = p.name.toLowerCase().includes(search);
+
+    const translationMatch =
+      p.translations &&
+      Object.values(p.translations).some((t) =>
+        t?.toLowerCase().includes(search)
+      );
+
+    return nameMatch || translationMatch;
+  });
 
   setFilteredProfessions(filtered);
 }, [professionSearch, professions]);
@@ -516,16 +526,22 @@ const createEmployeeAccount = async () => {
     <div className="mt-2 rounded-xl bg-[#0F172A] border border-white/10 max-h-60 overflow-y-auto">
       {filteredProfessions.length > 0 ? (
         filteredProfessions.map((p) => (
-          <div
-            key={p._id}
-            onClick={() => {
-              handleProfessionChange(p.name);
-              setProfessionSearch(p.name);
-              setShowProfessionsDropdown(false); // hide dropdown on select
-            }}
-            className="px-4 py-2 text-white hover:bg-[#1F2937] cursor-pointer"
-          >
-            {p.name}
+            <div
+    key={p._id}
+    onClick={() => {
+      handleProfessionChange(p.name); // keep English internally
+      setProfessionSearch(
+        i18n.language !== "en" && p.translations?.[i18n.language]
+          ? p.translations[i18n.language]
+          : p.name
+      );
+      setShowProfessionsDropdown(false);
+    }}
+    className="px-4 py-2 text-white hover:bg-[#1F2937] cursor-pointer"
+  >
+    {i18n.language !== "en" && p.translations?.[i18n.language]
+      ? p.translations[i18n.language]
+      : p.name}
           </div>
         ))
       ) : (

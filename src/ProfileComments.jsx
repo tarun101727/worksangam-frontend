@@ -3,6 +3,9 @@ import axios from "axios";
 import { BASE_URL } from "./config";
 import { socket } from "./utils/socket";
 import { countComments } from "../utils/countComment";
+import Cookies from "js-cookie";
+
+
 
 const getImageUrl = (img) => {
   if (!img) return "";
@@ -72,10 +75,7 @@ const CommentItem = React.memo(function CommentItem({
   const [showButton, setShowButton] = useState(false);
   const textRef = useRef(null);
   const hasReplies = comment.replies.length > 0;
-  const userId = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("userId="))
-    ?.split("=")[1];
+  const userId = Cookies.get("userId"); // now userId is reliably a string
 
   const isLiked = comment.likes?.includes(userId);
   const isProfileOwner = comment.user?._id === profileId;
@@ -175,7 +175,7 @@ const CommentItem = React.memo(function CommentItem({
                 </button>
               )}
 
-           {comment.user?._id.toString() === userId && (
+         {comment.user?._id?.toString() === userId && (
   <button
     onClick={() => deleteComment(comment._id)}
     className="text-xs text-red-400"

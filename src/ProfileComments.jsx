@@ -79,12 +79,10 @@ const userId = loggedInUserId;
 console.log("Logged-in userId:", userId, "Comment userId:", comment.user?._id);
 
   const isLiked = comment.likes?.includes(userId);
-
+const isOwner = String(comment.user?._id) === String(userId);
   const isProfileOwner = comment.user?._id === profileId;
 
   const visibleCount = visibleReplies[comment._id] || 5;
-  const canDelete = String(comment.user?._id) === String(loggedInUserId) || String(profileId) === String(loggedInUserId);
-
 
     useEffect(() => {
     const el = textRef.current;
@@ -179,14 +177,14 @@ console.log("Logged-in userId:", userId, "Comment userId:", comment.user?._id);
                 </button>
               )}
 
-              {canDelete && (
-  <button
-    onClick={() => deleteComment(comment._id)}
-    className="text-xs text-red-400"
-  >
-    Delete
-  </button>
-)}
+              {isOwner && (
+                <button
+                  onClick={() => deleteComment(comment._id)}
+                  className="text-xs text-red-400"
+                >
+                  Delete
+                </button>
+              )}
             </div>
 
             {showReply[comment._id] && (

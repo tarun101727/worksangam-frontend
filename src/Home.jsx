@@ -35,25 +35,7 @@ export default function Home() {
   const locationWatchIdRef = useRef(null);
   const lastCoordsRef = useRef(null);
   const { t } = useTranslation();
-  const [actionInProgress, setActionInProgress] = useState(false); // hides content temporarily
-const [showSpinner, setShowSpinner] = useState(false); // shows circle after delay
 
-const handleButtonClickWithSpinner = async (callback) => {
-  setActionInProgress(true); // hide content
-
-  // Show spinner after 500ms
-  const spinnerTimeout = setTimeout(() => {
-    setShowSpinner(true);
-  }, 500);
-
-  // Execute the action (like tab change, fetching data, distance filter)
-  await callback?.();
-
-  // After 2 seconds (or when action finishes), restore content
-  clearTimeout(spinnerTimeout);
-  setShowSpinner(false);
-  setActionInProgress(false);
-};
 
   const formatPrice = (price) => {
   if (!price) return "Contact for pricing";
@@ -271,17 +253,6 @@ const handleButtonClickWithSpinner = async (callback) => {
 
   return (
     <div className="pt-16">
-      {actionInProgress ? (
-  <div className="flex justify-center items-center h-64">
-    {showSpinner ? (
-    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-   ) : (
-      <p className="text-white/70">Processing...</p>
-    )}
-  </div>
-) : (
-  <>
-  
       {error && <p className="text-red-400 text-center mb-6">{error}</p>}
 
       {/* ======================= TABS ======================= */}
@@ -289,9 +260,7 @@ const handleButtonClickWithSpinner = async (callback) => {
         {["online", "offline", "online-jobs", "offline-jobs"].map((tab) => (
           <button
             key={tab}
-            onClick={() =>
-  handleButtonClickWithSpinner(() => setSelectedTab(tab))
-}
+            onClick={() => setSelectedTab(tab)}
             className={`${
               selectedTab === tab ? "bg-[#6366F1]" : "bg-[#1f2937]"
             } py-2 px-4 rounded-xl`}
@@ -437,7 +406,7 @@ const handleButtonClickWithSpinner = async (callback) => {
     {[1, 2, 5, 20].map((km) => (
       <button
         key={km}
-        onClick={() => handleButtonClickWithSpinner(() => fetchOfflineJobsByDistance(km))}
+        onClick={() => fetchOfflineJobsByDistance(km)}
         className="px-3 py-1 rounded-xl bg-[#6366F1] text-white hover:bg-[#4f46e5]"
       >
         {km} {t("km")}
@@ -518,9 +487,6 @@ const handleButtonClickWithSpinner = async (callback) => {
           ))}
         </div>
       )}
-
-        </>
-)}
     </div>
   );
 }

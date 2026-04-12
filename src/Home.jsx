@@ -35,8 +35,8 @@ export default function Home() {
   const locationWatchIdRef = useRef(null);
   const lastCoordsRef = useRef(null);
   const { t } = useTranslation();
-   const [loadingEmployees, setLoadingEmployees] = useState(false);
- 
+
+
   const formatPrice = (price) => {
   if (!price) return "Contact for pricing";
 
@@ -210,23 +210,16 @@ export default function Home() {
   setFilteredProfessions(filtered);
 };
 
-  const selectProfession = async (professionName) => {
-  setSearch(professionName);
-  setFilteredProfessions([]);
-  setEmployees([]); // clear old employees immediately
-  setLoadingEmployees(true); // show spinner
+  const selectProfession = (professionName) => {
+    setSearch(professionName);
+    setFilteredProfessions([]);
+    setEmployees([]); // clear old employees immediately
 
-  if (selectedTab === "online" || selectedTab === "offline") {
-    const professionType = selectedTab;
-
-    try {
-      await fetchEmployees(selectedTab, professionType, professionName);
-    } finally {
-      // keep spinner visible for at least 1 second
-      setTimeout(() => setLoadingEmployees(false), 800);
+    if (selectedTab === "online" || selectedTab === "offline") {
+      const professionType = selectedTab;
+      fetchEmployees(selectedTab, professionType, professionName);
     }
-  }
-};
+  };
 
   const fetchOfflineJobsByDistance = async (distanceKm) => {
   if (!navigator.geolocation) {
@@ -325,52 +318,51 @@ export default function Home() {
       {/* ======================= EMPLOYEES ======================= */}
       {(selectedTab === "online" || selectedTab === "offline") && (
         <div className="max-w-3xl mx-auto space-y-4">
-  {loadingEmployees ? (
-    <div className="flex justify-center py-10">
-      <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-    </div>
-  ) : employees.length === 0 ? (
-    <p className="text-center text-white/60 py-10">
-      {selectedTab === "online" && t("No online employees available")}
-      {selectedTab === "offline" && t("No offline employees available")}
-    </p>
-  ) : (
-    employees.map((emp) => (
-      <div
-        key={emp._id}
-        onClick={() => navigate(`/profile/${emp._id}`)}
-        className="cursor-pointer p-5 rounded-2xl bg-[#0F172A] border border-white/10"
-      >
-        <div className="flex items-center space-x-4">
-          {emp.profileImage ? (
-            <img
-              src={getImageUrl(emp.profileImage)}
-              alt={emp.firstName}
-              className="w-12 h-12 rounded-full object-cover"
-            />
-          ) : (
-            <div
-              className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold"
-              style={{ backgroundColor: emp.avatarColor }}
-            >
-              {emp.avatarInitial}
-            </div>
-          )}
-          <div>
-            <h3 className="font-semibold">{emp.profession}</h3>
-            <p className="text-white/70">{emp.firstName} {emp.lastName}</p>
-            <p className="text-sm text-white/50">
-              {emp.isAvailable ? "Online" : "Offline"}
+          {employees.length === 0 && (
+            <p className="text-center text-white/60 py-10">
+              {selectedTab === "online" && t("No online employees available")}
+              {selectedTab === "offline" && t("No offline employees available")}
             </p>
-            {emp.distanceKm !== undefined && (
-              <p className="text-xs text-blue-400">{emp.distanceKm} km away</p>
-            )}
-          </div>
+          )}
+
+          {employees.map((emp) => (
+            <div
+              key={emp._id}
+              onClick={() => navigate(`/profile/${emp._id}`)}
+              className="cursor-pointer p-5 rounded-2xl bg-[#0F172A] border border-white/10"
+            >
+              <div className="flex items-center space-x-4">
+                {emp.profileImage ? (
+                  <img
+                  src={getImageUrl(emp.profileImage)}
+                    alt={emp.firstName}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                ) : (
+                  <div
+                    className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold"
+                    style={{ backgroundColor: emp.avatarColor }}
+                  >
+                    {emp.avatarInitial}
+                  </div>
+                )}
+                <div>
+                  <h3 className="font-semibold">{emp.profession}</h3>
+                  <p className="text-white/70">
+                    {emp.firstName} {emp.lastName}
+                  </p>
+                  <p className="text-sm text-white/50">
+                    {emp.isAvailable ? "Online" : "Offline"}
+                  </p>
+
+                  {emp.distanceKm !== undefined && (
+                    <p className="text-xs text-blue-400">{emp.distanceKm} km away</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
-    ))
-  )}
-</div>
       )}
 
       {/* ======================= ONLINE JOBS SEARCH ======================= */}

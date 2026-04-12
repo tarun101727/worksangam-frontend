@@ -16,15 +16,6 @@ const getImageUrl = (img) => {
   return `${BASE_URL}${clean}`;
 };
 
-
-function Loader() {
-  return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-    </div>
-  );
-}
-
 export default function Home() {
   const navigate = useNavigate();
 
@@ -44,7 +35,25 @@ export default function Home() {
   const locationWatchIdRef = useRef(null);
   const lastCoordsRef = useRef(null);
   const { t } = useTranslation();
+  const [actionInProgress, setActionInProgress] = useState(false); // hides content temporarily
+const [showSpinner, setShowSpinner] = useState(false); // shows circle after delay
 
+const handleButtonClickWithSpinner = async (callback) => {
+  setActionInProgress(true); // hide content
+
+  // Show spinner after 500ms
+  const spinnerTimeout = setTimeout(() => {
+    setShowSpinner(true);
+  }, 500);
+
+  // Execute the action (like tab change, fetching data, distance filter)
+  await callback?.();
+
+  // After 2 seconds (or when action finishes), restore content
+  clearTimeout(spinnerTimeout);
+  setShowSpinner(false);
+  setActionInProgress(false);
+};
 
   const formatPrice = (price) => {
   if (!price) return "Contact for pricing";
@@ -123,24 +132,23 @@ export default function Home() {
 
   // ======================= FETCH EMPLOYEES =======================
   const fetchEmployees = async (status, professionType, profession = "") => {
-  setLoading(true); // start spinner
-  try {
-    let url = "";
+    try {
+      let url = "";
 
-    if (status === "offline" && !profession) {
-      url = `${BASE_URL}/api/auth/employees/nearby-offline`;
-    } else {
-      url = `${BASE_URL}/api/users/${status}?professionType=${professionType}&profession=${encodeURIComponent(profession)}`;
+      if (status === "offline" && !profession) {
+        url = `${BASE_URL}/api/auth/employees/nearby-offline`;
+      } else {
+        url = `${BASE_URL}/api/users/${status}?professionType=${professionType}&profession=${encodeURIComponent(
+          profession
+        )}`;
+      }
+
+      const res = await axios.get(url, { withCredentials: true });
+      setEmployees(res.data.employees || []);
+    } catch {
+      setError("Failed to fetch employees");
     }
-
-    const res = await axios.get(url, { withCredentials: true });
-    setEmployees(res.data.employees || []);
-  } catch {
-    setError("Failed to fetch employees");
-  } finally {
-    setLoading(false); // stop spinner
-  }
-};
+  };
 
   // ======================= FETCH JOBS =======================
   const fetchJobsByType = async (type) => {
@@ -185,29 +193,25 @@ export default function Home() {
     }
   };
 
+  // ======================= TAB CHANGE EFFECT =======================
   useEffect(() => {
-  if (!user) return;
+    if (!user) return;
 
-  setSearch("");
-  setFilteredProfessions([]);
-  setEmployees([]);
-  setJobs([]);
+    setSearch("");
+    setFilteredProfessions([]);
+    setEmployees([]);
+    setJobs([]);
 
-  const loadData = async () => {
-    setLoading(true);
     if (selectedTab === "online" || selectedTab === "offline") {
       const professionType = selectedTab;
-      await fetchEmployees(selectedTab, professionType);
-      await fetchProfessions();
+      fetchEmployees(selectedTab, professionType);
+      fetchProfessions();
     }
-    if (selectedTab === "online-jobs") await fetchJobsByType("online");
-    if (selectedTab === "offline-jobs") await fetchJobsByType("offline");
-    if (selectedTab === "my-job-posts" && user.role === "hirer") await fetchMyHirerJobs();
-    setLoading(false);
-  };
 
-  loadData();
-}, [user, selectedTab]);
+    if (selectedTab === "online-jobs") fetchJobsByType("online");
+    if (selectedTab === "offline-jobs") fetchJobsByType("offline");
+    if (selectedTab === "my-job-posts" && user.role === "hirer") fetchMyHirerJobs();
+  }, [user, selectedTab]);
 
   const handleSearch = (value) => {
   setSearch(value);
@@ -263,12 +267,21 @@ export default function Home() {
   );
 };
 
-
   if (loading) return null;
 
   return (
     <div className="pt-16">
-      {loading && <Loader />}
+      {actionInProgress ? (
+  <div className="flex justify-center items-center h-64">
+    {showSpinner ? (
+    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+   ) : (
+      <p className="text-white/70">Processing...</p>
+    )}
+  </div>
+) : (
+  <>
+  
       {error && <p className="text-red-400 text-center mb-6">{error}</p>}
 
       {/* ======================= TABS ======================= */}
@@ -276,7 +289,9 @@ export default function Home() {
         {["online", "offline", "online-jobs", "offline-jobs"].map((tab) => (
           <button
             key={tab}
-            onClick={() => setSelectedTab(tab)}
+            onClick={() =>
+  handleButtonClickWithSpinner(() => setSelectedTab(tab))
+}
             className={`${
               selectedTab === tab ? "bg-[#6366F1]" : "bg-[#1f2937]"
             } py-2 px-4 rounded-xl`}
@@ -422,7 +437,7 @@ export default function Home() {
     {[1, 2, 5, 20].map((km) => (
       <button
         key={km}
-        onClick={() => fetchOfflineJobsByDistance(km)}
+        onClick={() => handleButtonClickWithSpinner(() => fetchOfflineJobsByDistance(km))}
         className="px-3 py-1 rounded-xl bg-[#6366F1] text-white hover:bg-[#4f46e5]"
       >
         {km} {t("km")}
@@ -503,6 +518,9 @@ export default function Home() {
           ))}
         </div>
       )}
+
+        </>
+)}
     </div>
   );
 }

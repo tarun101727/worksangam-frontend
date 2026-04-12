@@ -70,24 +70,15 @@ const CommentItem = React.memo(function CommentItem({
   deleteComment,
   visibleReplies,
   setVisibleReplies,
-  currentUserId 
 }) {
   const [expanded, setExpanded] = useState(false); // track if comment is expanded
   const [showButton, setShowButton] = useState(false);
   const textRef = useRef(null);
   const hasReplies = comment.replies.length > 0;
-  const userId = Cookies.get("userId"); // current logged-in user
-
-  const isOwner = String(comment.user?._id) === String(currentUserId);
-
-  console.log("=== CommentItem Debug ===");
-  console.log("currentUserId:", currentUserId);
-  console.log("comment userId:", comment.user?._id);
-  console.log("isOwner:", isOwner);
+  const userId = Cookies.get("userId"); // now userId is reliably a string
 
   const isLiked = comment.likes?.includes(userId);
   const isProfileOwner = comment.user?._id === profileId;
- 
 
   const visibleCount = visibleReplies[comment._id] || 5;
 
@@ -183,19 +174,12 @@ const CommentItem = React.memo(function CommentItem({
                     : `View replies (${comment.replies.length})`}
                 </button>
               )}
-            
-
-{isOwner && (
   <button
-    onClick={() => {
-      console.log("Deleting comment:", comment._id);
-      deleteComment(comment._id);
-    }}
+    onClick={() => deleteComment(comment._id)}
     className="text-xs text-red-400"
   >
     Delete
   </button>
-)}
             
             </div>
 
@@ -283,7 +267,7 @@ const CommentItem = React.memo(function CommentItem({
   );
 });
 
-export default function ProfileComments({ profileId ,currentUserId  }) {
+export default function ProfileComments({ profileId }) {
 
   const [comments, setComments] = useState([]);
   const [text, setText] = useState("");
@@ -452,7 +436,6 @@ const totalCommentCount = useMemo(() => countComments(commentTree), [commentTree
             comment={c}
             depth={0}
             profileId={profileId}
-             currentUserId={currentUserId} 
             replyText={replyText}
             setReplyText={setReplyText}
             showReply={showReply}

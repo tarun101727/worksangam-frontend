@@ -175,25 +175,34 @@ export default function Home() {
     }
   };
 
-  // ======================= TAB CHANGE EFFECT =======================
   useEffect(() => {
-    if (!user) return;
+  if (!user) return;
 
-    setSearch("");
-    setFilteredProfessions([]);
-    setEmployees([]);
-    setJobs([]);
+  setSearch("");
+  setFilteredProfessions([]);
+  setEmployees([]);
+  let isActive = true; // <- track if this effect is still active
 
-    if (selectedTab === "online" || selectedTab === "offline") {
-      const professionType = selectedTab;
-      fetchEmployees(selectedTab, professionType);
-      fetchProfessions();
-    }
+  if (selectedTab === "online" || selectedTab === "offline") {
+    const professionType = selectedTab;
 
-    if (selectedTab === "online-jobs") fetchJobsByType("online");
-    if (selectedTab === "offline-jobs") fetchJobsByType("offline");
-    if (selectedTab === "my-job-posts" && user.role === "hirer") fetchMyHirerJobs();
-  }, [user, selectedTab]);
+    // fetch employees
+    fetchEmployees(selectedTab, professionType);
+
+    // fetch professions
+    fetchProfessions().then(() => {
+      if (!isActive) return; // ignore if tab changed
+    });
+  }
+
+  if (selectedTab === "online-jobs") fetchJobsByType("online");
+  if (selectedTab === "offline-jobs") fetchJobsByType("offline");
+  if (selectedTab === "my-job-posts" && user.role === "hirer") fetchMyHirerJobs();
+
+  return () => {
+    isActive = false; // mark previous effect as stale
+  };
+}, [user, selectedTab]);
 
   const handleSearch = (value) => {
   setSearch(value);

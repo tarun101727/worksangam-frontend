@@ -75,19 +75,6 @@ const EmployeeProfile = ({ user, notification, clear, readOnly }) => {
   const [avgRating, setAvgRating] = useState(0);
   const [myRating, setMyRating] = useState(0);
     const { t } = useTranslation();
-  const [currentUser, setCurrentUser] = useState(null);
-
-  useEffect(() => {
-  const fetchCurrentUser = async () => {
-    try {
-      const res = await axios.get(`${BASE_URL}/api/get-current-user`, { withCredentials: true });
-      setCurrentUser(res.data.user);
-    } catch (err) {
-      console.error("Failed to fetch current user", err);
-    }
-  };
-  fetchCurrentUser();
-}, []);
   
 
   /* Join socket room */
@@ -380,12 +367,7 @@ const EmployeeProfile = ({ user, notification, clear, readOnly }) => {
       )}
      {/* COMMENTS */}
 <div className="mt-12">
-  {currentUser && (
-  <ProfileComments
-    profileId={user?._id}             // Employee profile ID
-    loggedInUserId={currentUser._id} // Real logged-in user ID
-  />
-)}
+  <ProfileComments profileId={user?._id} loggedInUserId={user?._id} />
 </div>
      
     </>

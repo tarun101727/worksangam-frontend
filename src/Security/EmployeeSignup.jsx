@@ -6,7 +6,6 @@ import { BASE_URL } from "../config";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../useAuth";
 import { Listbox, Transition } from "@headlessui/react";
-import { indianLanguages } from "../constants/languages";
 import i18n from "../i18n.js";
 
 const EmployeeSignup = () => {
@@ -55,7 +54,10 @@ useEffect(() => {
   const fetchLanguages = async () => {
     try {
       const res = await axios.get(`${BASE_URL}/api/languages`);
-      setLanguagesList(res.data.map(lang => lang.nativeName));
+      // Map to "nativeName (English Name)" format
+      setLanguagesList(
+        res.data.map(lang => `${lang.nativeName} (${lang.name})`)
+      );
     } catch (err) {
       console.error("Failed to fetch languages", err);
     }

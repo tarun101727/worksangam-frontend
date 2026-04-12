@@ -1,11 +1,9 @@
+
 import React, { useEffect, useState, useMemo ,useRef } from "react";
 import axios from "axios";
 import { BASE_URL } from "./config";
 import { socket } from "./utils/socket";
 import { countComments } from "../utils/countComment";
-import Cookies from "js-cookie";
-
-
 
 const getImageUrl = (img) => {
   if (!img) return "";
@@ -59,7 +57,6 @@ const CommentItem = React.memo(function CommentItem({
   comment,
   depth,
   profileId,
-  userId,
   replyText,
   setReplyText,
   showReply,
@@ -76,11 +73,14 @@ const CommentItem = React.memo(function CommentItem({
   const [showButton, setShowButton] = useState(false);
   const textRef = useRef(null);
   const hasReplies = comment.replies.length > 0;
-  const isOwner = String(comment.user?._id) === String(userId);
-  const isLiked = comment.likes?.includes(userId);
-  const isProfileOwner = comment.user?._id === profileId;
-  
+  const userId = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("userId="))
+    ?.split("=")[1];
 
+  const isLiked = comment.likes?.includes(userId);
+  const isOwner = comment.user?._id === userId;
+  const isProfileOwner = comment.user?._id === profileId;
 
   const visibleCount = visibleReplies[comment._id] || 5;
 
@@ -176,18 +176,15 @@ const CommentItem = React.memo(function CommentItem({
                     : `View replies (${comment.replies.length})`}
                 </button>
               )}
-{isOwner && (
-  <button
-    onClick={() => {
-      console.log("Delete clicked for comment:", comment._id);
-      deleteComment(comment._id);
-    }}
-    className="text-xs text-red-400"
-  >
-    Delete
-  </button>
-)}
-            
+
+              {isOwner && (
+                <button
+                  onClick={() => deleteComment(comment._id)}
+                  className="text-xs text-red-400"
+                >
+                  Delete
+                </button>
+              )}
             </div>
 
             {showReply[comment._id] && (
@@ -243,7 +240,6 @@ const CommentItem = React.memo(function CommentItem({
             comment={r}
             depth={depth + 1}
             profileId={profileId}
-            userId={userId}
             replyText={replyText}
             setReplyText={setReplyText}
             showReply={showReply}
@@ -275,7 +271,7 @@ const CommentItem = React.memo(function CommentItem({
   );
 });
 
-export default function ProfileComments({ profileId , userId }) {
+export default function ProfileComments({ profileId }) {
 
   const [comments, setComments] = useState([]);
   const [text, setText] = useState("");
@@ -444,7 +440,6 @@ const totalCommentCount = useMemo(() => countComments(commentTree), [commentTree
             comment={c}
             depth={0}
             profileId={profileId}
-            userId={userId}
             replyText={replyText}
             setReplyText={setReplyText}
             showReply={showReply}

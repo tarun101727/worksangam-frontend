@@ -195,26 +195,20 @@ export default function Home() {
     if (selectedTab === "my-job-posts" && user.role === "hirer") fetchMyHirerJobs();
   }, [user, selectedTab]);
 
-  // ======================= SEARCH / FILTER =======================
   const handleSearch = (value) => {
-    setSearch(value);
+  setSearch(value);
 
-    if (!value) {
-      setFilteredProfessions([]);
-      // reset list when search is cleared
-      if (selectedTab === "online" || selectedTab === "offline") {
-        const professionType = selectedTab;
-        fetchEmployees(selectedTab, professionType);
-      }
-      if (selectedTab === "online-jobs") fetchJobsByType("online");
-      return;
-    }
+  if (!value) {
+    // Show all professions when input is empty
+    setFilteredProfessions(professions);
+    return;
+  }
 
-    const filtered = professions.filter((p) =>
-      p.name.toLowerCase().includes(value.toLowerCase())
-    );
-    setFilteredProfessions(filtered);
-  };
+  const filtered = professions.filter((p) =>
+    p.name.toLowerCase().includes(value.toLowerCase())
+  );
+  setFilteredProfessions(filtered);
+};
 
   const selectProfession = (professionName) => {
     setSearch(professionName);
@@ -293,17 +287,18 @@ export default function Home() {
       {/* ======================= SEARCH BAR ======================= */}
       {(selectedTab === "online" || selectedTab === "offline") && (
         <div className="max-w-3xl mx-auto mb-4 relative">
-          <input
-            type="text"
-            placeholder={
-              selectedTab === "online"
-                ? t("Search online profession...")
-                : t("Search offline profession...")
-            }
-            value={search}
-            onChange={(e) => handleSearch(e.target.value)}
-            className="w-full p-3 rounded-xl bg-[#0F172A] border border-white/10"
-          />
+         <input
+  type="text"
+  placeholder={
+    selectedTab === "online"
+      ? t("Search online profession...")
+      : t("Search offline profession...")
+  }
+  value={search}
+  onChange={(e) => handleSearch(e.target.value)}
+  onFocus={() => setFilteredProfessions(professions)} // <- NEW
+  className="w-full p-3 rounded-xl bg-[#0F172A] border border-white/10"
+/>
           {filteredProfessions.length > 0 && (
             <div className="absolute w-full bg-[#0F172A] border border-white/10 rounded-xl mt-1 max-h-60 overflow-y-auto z-50">
               {filteredProfessions.map((p) => (

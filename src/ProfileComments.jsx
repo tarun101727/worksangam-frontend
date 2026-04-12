@@ -57,7 +57,6 @@ const CommentItem = React.memo(function CommentItem({
   comment,
   depth,
   profileId,
-   currentUserId,
   replyText,
   setReplyText,
   showReply,
@@ -74,11 +73,13 @@ const CommentItem = React.memo(function CommentItem({
   const [showButton, setShowButton] = useState(false);
   const textRef = useRef(null);
   const hasReplies = comment.replies.length > 0;
-  const userId = currentUserId;
+  const userId = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("userId="))
+    ?.split("=")[1];
 
   const isLiked = comment.likes?.includes(userId);
-  const isOwner = String(comment.user?._id) === String(userId);
-console.log("comment.user._id:", comment.user?._id, "userId:", userId, "isOwner:", isOwner);
+  const isOwner = comment.user?._id === userId;
   const isProfileOwner = comment.user?._id === profileId;
 
   const visibleCount = visibleReplies[comment._id] || 5;
@@ -239,7 +240,6 @@ console.log("comment.user._id:", comment.user?._id, "userId:", userId, "isOwner:
             comment={r}
             depth={depth + 1}
             profileId={profileId}
-             currentUserId={currentUserId} 
             replyText={replyText}
             setReplyText={setReplyText}
             showReply={showReply}
@@ -271,7 +271,7 @@ console.log("comment.user._id:", comment.user?._id, "userId:", userId, "isOwner:
   );
 });
 
-export default function ProfileComments({ profileId ,currentUserId }) {
+export default function ProfileComments({ profileId }) {
 
   const [comments, setComments] = useState([]);
   const [text, setText] = useState("");
@@ -440,7 +440,6 @@ const totalCommentCount = useMemo(() => countComments(commentTree), [commentTree
             comment={c}
             depth={0}
             profileId={profileId}
-             currentUserId={currentUserId} 
             replyText={replyText}
             setReplyText={setReplyText}
             showReply={showReply}

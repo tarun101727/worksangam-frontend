@@ -178,13 +178,6 @@ const LanguageSelect = () => {
           </button>
 
           <button
-            onClick={() => handleLanguage("te")}
-            className="py-3 rounded-xl bg-gray-800 hover:bg-gray-700 transition-all duration-200 shadow-md hover:scale-105 font-medium"
-          >
-            తెలుగు (Telugu)
-          </button>
-
-          <button
             onClick={() => handleLanguage("ur")}
             className="py-3 rounded-xl bg-gray-800 hover:bg-gray-700 transition-all duration-200 shadow-md hover:scale-105 font-medium"
           >

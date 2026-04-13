@@ -67,6 +67,7 @@ import JobDetails from "./JobPost/JobDetails";
 import EditJob from "./JobPost/EditJob";
 import LanguageSelect from "./LanguageSelect";
 import { useTranslation } from "react-i18next";
+import HeaderLanguageSelect from "./HeaderLanguageSelect";
 
 
 
@@ -380,6 +381,8 @@ const openNotifications = async () => {
             </h1>
 
            <div className="flex items-center gap-4 sm:gap-5 md:gap-6 lg:gap-7 xl:gap-8 relative">
+
+            <HeaderLanguageSelect /> 
 
             <div
 onClick={() => navigate("/chats")}

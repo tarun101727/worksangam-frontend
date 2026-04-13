@@ -1,5 +1,5 @@
-import i18n from "./i18n";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const languages = [
   { code: "en", label: "English" },
@@ -28,10 +28,11 @@ const languages = [
 ];
 
 export default function HeaderLanguageSelect() {
+  const { i18n: i18nInstance } = useTranslation(); // ← important
   const [open, setOpen] = useState(false);
 
   const changeLanguage = (code) => {
-    i18n.changeLanguage(code);
+    i18nInstance.changeLanguage(code); // triggers re-render
     localStorage.setItem("lang", code);
     setOpen(false);
   };
@@ -42,7 +43,7 @@ export default function HeaderLanguageSelect() {
         onClick={() => setOpen(!open)}
         className="px-3 py-2 bg-gray-800 rounded-lg text-sm hover:bg-gray-700"
       >
-        {(i18n.language || "en").toUpperCase()}
+        {(i18nInstance.language || "en").toUpperCase()}
       </button>
 
       {open && (

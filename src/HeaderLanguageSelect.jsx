@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next"; // <--- important
 
 const languages = [
   { code: "en", label: "English" },
@@ -28,13 +28,16 @@ const languages = [
 ];
 
 export default function HeaderLanguageSelect() {
-  const { i18n: i18nInstance } = useTranslation(); // ← important
+  const { i18n: i18nInstance } = useTranslation(); // <--- listen for updates
   const [open, setOpen] = useState(false);
+  const [_, forceUpdate] = useState(0); // dummy state to force re-render
 
   const changeLanguage = (code) => {
-    i18nInstance.changeLanguage(code); // triggers re-render
-    localStorage.setItem("lang", code);
-    setOpen(false);
+    i18nInstance.changeLanguage(code).then(() => {
+      localStorage.setItem("lang", code);
+      setOpen(false);
+      forceUpdate((v) => v + 1); // <--- force a re-render
+    });
   };
 
   return (

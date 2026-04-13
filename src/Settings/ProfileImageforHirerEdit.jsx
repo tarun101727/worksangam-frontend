@@ -1,10 +1,13 @@
 import React, { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
 
 const ProfileImageforHirerEdit = () => {
 
 const fileRef = useRef();
 const navigate = useNavigate();
+    const { t } = useTranslation();
 
 const handleFile = (file)=>{
 
@@ -32,21 +35,21 @@ return(
 <div className="w-full max-w-sm p-8 rounded-3xl bg-[#0F172A]/90 border border-white/10 text-center">
 
 <h2 className="text-2xl font-bold text-white mb-6">
-Change Profile Photo
+{t("Change Profile Photo")}
 </h2>
 
 <button
 onClick={()=>fileRef.current.click()}
 className="w-full py-3 rounded-xl font-semibold text-white bg-[#6366F1] mb-4"
 >
-Choose from Gallery
+{t("Choose from Gallery")}
 </button>
 
 <button
 onClick={openCamera}
 className="w-full py-3 rounded-xl font-semibold text-white bg-[#111827] border border-white/10"
 >
-Open Camera
+{t("Open Camera")}
 </button>
 
 <input

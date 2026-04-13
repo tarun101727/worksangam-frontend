@@ -42,7 +42,7 @@ export default function HeaderLanguageSelect() {
         onClick={() => setOpen(!open)}
         className="px-3 py-2 bg-gray-800 rounded-lg text-sm hover:bg-gray-700"
       >
-        {i18n.language.toUpperCase()}
+        {(i18n.language || "en").toUpperCase()}
       </button>
 
       {open && (

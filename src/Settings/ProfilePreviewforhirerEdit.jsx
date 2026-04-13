@@ -1,5 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
 
 const SIZE = 260;
 
@@ -11,9 +13,7 @@ const ProfilePreviewforhirerEdit = () => {
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
   const [start, setStart] = useState({ x: 0, y: 0 });
-
-  const [scale, setScale] = useState(1); // ✅ zoom
-  const lastDistance = useRef(null);
+    const { t } = useTranslation();
 
   if (!state?.profileImage) return null;
 
@@ -27,17 +27,10 @@ const ProfilePreviewforhirerEdit = () => {
     return { x: e.clientX, y: e.clientY };
   };
 
-  const getTouchDistance = (touches) => {
-    const dx = touches[0].clientX - touches[1].clientX;
-    const dy = touches[0].clientY - touches[1].clientY;
-    return Math.sqrt(dx * dx + dy * dy);
-  };
-
   /* =======================
      DRAG START
   ======================= */
   const startDrag = (e) => {
-    if (e.touches?.length === 2) return; // ignore pinch
     e.preventDefault();
     const point = getPoint(e);
     setDragging(true);
@@ -48,29 +41,12 @@ const ProfilePreviewforhirerEdit = () => {
   };
 
   /* =======================
-     DRAG MOVE + PINCH
+     DRAG MOVE
   ======================= */
   const onDrag = (e) => {
-    if (e.touches && e.touches.length === 2) {
-      // ✅ PINCH ZOOM
-      const dist = getTouchDistance(e.touches);
-
-      if (lastDistance.current) {
-        const diff = dist - lastDistance.current;
-        setScale((prev) =>
-          Math.min(3, Math.max(0.5, prev + diff * 0.005))
-        );
-      }
-
-      lastDistance.current = dist;
-      return;
-    }
-
     if (!dragging) return;
-
     e.preventDefault();
     const point = getPoint(e);
-
     setPos({
       x: point.x - start.x,
       y: point.y - start.y,
@@ -80,22 +56,7 @@ const ProfilePreviewforhirerEdit = () => {
   /* =======================
      DRAG END
   ======================= */
-  const stopDrag = () => {
-    setDragging(false);
-    lastDistance.current = null;
-  };
-
-  /* =======================
-     MOUSE WHEEL ZOOM
-  ======================= */
-  const handleWheel = (e) => {
-    e.preventDefault();
-
-    const zoomSpeed = 0.001;
-    setScale((prev) =>
-      Math.min(3, Math.max(0.5, prev - e.deltaY * zoomSpeed))
-    );
-  };
+  const stopDrag = () => setDragging(false);
 
   /* =======================
      CROP & SAVE
@@ -140,8 +101,8 @@ const ProfilePreviewforhirerEdit = () => {
     const file = new File([blob], "profile.jpg", { type: "image/jpeg" });
 
     navigate("/settings/hirer/account", {
-      state: { profileImage: croppedURL, file },
-    });
+state: { profileImage: croppedURL, file },
+});
   };
 
   /* =======================
@@ -155,7 +116,6 @@ const ProfilePreviewforhirerEdit = () => {
       onMouseLeave={stopDrag}
       onTouchMove={onDrag}
       onTouchEnd={stopDrag}
-      onWheel={handleWheel} // ✅ desktop zoom
     >
       <div className="relative w-full max-w-md h-[420px] overflow-hidden">
 
@@ -166,7 +126,7 @@ const ProfilePreviewforhirerEdit = () => {
           className="absolute inset-0 w-full h-full object-cover blur-2xl scale-110"
         />
 
-        {/* DRAG + ZOOM IMAGE */}
+        {/* DRAGGABLE IMAGE */}
         <img
           ref={imgRef}
           src={state.profileImage}
@@ -178,17 +138,13 @@ const ProfilePreviewforhirerEdit = () => {
           style={{
             top: "50%",
             left: "50%",
-            transform: `
-              translate(${pos.x}px, ${pos.y}px)
-              translate(-50%, -50%)
-              scale(${scale})
-            `,
+            transform: `translate(${pos.x}px, ${pos.y}px) translate(-50%, -50%)`,
             maxWidth: "100%",
             maxHeight: "100%",
           }}
         />
 
-        {/* CIRCLE */}
+        {/* FIXED CROP CIRCLE */}
         <div
           className="absolute top-1/2 left-1/2 rounded-full pointer-events-none"
           style={{
@@ -205,7 +161,7 @@ const ProfilePreviewforhirerEdit = () => {
           onClick={cropAndSave}
           className="absolute bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl bg-indigo-500 text-white font-semibold"
         >
-          Use This Photo
+          {t("Use This Photo")}
         </button>
       </div>
     </div>

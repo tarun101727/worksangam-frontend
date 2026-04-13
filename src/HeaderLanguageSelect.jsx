@@ -33,12 +33,16 @@ export default function HeaderLanguageSelect() {
   const [open, setOpen] = useState(false);
   const [loadingLang, setLoadingLang] = useState(false);
 
+  // Find label for currently selected language
+  const currentLanguageLabel =
+    languages.find((lang) => lang.code === i18n.language)?.label || "English";
+
   const changeLanguage = async (code) => {
     if (loadingLang) return; // prevent multiple clicks
     setLoadingLang(true);
 
     try {
-      // ✅ Load language dynamically if not already loaded
+      // Load language dynamically if not already loaded
       if (code !== "en" && !i18n.hasResourceBundle(code, "translation")) {
         const res = await fetch(`${BASE_URL}/api/languages/${code}`);
         if (res.ok) {
@@ -47,10 +51,10 @@ export default function HeaderLanguageSelect() {
         }
       }
 
-      // ✅ Switch language
+      // Switch language
       await i18n.changeLanguage(code);
 
-      // ✅ Save to localStorage
+      // Save to localStorage
       localStorage.setItem("lang", code);
     } catch (err) {
       console.error("Failed to change language:", err);
@@ -64,14 +68,16 @@ export default function HeaderLanguageSelect() {
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="px-3 py-2 bg-gray-800 rounded-lg text-sm hover:bg-gray-700 flex items-center justify-between w-24"
+        className="px-3 py-2 bg-gray-800 rounded-lg text-sm hover:bg-gray-700 flex items-center justify-between w-28"
       >
-        <span>{(i18n.language || "en").toUpperCase()}</span>
-        {loadingLang && <span className="ml-2 animate-spin border-b-2 border-white rounded-full w-3 h-3"></span>}
+        <span>{currentLanguageLabel}</span>
+        {loadingLang && (
+          <span className="ml-2 animate-spin border-b-2 border-white rounded-full w-3 h-3"></span>
+        )}
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-40 max-h-60 overflow-y-auto bg-gray-900 border border-gray-700 rounded-lg shadow-lg z-50">
+        <div className="absolute right-0 mt-2 w-44 max-h-60 overflow-y-auto bg-gray-900 border border-gray-700 rounded-lg shadow-lg z-50">
           {languages.map((lang) => (
             <div
               key={lang.code}

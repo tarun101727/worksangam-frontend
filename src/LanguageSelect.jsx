@@ -1,11 +1,13 @@
 import i18n from "./i18n";
+import { useNavigate } from "react-router-dom";
 
 const LanguageSelect = () => {
+  const navigate = useNavigate();
 
   const handleLanguage = (lang) => {
     i18n.changeLanguage(lang);
     localStorage.setItem("lang", lang);
-    window.location.reload(); // <-- full page refresh
+    navigate("/signup");
   };
 
   return (

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next"; // <--- important
+import { useTranslation } from "react-i18next";
+import { BASE_URL } from "./config";
 
 const languages = [
   { code: "en", label: "English" },
@@ -28,25 +29,45 @@ const languages = [
 ];
 
 export default function HeaderLanguageSelect() {
-  const { i18n: i18nInstance } = useTranslation(); // <--- listen for updates
+  const { i18n } = useTranslation();
   const [open, setOpen] = useState(false);
-  const [_, forceUpdate] = useState(0); // dummy state to force re-render
+  const [loadingLang, setLoadingLang] = useState(false);
 
-  const changeLanguage = (code) => {
-    i18nInstance.changeLanguage(code).then(() => {
+  const changeLanguage = async (code) => {
+    if (loadingLang) return; // prevent multiple clicks
+    setLoadingLang(true);
+
+    try {
+      // ✅ Load language dynamically if not already loaded
+      if (code !== "en" && !i18n.hasResourceBundle(code, "translation")) {
+        const res = await fetch(`${BASE_URL}/api/languages/${code}`);
+        if (res.ok) {
+          const data = await res.json();
+          i18n.addResourceBundle(code, "translation", data, true, true);
+        }
+      }
+
+      // ✅ Switch language
+      await i18n.changeLanguage(code);
+
+      // ✅ Save to localStorage
       localStorage.setItem("lang", code);
+    } catch (err) {
+      console.error("Failed to change language:", err);
+    } finally {
       setOpen(false);
-      forceUpdate((v) => v + 1); // <--- force a re-render
-    });
+      setLoadingLang(false);
+    }
   };
 
   return (
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="px-3 py-2 bg-gray-800 rounded-lg text-sm hover:bg-gray-700"
+        className="px-3 py-2 bg-gray-800 rounded-lg text-sm hover:bg-gray-700 flex items-center justify-between w-24"
       >
-        {(i18nInstance.language || "en").toUpperCase()}
+        <span>{(i18n.language || "en").toUpperCase()}</span>
+        {loadingLang && <span className="ml-2 animate-spin border-b-2 border-white rounded-full w-3 h-3"></span>}
       </button>
 
       {open && (

@@ -433,15 +433,7 @@ useEffect(() => {
 
           {/* PROFESSION SEARCH */}
           <label className="block text-sm text-white/70">What do you do?</label>
-          <input
-            className={inputBase}
-            placeholder="Search your profession"
-            value={professionSearch}
-            onChange={(e) => {
-              setProfessionSearch(e.target.value);
-              updateForm("profession", e.target.value);
-            }}
-          />
+          
 
           <div id="profession-container" className="relative mt-2">
   <input

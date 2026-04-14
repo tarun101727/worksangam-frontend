@@ -264,19 +264,24 @@ useEffect(() => {
   }, []);
 
   const handleProfessionChange = useCallback(
-    (professionName) => {
-      const selected = professions.find(
-        (p) => p.name.toLowerCase() === professionName.toLowerCase()
+  (professionLabel) => {
+    const selected = professions.find((p) => {
+      return (
+        p.name.toLowerCase() === professionLabel.toLowerCase() ||
+        Object.values(p.translations || {}).some(
+          (t) => t?.toLowerCase() === professionLabel.toLowerCase()
+        )
       );
+    });
 
-      setForm((prev) => ({
-        ...prev,
-        profession: professionName,
-        professionType: selected ? selected.type : "offline",
-      }));
-    },
-    [professions]
-  );
+    setForm((prev) => ({
+      ...prev,
+      profession: professionLabel, // ✅ store Hindi/Telugu/etc
+      professionType: selected ? selected.type : "offline",
+    }));
+  },
+  [professions]
+);
 
   // -------------------------
   // Save profile
@@ -459,13 +464,20 @@ useEffect(() => {
           <div
             key={p._id}
             onClick={() => {
-              handleProfessionChange(p.name);
-              setProfessionSearch(p.name);
-              setShowProfessionsDropdown(false); // hide dropdown on select
-            }}
+  const selectedLabel =
+    i18n.language !== "en" && p.translations?.[i18n.language]
+      ? p.translations[i18n.language]
+      : p.name;
+
+  handleProfessionChange(selectedLabel); // ✅ store translated
+  setProfessionSearch(selectedLabel);    // ✅ show translated
+  setShowProfessionsDropdown(false);
+}}
             className="px-4 py-2 text-white hover:bg-[#1F2937] cursor-pointer"
           >
-            {p.name}
+            {i18n.language !== "en" && p.translations?.[i18n.language]
+  ? p.translations[i18n.language]
+  : p.name}
           </div>
         ))
       ) : (

@@ -268,15 +268,20 @@ useEffect(() => {
     setForm((prev) => ({ ...prev, [key]: value }));
   }, []);
 
-  const handleProfessionChange = useCallback((professionName) => {
-  const selected = professions.find(
-    (p) => p.name.toLowerCase() === professionName.toLowerCase()
-  );
+  const handleProfessionChange = useCallback((professionLabel) => {
+  const selected = professions.find((p) => {
+    return (
+      p.name.toLowerCase() === professionLabel.toLowerCase() ||
+      Object.values(p.translations || {}).some(
+        (t) => t?.toLowerCase() === professionLabel.toLowerCase()
+      )
+    );
+  });
 
   setForm((prev) => ({
     ...prev,
-    profession: professionName,
-    professionType: selected ? selected.type : "offline", // fallback to offline
+    profession: professionLabel, // ✅ now stores Hindi / Telugu / etc
+    professionType: selected ? selected.type : "offline",
   }));
 }, [professions]);
 
@@ -547,14 +552,16 @@ const createEmployeeAccount = async () => {
             <div
     key={p._id}
     onClick={() => {
-      handleProfessionChange(p.name); // keep English internally
-      setProfessionSearch(
-        i18n.language !== "en" && p.translations?.[i18n.language]
-          ? p.translations[i18n.language]
-          : p.name
-      );
-      setShowProfessionsDropdown(false);
-    }}
+  const selectedLabel =
+    i18n.language !== "en" && p.translations?.[i18n.language]
+      ? p.translations[i18n.language]
+      : p.name;
+
+  handleProfessionChange(selectedLabel); // ✅ store selected language
+
+  setProfessionSearch(selectedLabel);
+  setShowProfessionsDropdown(false);
+}}
     className="px-4 py-2 text-white hover:bg-[#1F2937] cursor-pointer"
   >
     {i18n.language !== "en" && p.translations?.[i18n.language]

@@ -7,28 +7,25 @@ import axios from "axios";
 const LanguageSelect = () => {
   const navigate = useNavigate();
 
-  const handleLanguage = async (lang) => {
-  localStorage.setItem("lang", lang); // Save selected language
+  const handleLanguage = (lang) => {
+  // Save language immediately
+  localStorage.setItem("lang", lang);
 
-  try {
-    // Wait for i18next to fully load the language
-    await i18n.changeLanguage(lang);
+  // Fire-and-forget: change language in background
+  i18n.changeLanguage(lang).catch(console.error);
 
-    // Update backend if user is logged in
-    const token = localStorage.getItem("token");
-    if (token) {
-      await axios.put(
-        `${BASE_URL}/api/auth/update-language`,
-        { language: lang },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-    }
-
-    // Navigate only after language is fully loaded
-    navigate("/signup");
-  } catch (err) {
-    console.error("Failed to change language:", err);
+  // Fire-and-forget: update backend
+  const token = localStorage.getItem("token");
+  if (token) {
+    axios.put(
+      `${BASE_URL}/api/auth/update-language`,
+      { language: lang },
+      { headers: { Authorization: `Bearer ${token}` } }
+    ).catch(console.error);
   }
+
+  // Navigate immediately without waiting
+  navigate("/signup");
 };
 
   return (

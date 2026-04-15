@@ -73,7 +73,10 @@ const SignupEmail = () => {
   const { t } = useTranslation();
   const isValidEmail = (email) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    const preferredLanguage = location.state?.preferredLanguage || "en";
+
+
+
+  const preferredLanguage = location.state?.preferredLanguage; // keep undefined if not passed
 
   /* =======================
      STYLES

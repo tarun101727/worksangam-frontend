@@ -9,10 +9,12 @@ const LanguageSelect = () => {
   const navigate = useNavigate();
 
   const handleLanguage = async (lang) => {
-  localStorage.setItem("lang", lang); // 🔑 Must match i18n
-  i18n.changeLanguage(lang);
+  localStorage.setItem("lang", lang);
 
-  // Update backend if user has token
+  // Wait until translation JSON is loaded
+  await i18n.changeLanguage(lang);
+
+  // Update backend
   const token = localStorage.getItem("token");
   if (token) {
     try {

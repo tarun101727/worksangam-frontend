@@ -8,24 +8,25 @@ const LanguageSelect = () => {
   const navigate = useNavigate();
 
   const handleLanguage = async (lang) => {
-  localStorage.setItem("lang", lang); 
+  // Save persistently
+  localStorage.setItem("preferredLanguage", lang);
   i18n.changeLanguage(lang);
 
-  try {
-    // Send selected language to backend if user exists (guest token)
-    const token = localStorage.getItem("token"); // if token exists
-    if (token) {
+  // Optional: update backend if user already has a token
+  const token = localStorage.getItem("token");
+  if (token) {
+    try {
       await axios.put(
         `${BASE_URL}/api/auth/update-language`,
         { language: lang },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+    } catch (err) {
+      console.error("Failed to update language:", err);
     }
-  } catch (err) {
-    console.error("Failed to update language:", err);
   }
 
-  navigate("/signup", { state: { preferredLanguage: lang } }); // optional: pass to signup
+  navigate("/signup"); // Do not rely on location.state
 };
 
   return (

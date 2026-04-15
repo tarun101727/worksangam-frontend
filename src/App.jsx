@@ -647,14 +647,7 @@ element={<ProfilePreviewforhirerEdit/>}
       <Route path="/job/:jobId" element={<JobDetails />} />
       <Route path="/edit-job/:jobId" element={<EditJob />} />
    <Route path="/buy-credits" element={<BuyCredits/>}/>
-        <Route
-  path="*"
-  element={
-    savedLang
-      ? <Navigate to="/signup" replace />
-      : <Navigate to="/select-language" replace />
-  }
-/>
+       <Route path="*" element={<Navigate to="/select-language" replace />} />
       </Routes>
       </div>
     </div>

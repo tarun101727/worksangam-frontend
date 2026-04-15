@@ -92,18 +92,16 @@ const handleTranslate = async (field, text) => {
   try {
     setLoadingTranslate(field);
 
-    console.log("Translating:", text, "→", currentLang); // ✅ debug
-
-    // ✅ SPLIT TEXT (important for skills, bio)
     const words = text.split(",").map((w) => w.trim());
 
     const translatedWords = await Promise.all(
       words.map(async (word) => {
-        const res = await axios.post(`${BASE_URL}/api/auth/translate`, {
-          text: word,
-          target: currentLang,
-        });
-        return res.data.translated;
+        const res = await fetch(
+          `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${currentLang}&dt=t&q=${encodeURIComponent(word)}`
+        );
+
+        const data = await res.json();
+        return data[0].map((item) => item[0]).join("");
       })
     );
 

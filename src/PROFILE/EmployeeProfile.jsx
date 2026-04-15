@@ -6,7 +6,7 @@ import { BASE_URL } from "../config";
 import ProfileRow from "./ProfileRow";
 import { useNavigate } from "react-router-dom";
 import { socket } from "../utils/socket";
-
+import i18n from "../i18n";
 /* ⭐ STAR COMPONENT (memoized & fixed gradient bug) */
 const Star = memo(({ index, value, setRating, setHover }) => {
 
@@ -83,7 +83,7 @@ const EmployeeProfile = ({ user, notification, clear, readOnly }) => {
 
 const [loadingTranslate, setLoadingTranslate] = useState(null);
 
-const currentLang = localStorage.getItem("lang") || "en";
+const currentLang = i18n.language || "en";
 
 
 const handleTranslate = async (field, text) => {

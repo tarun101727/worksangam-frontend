@@ -92,22 +92,17 @@ const handleTranslate = async (field, text) => {
   try {
     setLoadingTranslate(field);
 
-    const words = text.split(",").map((w) => w.trim());
-
-    const translatedWords = await Promise.all(
-      words.map(async (word) => {
-        const res = await fetch(
-          `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${currentLang}&dt=t&q=${encodeURIComponent(word)}`
-        );
-
-        const data = await res.json();
-        return data[0].map((item) => item[0]).join("");
-      })
+    const res = await fetch(
+      `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${currentLang}&dt=t&q=${encodeURIComponent(text)}`
     );
+
+    const data = await res.json();
+
+    const translatedText = data[0].map((item) => item[0]).join("");
 
     setTranslated((prev) => ({
       ...prev,
-      [field]: translatedWords.join(", "),
+      [field]: translatedText,
     }));
 
   } catch (err) {

@@ -8,9 +8,25 @@ const LanguageSelect = () => {
   const navigate = useNavigate();
 
   const handleLanguage = async (lang) => {
-  localStorage.setItem("lang", lang);  // store selected language
-  await i18n.changeLanguage(lang);     // wait for language change
+  localStorage.setItem("lang", lang); // store selected language
 
+  // 1️⃣ Dynamically fetch language if not already loaded
+  if (!i18n.hasResourceBundle(lang, "translation")) {
+    try {
+      const res = await fetch(`${BASE_URL}/api/languages/${lang}`);
+      if (!res.ok) throw new Error("Failed to fetch language");
+      const translations = await res.json();
+      i18n.addResourceBundle(lang, "translation", translations, true, true);
+    } catch (err) {
+      console.error("Failed to load language:", err);
+      return; // stop if fetch fails
+    }
+  }
+
+  // 2️⃣ Switch language
+  await i18n.changeLanguage(lang);
+
+  // 3️⃣ Update backend for logged-in users
   const token = localStorage.getItem("token");
   if (token) {
     try {
@@ -24,7 +40,8 @@ const LanguageSelect = () => {
     }
   }
 
-  navigate("/signup"); // redirect after language is set
+  // 4️⃣ Navigate after language change
+  navigate("/signup");
 };
 
   return (

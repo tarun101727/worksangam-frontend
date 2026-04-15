@@ -1,31 +1,23 @@
 import i18n from "./i18n";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { BASE_URL } from "./config";
-
-
 
 const LanguageSelect = () => {
   const navigate = useNavigate();
 
   const handleLanguage = async (lang) => {
-  try {
-    // change UI
-    await i18n.changeLanguage(lang);
-    localStorage.setItem("lang", lang);
+    try {
+      // ✅ Change UI language
+      await i18n.changeLanguage(lang);
 
-    // 🔥 save to DB (cookie auth)
-    await axios.put(
-      `${BASE_URL}/api/auth/update-language`,
-      { language: lang },
-      { withCredentials: true }
-    );
+      // ✅ Save in localStorage (important)
+      localStorage.setItem("lang", lang);
 
-    navigate("/signup");
-  } catch (err) {
-    console.error("Language update failed", err);
-  }
-};
+      // ✅ Navigate to signup
+      navigate("/signup");
+    } catch (err) {
+      console.error("Language change failed", err);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#020617] via-[#0a0d21] to-[#020617] text-white px-4 py-12">

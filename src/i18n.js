@@ -4,33 +4,38 @@ import { initReactI18next } from "react-i18next";
 import en from "./locales/en.json";
 import { BASE_URL } from "./config";
 
-const fetchLanguage = async (lang) => {
+const loadLanguage = async (lang) => {
   if (lang === "en") return en;
 
   try {
     const res = await fetch(`${BASE_URL}/api/languages/${lang}`);
-    if (!res.ok) return en;
+    if (!res.ok) throw new Error("Failed to fetch language");
     return await res.json();
-  } catch {
+  } catch (err) {
+    console.error("Language fetch failed:", err);
     return en;
   }
 };
 
-const savedLang = localStorage.getItem("lang");
+// Read saved language from localStorage or fallback
+const savedLang = localStorage.getItem("lang") || "en";
 
-(async () => {
+const initI18n = async () => {
+  const translations = await loadLanguage(savedLang);
+
   const resources = {
     en: { translation: en },
-    [savedLang]: { translation: await fetchLanguage(savedLang) },
+    [savedLang]: { translation: translations },
   };
 
   i18n.use(initReactI18next).init({
     resources,
-    lng: savedLang || "en",
+    lng: savedLang,
     fallbackLng: "en",
     interpolation: { escapeValue: false },
     react: { useSuspense: false },
   });
-})();
+};
 
+initI18n(); // initialize
 export default i18n;

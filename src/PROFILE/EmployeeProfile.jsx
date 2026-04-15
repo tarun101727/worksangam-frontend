@@ -6,7 +6,7 @@ import { BASE_URL } from "../config";
 import ProfileRow from "./ProfileRow";
 import { useNavigate } from "react-router-dom";
 import { socket } from "../utils/socket";
-import i18n from "../i18n";
+
 /* ⭐ STAR COMPONENT (memoized & fixed gradient bug) */
 const Star = memo(({ index, value, setRating, setHover }) => {
 
@@ -83,7 +83,7 @@ const EmployeeProfile = ({ user, notification, clear, readOnly }) => {
 
 const [loadingTranslate, setLoadingTranslate] = useState(null);
 
-const currentLang = i18n.language || "en";
+const currentLang = localStorage.getItem("lang") || "en";
 
 
 const handleTranslate = async (field, text) => {
@@ -92,17 +92,24 @@ const handleTranslate = async (field, text) => {
   try {
     setLoadingTranslate(field);
 
-    const res = await axios.post(
-      `${BASE_URL}/api/auth/translate`,
-      {
-        text,
-        target: currentLang,
-      }
+    console.log("Translating:", text, "→", currentLang); // ✅ debug
+
+    // ✅ SPLIT TEXT (important for skills, bio)
+    const words = text.split(",").map((w) => w.trim());
+
+    const translatedWords = await Promise.all(
+      words.map(async (word) => {
+        const res = await axios.post(`${BASE_URL}/api/auth/translate`, {
+          text: word,
+          target: currentLang,
+        });
+        return res.data.translated;
+      })
     );
 
     setTranslated((prev) => ({
       ...prev,
-      [field]: res.data.translated,
+      [field]: translatedWords.join(", "),
     }));
 
   } catch (err) {

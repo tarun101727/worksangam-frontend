@@ -1,3 +1,4 @@
+
 import { BASE_URL } from "./config";
 import i18n from "./i18n";
 import { useNavigate } from "react-router-dom";
@@ -8,13 +9,11 @@ const LanguageSelect = () => {
   const navigate = useNavigate();
 
   const handleLanguage = async (lang) => {
-  // Save in localStorage under the key "lang"
-  localStorage.setItem("lang", lang);
-  
-  // Update i18n
+  // Save persistently
+  localStorage.setItem("preferredLanguage", lang);
   i18n.changeLanguage(lang);
 
-  // Optional: update backend if user has token
+  // Optional: update backend if user already has a token
   const token = localStorage.getItem("token");
   if (token) {
     try {
@@ -28,8 +27,7 @@ const LanguageSelect = () => {
     }
   }
 
-  // Navigate to signup
-  navigate("/signup");
+  navigate("/signup"); // Do not rely on location.state
 };
 
   return (

@@ -5,5 +5,8 @@ import { BASE_URL } from "../config"; // make sure config.js exports BASE_URL
 
 export const socket = io(BASE_URL, {
   withCredentials: true,
-  auth: { userId: Cookies.get("userId") },
+  transports: ["websocket"], // 🔥 IMPORTANT FIX
+  auth: {
+    userId: Cookies.get("userId"),
+  },
 });

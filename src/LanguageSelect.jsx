@@ -1,15 +1,32 @@
-
+import { BASE_URL } from "./config";
 import i18n from "./i18n";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
 
 const LanguageSelect = () => {
   const navigate = useNavigate();
 
-  const handleLanguage = (lang) => {
-    i18n.changeLanguage(lang);
-    localStorage.setItem("lang", lang);
-    navigate("/signup");
-  };
+  const handleLanguage = async (lang) => {
+  localStorage.setItem("lang", lang); 
+  i18n.changeLanguage(lang);
+
+  try {
+    // Send selected language to backend if user exists (guest token)
+    const token = localStorage.getItem("token"); // if token exists
+    if (token) {
+      await axios.put(
+        `${BASE_URL}/api/auth/update-language`,
+        { language: lang },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    }
+  } catch (err) {
+    console.error("Failed to update language:", err);
+  }
+
+  navigate("/signup", { state: { preferredLanguage: lang } }); // optional: pass to signup
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#020617] via-[#0a0d21] to-[#020617] text-white px-4 py-12">

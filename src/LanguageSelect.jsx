@@ -8,10 +8,9 @@ const LanguageSelect = () => {
   const navigate = useNavigate();
 
   const handleLanguage = async (lang) => {
-  localStorage.setItem("lang", lang); // 🔑 Must match i18n
-  i18n.changeLanguage(lang);
+  localStorage.setItem("lang", lang);  // store selected language
+  await i18n.changeLanguage(lang);     // wait for language change
 
-  // Update backend if user has token
   const token = localStorage.getItem("token");
   if (token) {
     try {
@@ -25,7 +24,7 @@ const LanguageSelect = () => {
     }
   }
 
-  navigate("/signup");
+  navigate("/signup"); // redirect after language is set
 };
 
   return (

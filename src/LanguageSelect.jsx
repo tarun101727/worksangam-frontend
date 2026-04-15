@@ -1,13 +1,15 @@
+
 import i18n from "./i18n";
 import { useNavigate } from "react-router-dom";
 
 const LanguageSelect = () => {
   const navigate = useNavigate();
 
- const handleLanguage = (lang) => { 
-  i18n.changeLanguage(lang); 
-  localStorage.setItem("lang", lang); 
-  navigate("/signup"); };
+  const handleLanguage = (lang) => {
+    i18n.changeLanguage(lang);
+    localStorage.setItem("lang", lang);
+    navigate("/signup");
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#020617] via-[#0a0d21] to-[#020617] text-white px-4 py-12">

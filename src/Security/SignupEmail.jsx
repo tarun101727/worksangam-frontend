@@ -73,6 +73,7 @@ const SignupEmail = () => {
   const { t } = useTranslation();
   const isValidEmail = (email) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const preferredLanguage = location.state?.preferredLanguage || "en";
 
   /* =======================
      STYLES
@@ -141,6 +142,7 @@ const SignupEmail = () => {
         password: form.password,
         otp: form.otp,
         role,
+        preferredLanguage,
       });
 
       navigate(role === "hirer" ? "/signup/hirer" : "/signup/employee", {

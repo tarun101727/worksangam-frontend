@@ -8,11 +8,13 @@ const LanguageSelect = () => {
   const navigate = useNavigate();
 
   const handleLanguage = async (lang) => {
-  // Save persistently
-  localStorage.setItem("preferredLanguage", lang);
+  // Save in localStorage under the key "lang"
+  localStorage.setItem("lang", lang);
+  
+  // Update i18n
   i18n.changeLanguage(lang);
 
-  // Optional: update backend if user already has a token
+  // Optional: update backend if user has token
   const token = localStorage.getItem("token");
   if (token) {
     try {
@@ -26,7 +28,8 @@ const LanguageSelect = () => {
     }
   }
 
-  navigate("/signup"); // Do not rely on location.state
+  // Navigate to signup
+  navigate("/signup");
 };
 
   return (

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { BASE_URL } from "./config";
+import axios from "axios";
 
 const languages = [
   { code: "en", label: "English" },
@@ -56,6 +57,15 @@ export default function HeaderLanguageSelect() {
 
       // Save to localStorage
       localStorage.setItem("lang", code);
+
+      // ✅ ADD THIS
+await axios.put(
+  `${BASE_URL}/api/auth/update-language`,
+  { language: code },
+  { withCredentials: true }
+);
+
+
     } catch (err) {
       console.error("Failed to change language:", err);
     } finally {

@@ -76,7 +76,8 @@ const SignupEmail = () => {
 
 
 
-  const preferredLanguage = location.state?.preferredLanguage; // keep undefined if not passed
+  const preferredLanguage =
+  location.state?.preferredLanguage || localStorage.getItem("preferredLanguage") || "en";
 
   /* =======================
      STYLES

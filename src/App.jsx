@@ -91,7 +91,6 @@ const [notifications, setNotifications] = useState([]); // job notifications
 const [chatNotifications, setChatNotifications] = useState([]); // chat notifications
   const { t } = useTranslation();
 
-  const savedLang = localStorage.getItem("lang");
 
 // Combined unread count for the bell
 const unreadCount =
@@ -519,14 +518,7 @@ d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03
       {/* ROUTES */}
 <div>
       <Routes>
-       <Route
-  path="/select-language"
-  element={
-    savedLang
-      ? <Navigate to="/signup" replace />
-      : <LanguageSelect />
-  }
-/>
+        <Route path="/select-language" element={<LanguageSelect />} />
 
         <Route
           path="/signup"
@@ -647,7 +639,7 @@ element={<ProfilePreviewforhirerEdit/>}
       <Route path="/job/:jobId" element={<JobDetails />} />
       <Route path="/edit-job/:jobId" element={<EditJob />} />
    <Route path="/buy-credits" element={<BuyCredits/>}/>
-       <Route path="*" element={<Navigate to="/select-language" replace />} />
+        <Route path="*" element={<Navigate to="/select-language" replace />} />
       </Routes>
       </div>
     </div>

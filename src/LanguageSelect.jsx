@@ -1,4 +1,3 @@
-
 import { BASE_URL } from "./config";
 import i18n from "./i18n";
 import { useNavigate } from "react-router-dom";
@@ -9,12 +8,10 @@ const LanguageSelect = () => {
   const navigate = useNavigate();
 
   const handleLanguage = async (lang) => {
-  localStorage.setItem("lang", lang);
+  localStorage.setItem("lang", lang); // 🔑 Must match i18n
+  i18n.changeLanguage(lang);
 
-  // Wait until translation JSON is loaded
-  await i18n.changeLanguage(lang);
-
-  // Update backend
+  // Update backend if user has token
   const token = localStorage.getItem("token");
   if (token) {
     try {

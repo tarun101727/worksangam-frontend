@@ -74,7 +74,43 @@ const EmployeeProfile = ({ user, notification, clear, readOnly }) => {
 
   const [avgRating, setAvgRating] = useState(0);
   const [myRating, setMyRating] = useState(0);
-    const { t } = useTranslation();
+  const { t } = useTranslation();
+  const [translated, setTranslated] = useState({
+  profession: null,
+  skills: null,
+  bio: null,
+});
+
+const [loadingTranslate, setLoadingTranslate] = useState(null);
+
+const currentLang = localStorage.getItem("lang") || "en";
+
+
+const handleTranslate = async (field, text) => {
+  if (!text) return;
+
+  try {
+    setLoadingTranslate(field);
+
+    const res = await axios.post(
+      `${BASE_URL}/api/auth/translate`,
+      {
+        text,
+        target: currentLang,
+      }
+    );
+
+    setTranslated((prev) => ({
+      ...prev,
+      [field]: res.data.translated,
+    }));
+
+  } catch (err) {
+    console.error("Translation failed", err);
+  } finally {
+    setLoadingTranslate(null);
+  }
+};
   
 
   /* Join socket room */
@@ -308,13 +344,60 @@ const EmployeeProfile = ({ user, notification, clear, readOnly }) => {
           {(avgRating ?? 0).toFixed(1)} / 5
         </span>
       </div>
-
       {/* PROFILE INFO */}
       <div className="space-y-4 text-white mt-6">
         <ProfileRow label={t("Age")} value={user?.age ?? "—"} />
         <ProfileRow label={t("Gender")} value={user?.gender ?? "—"} />
-        <ProfileRow label={t("Profession")} value={user?.profession ?? "—"} />
-        <ProfileRow label={t("Skills")} value={user?.skills ?? "—"} />
+
+        <div>
+  <ProfileRow
+    label={t("Profession")}
+    value={translated.profession || user?.profession || "—"}
+  />
+
+  {readOnly && user?.profession && (
+    <button
+      onClick={() => handleTranslate("profession", user.profession)}
+      className="text-sm text-indigo-400"
+    >
+      {loadingTranslate === "profession" ? "..." : t("Translate")}
+    </button>
+  )}
+</div>
+
+<div>
+  <ProfileRow
+    label={t("Skills")}
+    value={translated.skills || user?.skills || "—"}
+  />
+
+  {readOnly && user?.skills && (
+    <button
+      onClick={() => handleTranslate("skills", user.skills)}
+      className="text-sm text-indigo-400"
+    >
+      {loadingTranslate === "skills" ? "..." : t("Translate")}
+    </button>
+  )}
+</div>
+
+<div>
+  <ProfileRow
+    label={t("Description")}
+    value={translated.bio || user?.bio || "—"}
+  />
+
+  {readOnly && user?.bio && (
+    <button
+      onClick={() => handleTranslate("bio", user.bio)}
+      className="text-sm text-indigo-400"
+    >
+      {loadingTranslate === "bio" ? "..." : t("Translate")}
+    </button>
+  )}
+</div>
+
+
         <ProfileRow
           label={t("Experience")}
           value={user?.experience ? `${user.experience} years` : "—"}

@@ -7,40 +7,24 @@ import axios from "axios";
 const LanguageSelect = () => {
   const navigate = useNavigate();
 
-  const handleLanguage = async (lang) => {
-  localStorage.setItem("lang", lang); // store selected language
+  const handleLanguage = (lang) => {
+  // 1️⃣ Save selected language locally
+  localStorage.setItem("lang", lang);
 
-  // 1️⃣ Dynamically fetch language if not already loaded
-  if (!i18n.hasResourceBundle(lang, "translation")) {
-    try {
-      const res = await fetch(`${BASE_URL}/api/languages/${lang}`);
-      if (!res.ok) throw new Error("Failed to fetch language");
-      const translations = await res.json();
-      i18n.addResourceBundle(lang, "translation", translations, true, true);
-    } catch (err) {
-      console.error("Failed to load language:", err);
-      return; // stop if fetch fails
-    }
-  }
+  // 2️⃣ Change language (already loaded, instant)
+  i18n.changeLanguage(lang);
 
-  // 2️⃣ Switch language
-  await i18n.changeLanguage(lang);
-
-  // 3️⃣ Update backend for logged-in users
+  // 3️⃣ Update backend asynchronously (does not block UI)
   const token = localStorage.getItem("token");
   if (token) {
-    try {
-      await axios.put(
-        `${BASE_URL}/api/auth/update-language`,
-        { language: lang },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-    } catch (err) {
-      console.error("Failed to update language:", err);
-    }
+    axios.put(
+      `${BASE_URL}/api/auth/update-language`,
+      { language: lang },
+      { headers: { Authorization: `Bearer ${token}` } }
+    ).catch(err => console.error("Failed to update language:", err));
   }
 
-  // 4️⃣ Navigate after language change
+  // 4️⃣ Navigate immediately
   navigate("/signup");
 };
 

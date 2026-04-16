@@ -4,38 +4,39 @@ import { initReactI18next } from "react-i18next";
 import en from "./locales/en.json";
 import { BASE_URL } from "./config";
 
-const loadLanguage = async (lang) => {
-  if (lang === "en") return en;
+// List all your language codes
+const languages = [
+  "en","te","hi","as","bn","brx","doi","gu","kn","ks","kok",
+  "mai","ml","mni","mr","ne","or","pa","sa","sat","sd","ta","ur"
+];
 
-  try {
-    const res = await fetch(`${BASE_URL}/api/languages/${lang}`);
-    if (!res.ok) throw new Error("Failed to fetch language");
-    return await res.json();
-  } catch (err) {
-    console.error("Language fetch failed:", err);
-    return en;
-  }
-};
+// Preload all languages
+const loadAllLanguages = async () => {
+  const resources = { en: { translation: en } };
 
-// Read saved language from localStorage or fallback
-const savedLang = localStorage.getItem("lang") || "en";
+  await Promise.all(
+    languages.map(async (lang) => {
+      if (lang === "en") return; // English is already imported
+      try {
+        const res = await fetch(`${BASE_URL}/api/languages/${lang}`);
+        if (!res.ok) throw new Error("Failed to fetch language");
+        const data = await res.json();
+        resources[lang] = { translation: data };
+      } catch (err) {
+        console.error(`Failed to load ${lang}:`, err);
+      }
+    })
+  );
 
-const initI18n = async () => {
-  const translations = await loadLanguage(savedLang);
-
-  const resources = {
-    en: { translation: en },
-    [savedLang]: { translation: translations },
-  };
-
+  // Initialize i18n
   i18n.use(initReactI18next).init({
     resources,
-    lng: savedLang,
+    lng: localStorage.getItem("lang") || "en",
     fallbackLng: "en",
     interpolation: { escapeValue: false },
     react: { useSuspense: false },
   });
 };
 
-initI18n(); // initialize
+loadAllLanguages(); // load all at startup
 export default i18n;

@@ -120,7 +120,7 @@ const Profile = () => {
                  hover:bg-green-600 
                  transition-all"
       >
-        {t("chat_with_user", { name: profileUser.firstName })}
+        {t("chat_with_user")}, { profileUser.firstName }
       </button>
   )}
 

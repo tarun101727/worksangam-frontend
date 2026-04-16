@@ -106,7 +106,10 @@ const CommentItem = React.memo(function CommentItem({
   const hasReplies = comment.replies.length > 0;
 
   const userId = loggedInUserId;
-  const isOwner = String(comment.user?._id) === String(userId);
+  const isOwner =
+  comment?.user?._id &&
+  userId &&
+  String(comment.user._id) === String(userId);
   const isProfileOwner = comment.user?._id === profileId;
   const visibleCount = visibleReplies[comment._id] || 5;
 

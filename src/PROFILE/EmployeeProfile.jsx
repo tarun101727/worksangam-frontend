@@ -6,6 +6,9 @@ import { BASE_URL } from "../config";
 import ProfileRow from "./ProfileRow";
 import { useNavigate } from "react-router-dom";
 import { socket } from "../utils/socket";
+import { useAuth } from "../useAuth";
+
+
 
 /* ⭐ STAR COMPONENT (memoized & fixed gradient bug) */
 const Star = memo(({ index, value, setRating, setHover }) => {
@@ -84,6 +87,7 @@ const EmployeeProfile = ({ user, notification, clear, readOnly }) => {
 const [loadingTranslate, setLoadingTranslate] = useState(null);
 
 const currentLang = localStorage.getItem("lang") || "en";
+const { user: loggedUser } = useAuth();
 
 
 const handleTranslate = async (field, text) => {
@@ -450,7 +454,10 @@ const handleTranslate = async (field, text) => {
       )}
      {/* COMMENTS */}
 <div className="mt-12">
-  <ProfileComments profileId={user?._id} loggedInUserId={user?._id} />
+  <ProfileComments 
+  profileId={user?._id} 
+  loggedInUserId={loggedUser?._id} 
+/>
 </div>
      
     </>

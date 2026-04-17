@@ -23,7 +23,7 @@ const CreditPlans = () => {
 
       // 🔥 OPEN CASHFREE CHECKOUT
       const cashfree = window.Cashfree({
-        mode: "production", // change to "sandbox" for testing
+        mode: "sandbox", // change to "sandbox" for testing
       });
 
       cashfree.checkout({

@@ -68,7 +68,7 @@ import EditJob from "./JobPost/EditJob";
 import LanguageSelect from "./LanguageSelect";
 import { useTranslation } from "react-i18next";
 import HeaderLanguageSelect from "./HeaderLanguageSelect";
-import PaymentSuccess from "./PaymentSuccess";
+import CreditPlans from "./CreditPlans";
 
 
 
@@ -640,7 +640,7 @@ element={<ProfilePreviewforhirerEdit/>}
       <Route path="/job/:jobId" element={<JobDetails />} />
       <Route path="/edit-job/:jobId" element={<EditJob />} />
    <Route path="/buy-credits" element={<BuyCredits/>}/>
-  <Route path="/payment-success" element={<PaymentSuccess />} />
+  <Route path="/payment-success" element={<CreditPlans />} />
         <Route path="*" element={<Navigate to="/select-language" replace />} />
       </Routes>
       </div>

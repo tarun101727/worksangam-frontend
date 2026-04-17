@@ -205,7 +205,10 @@ export default function Home() {
       fetchProfessions();
     }
 
-    if (selectedTab === "online-jobs") fetchJobsByType("online");
+    if (selectedTab === "online-jobs") {
+  fetchJobsByType("online");
+  fetchProfessions(); // ✅ ADD THIS LINE
+}
     if (selectedTab === "offline-jobs") fetchJobsByType("offline");
     if (selectedTab === "my-job-posts" && user.role === "hirer") fetchMyHirerJobs();
   }, [user, selectedTab]);
@@ -384,12 +387,13 @@ export default function Home() {
       {selectedTab === "online-jobs" && (
         <div className="max-w-3xl mx-auto mb-4 relative">
           <input
-            type="text"
-            placeholder="Search online jobs by profession..."
-            value={search}
-            onChange={(e) => handleSearch(e.target.value)}
-            className="w-full p-3 rounded-xl bg-[#0F172A] border border-white/10"
-          />
+  type="text"
+  placeholder="Search online jobs by profession..."
+  value={search}
+  onChange={(e) => handleSearch(e.target.value)}
+  onFocus={() => setFilteredProfessions(professions)} // ✅ ADD THIS
+  className="w-full p-3 rounded-xl bg-[#0F172A] border border-white/10"
+/>
 
           {filteredProfessions.length > 0 && (
             <div className="absolute w-full bg-[#0F172A] border border-white/10 rounded-xl mt-1 max-h-60 overflow-y-auto z-50">

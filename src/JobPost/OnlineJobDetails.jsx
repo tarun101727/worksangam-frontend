@@ -2,6 +2,10 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BASE_URL } from "../config";
+import { useContext } from "react";
+import { AuthContext } from "../AuthContext";
+
+
 
 const getImageUrl = (img) => {
   if (!img) return "";
@@ -12,9 +16,12 @@ const getImageUrl = (img) => {
 export default function OnlineJobDetails() {
   const { jobId } = useParams();
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
   const [job, setJob] = useState(null);
   const [error, setError] = useState("");
   const [applying, setApplying] = useState(false);
+
+  const isOwner = user?._id === job.hirer?._id;
 
   useEffect(() => {
     if (!jobId) return;
@@ -111,13 +118,15 @@ export default function OnlineJobDetails() {
           Chat with {job.hirer.firstName}
         </button>
 
-        <button
-          onClick={applyJob}
-          disabled={applying}
-          className="px-5 py-2 rounded-xl bg-indigo-500 disabled:opacity-50"
-        >
-          {applying ? "Applied" : "Apply"}
-        </button>
+        {!isOwner && (
+  <button
+    onClick={applyJob}
+    disabled={applying}
+    className="px-5 py-2 rounded-xl bg-indigo-500 disabled:opacity-50"
+  >
+    {applying ? "Applied" : "Apply"}
+  </button>
+)}
       </div>
     </div>
   );

@@ -14,10 +14,10 @@ const CreditPlans = () => {
   const handleBuy = async (amount) => {
     try {
       const res = await axios.post(
-        `${BASE_URL}/api/payment/create-order`,
-        { amount },
-        { withCredentials: true }
-      );
+  `${BASE_URL}/api/payment/create-order`, // ✅ FIXED
+  { amount },
+  { withCredentials: true }
+);
 
       const sessionId = res.data.payment_session_id;
 

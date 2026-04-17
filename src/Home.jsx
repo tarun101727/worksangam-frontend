@@ -172,23 +172,26 @@ export default function Home() {
 
   // ======================= FETCH PROFESSIONS =======================
   const fetchProfessions = async () => {
-    try {
-      if (selectedTab === "online") {
-        const res = await axios.get(`${BASE_URL}/api/online-professions`, {
-          withCredentials: true,
-        });
-        setProfessions(res.data.professions || []);
-      }
-      if (selectedTab === "offline") {
-        const res = await axios.get(`${BASE_URL}/api/offline-professions`, {
-          withCredentials: true,
-        });
-        setProfessions(res.data.professions || []);
-      }
-    } catch (err) {
-      console.error(err);
+  try {
+    // ✅ ONLINE + ONLINE-JOBS
+    if (selectedTab === "online" || selectedTab === "online-jobs") {
+      const res = await axios.get(`${BASE_URL}/api/online-professions`, {
+        withCredentials: true,
+      });
+      setProfessions(res.data.professions || []);
     }
-  };
+
+    // ✅ OFFLINE + OFFLINE-JOBS
+    if (selectedTab === "offline" || selectedTab === "offline-jobs") {
+      const res = await axios.get(`${BASE_URL}/api/offline-professions`, {
+        withCredentials: true,
+      });
+      setProfessions(res.data.professions || []);
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   // ======================= TAB CHANGE EFFECT =======================
   useEffect(() => {

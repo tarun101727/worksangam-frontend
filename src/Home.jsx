@@ -385,7 +385,7 @@ export default function Home() {
 
       {/* ======================= ONLINE JOBS SEARCH ======================= */}
       {selectedTab === "online-jobs" && (
-        <div className="max-w-3xl mx-auto mb-4 relative">
+       <div ref={searchRef} className="max-w-3xl mx-auto mb-4 relative">
           <input
   type="text"
   placeholder="Search online jobs by profession..."

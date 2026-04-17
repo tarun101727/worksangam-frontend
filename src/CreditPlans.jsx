@@ -1,5 +1,7 @@
 // CreditPlans.jsx
 import axios from "axios";
+import { BASE_URL } from "../config";
+
 
 const plans = [
   { amount: 99, credits: 50 },
@@ -12,7 +14,7 @@ const CreditPlans = () => {
   const handleBuy = async (amount) => {
     try {
       const res = await axios.post(
-        "/api/payments/create-order",
+        `${BASE_URL}/api/payments/create-order`,
         { amount },
         { withCredentials: true }
       );

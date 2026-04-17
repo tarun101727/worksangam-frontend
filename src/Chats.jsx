@@ -3,6 +3,9 @@ import axios from "axios";
 import { BASE_URL } from "./config";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
+import { useTranslation } from "react-i18next";
+
+
 
 const getImageUrl = (img) => {
   if (!img) return null;
@@ -20,6 +23,7 @@ export default function Chats() {
 
   const { user } = useContext(AuthContext);
   const userId = user?._id;
+  const { t } = useTranslation();
 
   useEffect(() => {
     axios
@@ -32,11 +36,11 @@ export default function Chats() {
 
   return (
     <div className="max-w-xl mx-auto p-6">
-      <h2 className="text-xl mb-4">Messages</h2>
+      <h2 className="text-xl mb-4">{t("Messages")}</h2>
 
       {chats.length === 0 && (
         <div className="text-center text-gray-400 py-10">
-          No conversations yet.
+          {t("No conversations yet")}
         </div>
       )}
 

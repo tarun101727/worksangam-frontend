@@ -28,7 +28,7 @@ return(
 
 <div className="space-y-4">
 <button
-onClick={()=>navigate("/buy-credits")}
+onClick={()=>navigate("/payment-success")}
 className="w-full text-left p-4 bg-green-900/30 rounded-xl border border-green-500/20"
 >
 {t("Buy Credits")} 💳

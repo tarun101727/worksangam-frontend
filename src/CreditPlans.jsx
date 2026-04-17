@@ -14,7 +14,7 @@ const CreditPlans = () => {
   const handleBuy = async (amount) => {
     try {
       const res = await axios.post(
-        `${BASE_URL}/api/payments/create-order`,
+        `${BASE_URL}/api/payment/create-order`,
         { amount },
         { withCredentials: true }
       );

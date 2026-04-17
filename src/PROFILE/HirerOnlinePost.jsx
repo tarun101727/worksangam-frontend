@@ -138,7 +138,7 @@ const submit = async () => {
       { withCredentials: true }
     );
 
-    navigate(`/job/${res.data.job._id}`);
+    navigate(`/onlinejob/${res.data.job._id}`);
   } catch {
     setError("Failed to create job post");
   } finally {

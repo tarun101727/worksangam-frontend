@@ -40,6 +40,9 @@ export default function Home() {
   const [cachedProfessions, setCachedProfessions] = useState({});
   const jobSearchRef = useRef(null);
    const searchTimeoutRef = useRef(null);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+
+
 
   useEffect(() => {
   return () => {
@@ -59,6 +62,7 @@ export default function Home() {
   (!jobSearchRef.current || !jobSearchRef.current.contains(event.target))
 ) {
   setFilteredProfessions([]);
+  setIsSearchFocused(false);
 }
   };
 
@@ -418,6 +422,8 @@ const filtered = professions.filter((p) =>
   value={search}
   onChange={(e) => handleSearch(e.target.value)}
   onFocus={() => {
+  setIsSearchFocused(true); // ✅ track focus
+
   if (!profLoading) {
     setFilteredProfessions(professions || []);
   }
@@ -430,7 +436,7 @@ const filtered = professions.filter((p) =>
     Loading professions...
   </div>
 )}
-          {!profLoading && filteredProfessions.length > 0 && (
+          {isSearchFocused && !profLoading && filteredProfessions.length > 0 && (
             <div className="absolute w-full bg-[#0F172A] border border-white/10 rounded-xl mt-1 max-h-60 overflow-y-auto z-50">
               {filteredProfessions.map((p) => (
                 <div
@@ -505,6 +511,8 @@ const filtered = professions.filter((p) =>
   value={search}
   onChange={(e) => handleSearch(e.target.value)}
  onFocus={() => {
+  setIsSearchFocused(true); // ✅ track focus
+
   if (!profLoading) {
     setFilteredProfessions(professions || []);
   }
@@ -518,7 +526,7 @@ const filtered = professions.filter((p) =>
   </div>
 )}
 
-          {!profLoading && filteredProfessions.length > 0 && (
+          {isSearchFocused && !profLoading && filteredProfessions.length > 0 && (
             <div className="absolute w-full bg-[#0F172A] border border-white/10 rounded-xl mt-1 max-h-60 overflow-y-auto z-50">
               {filteredProfessions.map((p) => (
                 <div

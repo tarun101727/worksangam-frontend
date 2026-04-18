@@ -10,19 +10,18 @@ const languages = [
 
 const savedLang = localStorage.getItem("lang") || "en";
 
-// Initialize i18n
+// ✅ Initialize i18next with English fully loaded
 i18n.use(initReactI18next).init({
-  resources: { en: { translation: en } },
+  resources: { en: { translation: en } }, // English fully registered here
   lng: savedLang,
   fallbackLng: "en",
   interpolation: { escapeValue: false },
   react: { useSuspense: false },
 });
 
-// Load other languages dynamically
+// ✅ Dynamically load other languages
 languages.forEach(async (lang) => {
-  if (lang === "en") return;
-
+  if (lang === "en") return; // skip English
   try {
     const res = await fetch(`${BASE_URL}/api/languages/${lang}`);
     if (!res.ok) throw new Error("Failed to fetch language");
@@ -32,8 +31,5 @@ languages.forEach(async (lang) => {
     console.error(`Failed to load ${lang}:`, err);
   }
 });
-
-// Ensure English bundle is also registered explicitly
-i18n.addResourceBundle("en", "translation", en, true, true);
 
 export default i18n;

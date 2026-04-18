@@ -58,12 +58,17 @@ export default function HeaderLanguageSelect() {
       // Save to localStorage
       localStorage.setItem("lang", code);
 
-      // ✅ ADD THIS
-await axios.put(
-  `${BASE_URL}/api/auth/update-language`,
-  { language: code },
-  { withCredentials: true }
-);
+      try {
+  await axios.put(
+    `${BASE_URL}/api/auth/update-language`,
+    { language: code },
+    { withCredentials: true }
+  );
+} catch (err) {
+  console.error("Failed to update language on backend:", err);
+  // fallback: just save locally
+  localStorage.setItem("lang", code);
+}
 
 
     } catch (err) {

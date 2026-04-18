@@ -31,7 +31,7 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [professions, setProfessions] = useState([]);
   const [filteredProfessions, setFilteredProfessions] = useState([]);
-
+  const [profLoading, setProfLoading] = useState(false);
   const locationWatchIdRef = useRef(null);
   const lastCoordsRef = useRef(null);
   const { t } = useTranslation();
@@ -170,51 +170,56 @@ export default function Home() {
     }
   };
 
-  // ======================= FETCH PROFESSIONS =======================
   const fetchProfessions = async () => {
   try {
-    // ✅ ONLINE + ONLINE-JOBS
+    setProfLoading(true); // ✅ start loading
+
+    let url = "";
+
     if (selectedTab === "online" || selectedTab === "online-jobs") {
-      const res = await axios.get(`${BASE_URL}/api/online-professions`, {
-        withCredentials: true,
-      });
-      setProfessions(res.data.professions || []);
+      url = `${BASE_URL}/api/online-professions`;
+    } else {
+      url = `${BASE_URL}/api/offline-professions`;
     }
 
-    // ✅ OFFLINE + OFFLINE-JOBS
-    if (selectedTab === "offline" || selectedTab === "offline-jobs") {
-      const res = await axios.get(`${BASE_URL}/api/offline-professions`, {
-        withCredentials: true,
-      });
-      setProfessions(res.data.professions || []);
-    }
+    const res = await axios.get(url, { withCredentials: true });
+    setProfessions(res.data.professions || []);
   } catch (err) {
     console.error(err);
+  } finally {
+    setProfLoading(false); // ✅ stop loading
   }
 };
 
-  // ======================= TAB CHANGE EFFECT =======================
   useEffect(() => {
-    if (!user) return;
+  if (!user) return;
 
-    setSearch("");
-    setFilteredProfessions([]);
-    setEmployees([]);
-    setJobs([]);
+  setSearch("");
+  setFilteredProfessions([]);
+  setEmployees([]);
+  setJobs([]);
+  setProfessions([]); // ✅ FIX: clear old professions immediately
 
-    if (selectedTab === "online" || selectedTab === "offline") {
-      const professionType = selectedTab;
-      fetchEmployees(selectedTab, professionType);
-      fetchProfessions();
-    }
+  if (selectedTab === "online" || selectedTab === "offline") {
+    const professionType = selectedTab;
+    fetchEmployees(selectedTab, professionType);
+    fetchProfessions();
+  }
 
-    if (selectedTab === "online-jobs") {
-  fetchJobsByType("online");
-  fetchProfessions(); // ✅ ADD THIS LINE
-}
-    if (selectedTab === "offline-jobs") fetchJobsByType("offline");
-    if (selectedTab === "my-job-posts" && user.role === "hirer") fetchMyHirerJobs();
-  }, [user, selectedTab]);
+  if (selectedTab === "online-jobs") {
+    fetchJobsByType("online");
+    fetchProfessions();
+  }
+
+  if (selectedTab === "offline-jobs") {
+    fetchJobsByType("offline");
+    fetchProfessions(); // ✅ FIX: you missed this
+  }
+
+  if (selectedTab === "my-job-posts" && user.role === "hirer") {
+    fetchMyHirerJobs();
+  }
+}, [user, selectedTab]);
 
   const handleSearch = (value) => {
   setSearch(value);
@@ -317,20 +322,28 @@ export default function Home() {
   }
   value={search}
   onChange={(e) => handleSearch(e.target.value)}
-  onFocus={() => setFilteredProfessions(professions)} // <- NEW
+  onFocus={() => {
+  if (!profLoading) {
+    setFilteredProfessions(professions);
+  }
+}}
   className="w-full p-3 rounded-xl bg-[#0F172A] border border-white/10"
 />
           {filteredProfessions.length > 0 && (
             <div className="absolute w-full bg-[#0F172A] border border-white/10 rounded-xl mt-1 max-h-60 overflow-y-auto z-50">
-              {filteredProfessions.map((p) => (
-                <div
-                  key={p._id}
-                  onClick={() => selectProfession(p.name)}
-                  className="p-3 hover:bg-[#1F2937] cursor-pointer"
-                >
-                  {p.name}
-                </div>
-              ))}
+              {profLoading ? (
+  <div className="p-3 text-white/50">Loading...</div>
+) : (
+  filteredProfessions.map((p) => (
+    <div
+      key={p._id}
+      onClick={() => selectProfession(p.name)}
+      className="p-3 hover:bg-[#1F2937] cursor-pointer"
+    >
+      {p.name}
+    </div>
+  ))
+)}
             </div>
           )}
         </div>

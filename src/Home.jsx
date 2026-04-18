@@ -431,7 +431,7 @@ const filtered = professions.filter((p) =>
   className="w-full p-3 rounded-xl bg-[#0F172A] border border-white/10"
 />
 
- {profLoading && (
+{isSearchFocused && profLoading && (
   <div className="absolute w-full bg-[#0F172A] border border-white/10 rounded-xl mt-1 p-3 text-white/60">
     Loading professions...
   </div>
@@ -520,7 +520,7 @@ const filtered = professions.filter((p) =>
   className="w-full p-3 rounded-xl bg-[#0F172A] border border-white/10"
 />
      
-     {profLoading && (
+    {isSearchFocused && profLoading && (
   <div className="absolute w-full bg-[#0F172A] border border-white/10 rounded-xl mt-1 p-3 text-white/60">
     Loading professions...
   </div>

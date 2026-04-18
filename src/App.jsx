@@ -519,7 +519,11 @@ d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03
       {/* ROUTES */}
 <div>
       <Routes>
-        <Route path="/select-language" element={<LanguageSelect />} />
+        <Route path="/select-language" element={
+            isAuthenticated && user?.isGuest === false && !isSwitchMode
+              ? <Navigate to="/home" replace />
+              : <LanguageSelect />
+          }/>
 
         <Route
           path="/signup"

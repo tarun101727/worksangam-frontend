@@ -210,7 +210,7 @@ export default function Home() {
 
       setProfessions(res?.data?.professions || []);
       setProfLoading(false);
-    }, 300);
+    }, 100);
 
   } catch (err) {
     console.error(err);

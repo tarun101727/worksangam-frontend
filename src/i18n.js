@@ -1,6 +1,6 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import en from "./locales/en.json";
+import en from "./locales/en.json"; // keep this
 import { BASE_URL } from "./config";
 
 const languages = [
@@ -10,21 +10,18 @@ const languages = [
 
 const savedLang = localStorage.getItem("lang") || "en";
 
-// ✅ Step 1: Fully register English resources
-const resources = { en: { translation: en } };
-
-// ✅ Step 2: Initialize i18n
+// Step 1: Fully register English resources first
 i18n.use(initReactI18next).init({
-  resources,
+  resources: { en: { translation: en } }, // ✅ register English immediately
   lng: savedLang,
   fallbackLng: "en",
   interpolation: { escapeValue: false },
   react: { useSuspense: false },
 });
 
-// ✅ Step 3: Load other languages dynamically (skip English)
+// Step 2: Dynamically load all other languages asynchronously
 languages.forEach(async (lang) => {
-  if (lang === "en") return;
+  if (lang === "en") return; // skip English
   try {
     const res = await fetch(`${BASE_URL}/api/languages/${lang}`);
     if (!res.ok) throw new Error("Failed to fetch language");
@@ -34,5 +31,3 @@ languages.forEach(async (lang) => {
     console.error(`Failed to load ${lang}:`, err);
   }
 });
-
-export default i18n;

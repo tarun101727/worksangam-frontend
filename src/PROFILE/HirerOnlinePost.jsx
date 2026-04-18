@@ -49,6 +49,8 @@ const [allLanguages, setAllLanguages] = useState([]);
     const { t } = useTranslation();
 const translateTimer = useRef(null);
 const latestTypedValue = useRef({});
+const languageContainerRef = useRef(null);
+
 
 const urgentPriceOptions = [
   { label: t("Fixed Price"), value: "fixed" },
@@ -61,6 +63,17 @@ const urgentPriceOptions = [
   const selectedCurrency = currencies.find(
     (c) => c.code === form.currency
   );
+
+  useEffect(() => {
+  const handleClickOutside = (e) => {
+    if (languageContainerRef.current && !languageContainerRef.current.contains(e.target)) {
+      setLanguageSuggestions([]); // hide dropdown
+    }
+  };
+
+  document.addEventListener("click", handleClickOutside);
+  return () => document.removeEventListener("click", handleClickOutside);
+}, []);
 
   useEffect(() => {
   const handleClickOutside = (e) => {
@@ -365,88 +378,61 @@ const handleSentenceChange = (value, field) => {
 <div className="space-y-2 relative">
   <p className="text-sm font-medium text-red-400">🗣 {t("Languages Required")}</p>
 
-  {/* Selected languages */}
-  <div className="flex flex-wrap gap-2 mb-2">
-    {languages.map((lang, idx) => (
-      <span
-        key={idx}
-        className="bg-indigo-600 text-white px-3 py-1 rounded-full flex items-center gap-2"
-      >
-        {lang}
-        <button
-          type="button"
-          onClick={() =>
-            setLanguages(langs => langs.filter(l => l !== lang))
-          }
-          className="text-white/70 hover:text-white"
-        >
-          ✕
-        </button>
-      </span>
-    ))}
-  </div>
-
-  <div id="languages-container" className="relative mt-2">
-  {/* Selected languages */}
+  <div id="languages-container" className="relative mt-2" ref={languageContainerRef}>
+  {/* Selected languages tags */}
   <div className="flex flex-wrap gap-2 mb-2">
     {languages.map((lang, idx) => (
       <span key={idx} className="bg-indigo-600 text-white px-3 py-1 rounded-full flex items-center gap-2">
         {lang}
-        <button type="button" onClick={() => setLanguages(langs => langs.filter(l => l !== lang))} className="text-white/70 hover:text-white">
-          ✕
-        </button>
+        <button type="button" onClick={() => setLanguages(langs => langs.filter(l => l !== lang))} className="text-white/70 hover:text-white">✕</button>
       </span>
     ))}
   </div>
 
   {/* Input */}
   <input
-  type="text"
-  className={inputBase}
-  placeholder={t("Add a language (English, Hindi...)")}
-  value={languageInput}
-  onFocus={() => setLanguageSuggestions(allLanguages.filter(l => !languages.includes(l)))} // show all on click
-  onChange={(e) => {
-    const val = e.target.value;
-    setLanguageInput(val);
-    if (val.trim()) {
-      setLanguageSuggestions(
-        allLanguages.filter(
-          l => l.toLowerCase().includes(val.toLowerCase()) && !languages.includes(l)
-        )
-      );
-    } else {
-      setLanguageSuggestions(allLanguages.filter(l => !languages.includes(l)));
-    }
-  }}
-  onKeyDown={(e) => {
-    if ((e.key === "Enter" || e.key === " ") && languageInput.trim() && !languages.includes(languageInput.trim())) {
-      e.preventDefault();
-      setLanguages(prev => [...prev, languageInput.trim()]);
-      setLanguageInput("");
-      setLanguageSuggestions(allLanguages.filter(l => !languages.includes(l)));
-    }
-  }}
-/>
+    type="text"
+    className={inputBase}
+    placeholder={t("Add a language (English, Hindi...)")}
+    value={languageInput}
+    onFocus={() => setLanguageSuggestions(allLanguages.filter(l => !languages.includes(l)))} // show all on click
+    onChange={(e) => {
+      const val = e.target.value;
+      setLanguageInput(val);
+      if (val.trim()) {
+        setLanguageSuggestions(allLanguages.filter(l => l.toLowerCase().includes(val.toLowerCase()) && !languages.includes(l)));
+      } else {
+        setLanguageSuggestions(allLanguages.filter(l => !languages.includes(l)));
+      }
+    }}
+    onKeyDown={(e) => {
+      if ((e.key === "Enter" || e.key === " ") && languageInput.trim() && !languages.includes(languageInput.trim())) {
+        e.preventDefault();
+        setLanguages(prev => [...prev, languageInput.trim()]);
+        setLanguageInput("");
+        setLanguageSuggestions(allLanguages.filter(l => !languages.includes(l)));
+      }
+    }}
+  />
 
-  {/* Suggestions */}
+  {/* Dropdown */}
   {languageSuggestions.length > 0 && (
-  <div className="absolute z-50 mt-1 w-full max-h-64 overflow-auto rounded-xl bg-[#0F172A] border border-white/10 shadow-xl">
-    {languageSuggestions.map((lang) => (
-      <div
-        key={lang}
-        className="px-4 py-2 text-white hover:bg-[#374151] cursor-pointer"
-        onClick={() => {
-          if (!languages.includes(lang)) setLanguages(prev => [...prev, lang]);
-          setLanguageInput("");
-          setLanguageSuggestions(allLanguages.filter(l => !languages.includes(l)));
-        }}
-      >
-        {lang}
-      </div>
-    ))}
-  </div>
-)}
+    <div className="absolute z-50 mt-1 w-full max-h-64 overflow-auto rounded-xl bg-[#0F172A] border border-white/10 shadow-xl">
+      {languageSuggestions.map((lang) => (
+        <div
+          key={lang}
+          className="px-4 py-2 text-white hover:bg-[#374151] cursor-pointer"
+          onClick={() => {
+            if (!languages.includes(lang)) setLanguages(prev => [...prev, lang]);
+            setLanguageInput("");
+            setLanguageSuggestions([]); // hide after selecting
+          }}
+        >
+          {lang}
+        </div>
+      ))}
+    </div>
+  )}
 </div>
 </div>
 

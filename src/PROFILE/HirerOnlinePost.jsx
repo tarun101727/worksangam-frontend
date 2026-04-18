@@ -43,6 +43,9 @@ const HirerOnlinePost = () => {
 const [languageInput, setLanguageInput] = useState("");
 const [languages, setLanguages] = useState([]);
 const [languageSuggestions, setLanguageSuggestions] = useState([]);
+
+// Add this at the top inside HirerOnlinePost component
+const [allLanguages, setAllLanguages] = useState([]);
     const { t } = useTranslation();
 const translateTimer = useRef(null);
 const latestTypedValue = useRef({});
@@ -68,6 +71,23 @@ const urgentPriceOptions = [
 
   document.addEventListener("click", handleClickOutside);
   return () => document.removeEventListener("click", handleClickOutside);
+}, []);
+
+
+useEffect(() => {
+  const fetchLanguages = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/api/languages`);
+      // Map to nativeName (English) format
+      const langs = res.data.map(l => `${l.nativeName} (${l.name})`);
+      setAllLanguages(langs);
+    } catch (err) {
+      console.error("Failed to fetch languages", err);
+      setAllLanguages([]);
+    }
+  };
+
+  fetchLanguages();
 }, []);
 
   /* ================= HANDLE CHANGE ================= */
@@ -381,50 +401,52 @@ const handleSentenceChange = (value, field) => {
 
   {/* Input */}
   <input
-    type="text"
-    className={inputBase}
-    placeholder={t("Add a language (English, Hindi...)")}
-    value={languageInput}
-    onChange={async (e) => {
-      const val = e.target.value;
-      setLanguageInput(val);
-      if (val.trim()) {
-        try {
-          const res = await axios.get(`${BASE_URL}/api/languages?search=${val.trim()}`);
-          setLanguageSuggestions(res.data || []);
-        } catch {
-          setLanguageSuggestions([]);
-        }
-      } else setLanguageSuggestions([]);
-    }}
-    onKeyDown={(e) => {
-      if ((e.key === "Enter" || e.key === " ") && languageInput.trim() && !languages.includes(languageInput.trim())) {
-        e.preventDefault();
-        setLanguages(prev => [...prev, languageInput.trim()]);
-        setLanguageInput("");
-        setLanguageSuggestions([]);
-      }
-    }}
-  />
+  type="text"
+  className={inputBase}
+  placeholder={t("Add a language (English, Hindi...)")}
+  value={languageInput}
+  onFocus={() => setLanguageSuggestions(allLanguages.filter(l => !languages.includes(l)))} // show all on click
+  onChange={(e) => {
+    const val = e.target.value;
+    setLanguageInput(val);
+    if (val.trim()) {
+      setLanguageSuggestions(
+        allLanguages.filter(
+          l => l.toLowerCase().includes(val.toLowerCase()) && !languages.includes(l)
+        )
+      );
+    } else {
+      setLanguageSuggestions(allLanguages.filter(l => !languages.includes(l)));
+    }
+  }}
+  onKeyDown={(e) => {
+    if ((e.key === "Enter" || e.key === " ") && languageInput.trim() && !languages.includes(languageInput.trim())) {
+      e.preventDefault();
+      setLanguages(prev => [...prev, languageInput.trim()]);
+      setLanguageInput("");
+      setLanguageSuggestions(allLanguages.filter(l => !languages.includes(l)));
+    }
+  }}
+/>
 
   {/* Suggestions */}
   {languageSuggestions.length > 0 && (
-    <div className="absolute z-50 mt-1 w-full max-h-64 overflow-auto rounded-xl bg-[#0F172A] border border-white/10 shadow-xl">
-      {languageSuggestions.map((lang) => (
-        <div
-          key={lang._id}
-          className="px-4 py-2 text-white hover:bg-[#374151] cursor-pointer"
-          onClick={() => {
-            if (!languages.includes(lang.name)) setLanguages(prev => [...prev, lang.name]);
-            setLanguageInput("");
-            setLanguageSuggestions([]);
-          }}
-        >
-          {lang.name} ({lang.code})
-        </div>
-      ))}
-    </div>
-  )}
+  <div className="absolute z-50 mt-1 w-full max-h-64 overflow-auto rounded-xl bg-[#0F172A] border border-white/10 shadow-xl">
+    {languageSuggestions.map((lang) => (
+      <div
+        key={lang}
+        className="px-4 py-2 text-white hover:bg-[#374151] cursor-pointer"
+        onClick={() => {
+          if (!languages.includes(lang)) setLanguages(prev => [...prev, lang]);
+          setLanguageInput("");
+          setLanguageSuggestions(allLanguages.filter(l => !languages.includes(l)));
+        }}
+      >
+        {lang}
+      </div>
+    ))}
+  </div>
+)}
 </div>
 </div>
 

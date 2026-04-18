@@ -1,28 +1,25 @@
-// i18n.js
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import en from "./locales/en.json";
 import { BASE_URL } from "./config";
 
-// List all language codes
 const languages = [
   "en","te","hi","as","bn","brx","doi","gu","kn","ks","kok",
   "mai","ml","mni","mr","ne","or","pa","sa","sat","sd","ta","ur"
 ];
 
-// ✅ Step 1: Get saved language
 const savedLang = localStorage.getItem("lang") || "en";
 
-// ✅ Step 2: Initialize i18n immediately with saved language
+// Initialize i18n
 i18n.use(initReactI18next).init({
-  resources: { en: { translation: en } }, // English loaded immediately
-  lng: savedLang,                         // Use saved language right away
+  resources: { en: { translation: en } },
+  lng: savedLang,
   fallbackLng: "en",
   interpolation: { escapeValue: false },
   react: { useSuspense: false },
 });
 
-// ✅ Step 3: Load other languages asynchronously
+// Load other languages dynamically
 languages.forEach(async (lang) => {
   if (lang === "en") return;
 
@@ -35,5 +32,8 @@ languages.forEach(async (lang) => {
     console.error(`Failed to load ${lang}:`, err);
   }
 });
+
+// Ensure English bundle is also registered explicitly
+i18n.addResourceBundle("en", "translation", en, true, true);
 
 export default i18n;

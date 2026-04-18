@@ -118,10 +118,10 @@ const submit = async () => {
     setError("Description is required");
     return;
   }
-  if (languages.length === 0 && !languageInput.trim()) {
-    setError("At least one language is required");
-    return;
-  }
+  if (languages.length === 0) {
+  setError(t("Please select at least one language"));
+  return;
+}
 
   try {
     setLoading(true);
@@ -155,21 +155,14 @@ const translateText = async (text, field) => {
     const res = await fetch(
       `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${lang}&dt=t&q=${encodeURIComponent(text)}`
     );
-
     const data = await res.json();
-
-    let translated = data[0].map((item) => item[0]).join("");
-
-    // preserve trailing spaces
+    let translated = data[0].map(item => item[0]).join("");
     const trailingSpaces = text.match(/\s+$/);
-    if (trailingSpaces) {
-      translated += trailingSpaces[0];
-    }
+    if (trailingSpaces) translated += trailingSpaces[0];
 
-    // prevent overwrite race condition
     if (latestTypedValue.current[field] !== text) return;
 
-    handleChange(field, translated);
+    setForm(prev => ({ ...prev, [field]: translated }));
   } catch (err) {
     console.error(err);
   }
@@ -177,20 +170,16 @@ const translateText = async (text, field) => {
 
 const handleSentenceChange = (value, field) => {
   latestTypedValue.current[field] = value;
-
-  // instant UI update
-  handleChange(field, value);
+  setForm(prev => ({ ...prev, [field]: value }));
 
   const lang = i18n.language || "en";
   if (lang === "en") return;
 
   clearTimeout(translateTimer.current);
-
   translateTimer.current = setTimeout(() => {
     if (latestTypedValue.current[field] !== value) return;
-
     translateText(value, field);
-  }, 800); // delay for smooth typing
+  }, 800);
 };
 
   return (
@@ -377,6 +366,19 @@ const handleSentenceChange = (value, field) => {
     ))}
   </div>
 
+  <div id="languages-container" className="relative mt-2">
+  {/* Selected languages */}
+  <div className="flex flex-wrap gap-2 mb-2">
+    {languages.map((lang, idx) => (
+      <span key={idx} className="bg-indigo-600 text-white px-3 py-1 rounded-full flex items-center gap-2">
+        {lang}
+        <button type="button" onClick={() => setLanguages(langs => langs.filter(l => l !== lang))} className="text-white/70 hover:text-white">
+          ✕
+        </button>
+      </span>
+    ))}
+  </div>
+
   {/* Input */}
   <input
     type="text"
@@ -386,45 +388,34 @@ const handleSentenceChange = (value, field) => {
     onChange={async (e) => {
       const val = e.target.value;
       setLanguageInput(val);
-
       if (val.trim()) {
         try {
-          const res = await axios.get(
-            `${BASE_URL}/api/languages?search=${val.trim()}`,
-            { withCredentials: true }
-          );
+          const res = await axios.get(`${BASE_URL}/api/languages?search=${val.trim()}`);
           setLanguageSuggestions(res.data || []);
-        } catch (err) {
-          console.error(err);
+        } catch {
           setLanguageSuggestions([]);
         }
-      } else {
-        setLanguageSuggestions([]);
-      }
+      } else setLanguageSuggestions([]);
     }}
     onKeyDown={(e) => {
-      if (e.key === "Enter" || e.key === " ") {
+      if ((e.key === "Enter" || e.key === " ") && languageInput.trim() && !languages.includes(languageInput.trim())) {
         e.preventDefault();
-        if (languageInput.trim() && !languages.includes(languageInput.trim())) {
-          setLanguages(prev => [...prev, languageInput.trim()]);
-          setLanguageInput("");
-          setLanguageSuggestions([]);
-        }
+        setLanguages(prev => [...prev, languageInput.trim()]);
+        setLanguageInput("");
+        setLanguageSuggestions([]);
       }
     }}
   />
 
-  {/* Suggestions dropdown */}
+  {/* Suggestions */}
   {languageSuggestions.length > 0 && (
-    <div className="absolute z-20 w-full mt-2 max-h-60 overflow-auto rounded-xl bg-slate-900 border border-slate-700 shadow-lg">
+    <div className="absolute z-50 mt-1 w-full max-h-64 overflow-auto rounded-xl bg-[#0F172A] border border-white/10 shadow-xl">
       {languageSuggestions.map((lang) => (
         <div
           key={lang._id}
-          className="px-4 py-2 text-sm text-slate-200 hover:bg-indigo-500/20 cursor-pointer"
+          className="px-4 py-2 text-white hover:bg-[#374151] cursor-pointer"
           onClick={() => {
-            if (!languages.includes(lang.name)) {
-              setLanguages(prev => [...prev, lang.name]);
-            }
+            if (!languages.includes(lang.name)) setLanguages(prev => [...prev, lang.name]);
             setLanguageInput("");
             setLanguageSuggestions([]);
           }}
@@ -434,6 +425,7 @@ const handleSentenceChange = (value, field) => {
       ))}
     </div>
   )}
+</div>
 </div>
 
         {/* ================= SUBMIT ================= */}

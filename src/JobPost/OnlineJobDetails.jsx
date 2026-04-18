@@ -98,7 +98,7 @@ export default function OnlineJobDetails() {
       {/* Profession */}
 <div className="flex items-center gap-3">
   <h1 className="text-2xl font-bold">
-    Profession:{" "}
+    {t("Profession")}:{" "}
     <span className="text-indigo-300 capitalize">
       {translated.profession || job.profession}
     </span>
@@ -131,7 +131,7 @@ export default function OnlineJobDetails() {
       {/* Back & Chat */}
       <div className="mt-6 flex gap-4">
         <button onClick={() => navigate(-1)} className="px-6 py-2 rounded-lg bg-gray-700 hover:bg-gray-600">
-          Back
+          {t("Back")}
         </button>
 
         <button
@@ -141,7 +141,7 @@ export default function OnlineJobDetails() {
           }}
           className="px-5 py-2 rounded-xl bg-green-500"
         >
-          Chat with {job.hirer.firstName}
+           {t("chat_with_user", { name: job.hirer.firstName })}
         </button>
 
         <button
@@ -149,7 +149,7 @@ export default function OnlineJobDetails() {
           disabled={applying}
           className="px-5 py-2 rounded-xl bg-indigo-500 disabled:opacity-50"
         >
-          {applying ? "Applied" : "Apply"}
+          {applying ? t("Applied") : t("Apply")}
         </button>
       </div>
     </div>

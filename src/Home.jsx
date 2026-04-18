@@ -36,6 +36,15 @@ export default function Home() {
   const lastCoordsRef = useRef(null);
   const { t } = useTranslation();
   const searchRef = useRef(null);
+  const profTimeoutRef = useRef(null); // ✅ ADD THIS
+
+  useEffect(() => {
+  return () => {
+    if (profTimeoutRef.current) {
+      clearTimeout(profTimeoutRef.current);
+    }
+  };
+}, []);
 
   useEffect(() => {
   const handleClickOutside = (event) => {
@@ -170,56 +179,71 @@ export default function Home() {
     }
   };
 
+  // ======================= FETCH PROFESSIONS =======================
   const fetchProfessions = async () => {
   try {
-    setProfLoading(true); // ✅ start loading
+    setProfLoading(true);
 
-    let url = "";
-
-    if (selectedTab === "online" || selectedTab === "online-jobs") {
-      url = `${BASE_URL}/api/online-professions`;
-    } else {
-      url = `${BASE_URL}/api/offline-professions`;
+    if (profTimeoutRef.current) {
+      clearTimeout(profTimeoutRef.current);
     }
 
-    const res = await axios.get(url, { withCredentials: true });
-    setProfessions(res.data.professions || []);
+    setProfessions([]);
+    setFilteredProfessions([]);
+
+    let res;
+    const tabAtRequestTime = selectedTab; // ✅ FIX HERE
+
+    if (tabAtRequestTime === "online" || tabAtRequestTime === "online-jobs") {
+      res = await axios.get(`${BASE_URL}/api/online-professions`, {
+        withCredentials: true,
+      });
+    } else if (tabAtRequestTime === "offline" || tabAtRequestTime === "offline-jobs") {
+      res = await axios.get(`${BASE_URL}/api/offline-professions`, {
+        withCredentials: true,
+      });
+    }
+
+    profTimeoutRef.current = setTimeout(() => {
+      // ✅ Compare with latest selectedTab
+      if (tabAtRequestTime !== selectedTab) return;
+
+      setProfessions(res?.data?.professions || []);
+      setProfLoading(false);
+    }, 300);
+
   } catch (err) {
     console.error(err);
-  } finally {
-    setProfLoading(false); // ✅ stop loading
+    setProfLoading(false);
   }
 };
 
+  // ======================= TAB CHANGE EFFECT =======================
   useEffect(() => {
-  if (!user) return;
+    if (!user) return;
 
-  setSearch("");
-  setFilteredProfessions([]);
-  setEmployees([]);
-  setJobs([]);
-  setProfessions([]); // ✅ FIX: clear old professions immediately
+    setSearch("");
+    setFilteredProfessions([]);
+    setEmployees([]);
+    setJobs([]);
+    setProfessions([]);
 
-  if (selectedTab === "online" || selectedTab === "offline") {
-    const professionType = selectedTab;
-    fetchEmployees(selectedTab, professionType);
-    fetchProfessions();
-  }
+    if (selectedTab === "online" || selectedTab === "offline") {
+      const professionType = selectedTab;
+      fetchEmployees(selectedTab, professionType);
+      fetchProfessions();
+    }
 
-  if (selectedTab === "online-jobs") {
-    fetchJobsByType("online");
-    fetchProfessions();
-  }
-
-  if (selectedTab === "offline-jobs") {
-    fetchJobsByType("offline");
-    fetchProfessions(); // ✅ FIX: you missed this
-  }
-
-  if (selectedTab === "my-job-posts" && user.role === "hirer") {
-    fetchMyHirerJobs();
-  }
-}, [user, selectedTab]);
+    if (selectedTab === "online-jobs") {
+  fetchJobsByType("online");
+  fetchProfessions(); // ✅ ADD THIS LINE
+}
+    if (selectedTab === "offline-jobs") {
+  fetchJobsByType("offline");
+  fetchProfessions(); // ✅ ADD THIS
+}
+    if (selectedTab === "my-job-posts" && user.role === "hirer") fetchMyHirerJobs();
+  }, [user, selectedTab]);
 
   const handleSearch = (value) => {
   setSearch(value);
@@ -329,21 +353,23 @@ export default function Home() {
 }}
   className="w-full p-3 rounded-xl bg-[#0F172A] border border-white/10"
 />
-          {filteredProfessions.length > 0 && (
-            <div className="absolute w-full bg-[#0F172A] border border-white/10 rounded-xl mt-1 max-h-60 overflow-y-auto z-50">
-              {profLoading ? (
-  <div className="p-3 text-white/50">Loading...</div>
-) : (
-  filteredProfessions.map((p) => (
-    <div
-      key={p._id}
-      onClick={() => selectProfession(p.name)}
-      className="p-3 hover:bg-[#1F2937] cursor-pointer"
-    >
-      {p.name}
-    </div>
-  ))
+
+ {profLoading && (
+  <div className="absolute w-full bg-[#0F172A] border border-white/10 rounded-xl mt-1 p-3 text-white/60">
+    Loading professions...
+  </div>
 )}
+          {!profLoading && filteredProfessions.length > 0 && (
+            <div className="absolute w-full bg-[#0F172A] border border-white/10 rounded-xl mt-1 max-h-60 overflow-y-auto z-50">
+              {filteredProfessions.map((p) => (
+                <div
+                  key={p._id}
+                  onClick={() => selectProfession(p.name)}
+                  className="p-3 hover:bg-[#1F2937] cursor-pointer"
+                >
+                  {p.name}
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -407,11 +433,21 @@ export default function Home() {
   placeholder="Search online jobs by profession..."
   value={search}
   onChange={(e) => handleSearch(e.target.value)}
-  onFocus={() => setFilteredProfessions(professions)} // ✅ ADD THIS
+  onFocus={() => {
+  if (!profLoading) {
+    setFilteredProfessions(professions);
+  }
+}}
   className="w-full p-3 rounded-xl bg-[#0F172A] border border-white/10"
 />
+     
+     {profLoading && (
+  <div className="absolute w-full bg-[#0F172A] border border-white/10 rounded-xl mt-1 p-3 text-white/60">
+    Loading professions...
+  </div>
+)}
 
-          {filteredProfessions.length > 0 && (
+          {!profLoading && filteredProfessions.length > 0 && (
             <div className="absolute w-full bg-[#0F172A] border border-white/10 rounded-xl mt-1 max-h-60 overflow-y-auto z-50">
               {filteredProfessions.map((p) => (
                 <div

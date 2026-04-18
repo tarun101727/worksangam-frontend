@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BASE_URL } from "../config";
 import { useTranslation } from "react-i18next";
-import i18n from "../i18n";
 
 
 const getImageUrl = (img) => {
@@ -136,19 +135,15 @@ export default function OnlineJobDetails() {
           {t("Back")}
         </button>
 
-       <button
-  onClick={async () => {
-    const res = await axios.post(`${BASE_URL}/api/chat/create/${job.hirer._id}`, {}, { withCredentials: true });
-    navigate(`/chat/${res.data._id}`);
-  }}
-  className="px-5 py-2 rounded-xl bg-green-500"
->
-  {(() => {
-    console.log("Current language:", localStorage.getItem("lang"), "i18n language:", i18n.language);
-    console.log("t keys loaded:", Object.keys(i18n.getResourceBundle(i18n.language, "translation") || {}));
-    return t("chat_with_user", { name: job.hirer.firstName });
-  })()}
-</button>
+     <button
+          onClick={async () => {
+            const res = await axios.post(`${BASE_URL}/api/chat/create/${job.hirer._id}`, {}, { withCredentials: true });
+            navigate(`/chat/${res.data._id}`);
+          }}
+          className="px-5 py-2 rounded-xl bg-green-500"
+        >
+           {t("chat_with_user", { name: job.hirer.firstName })}
+        </button>
 
         <button
           onClick={applyJob}

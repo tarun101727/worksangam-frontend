@@ -95,60 +95,38 @@ export default function OnlineJobDetails() {
         </div>
       </div>
 
-      {/* Job Card */}
-      <div className="bg-white/5 rounded-2xl p-6 space-y-6">
-        {/* Profession */}
-        <h1 className="text-2xl font-bold">
-          Profession:{" "}
-          <span className="text-indigo-300 capitalize">
-            {translated.profession || job.profession}
-          </span>
-        </h1>
-        {job.profession && (
-          <button
-            onClick={() => handleTranslate("profession", job.profession)}
-            className="text-sm text-indigo-400"
-          >
-            {loadingTranslate === "profession" ? "..." : t("Translate")}
-          </button>
-        )}
+      {/* Profession */}
+<div className="flex items-center gap-3">
+  <h1 className="text-2xl font-bold">
+    Profession:{" "}
+    <span className="text-indigo-300 capitalize">
+      {translated.profession || job.profession}
+    </span>
+  </h1>
+  {job.profession && (
+    <button
+      onClick={() => handleTranslate("profession", job.profession)}
+      className="text-sm text-indigo-400 underline hover:text-indigo-300"
+    >
+      {loadingTranslate === "profession" ? "..." : t("Translate")}
+    </button>
+  )}
+</div>
 
-        {/* Description */}
-        <p className="text-white/70 mt-2">
-          {translated.description || job.description}
-        </p>
-        {job.description && (
-          <button
-            onClick={() => handleTranslate("description", job.description)}
-            className="text-sm text-indigo-400"
-          >
-            {loadingTranslate === "description" ? "..." : t("Translate")}
-          </button>
-        )}
-
-        {/* Languages */}
-        {job.languages?.length > 0 && (
-          <div>
-            <p className="text-white/50 font-semibold mb-1">Languages Required:</p>
-            <div className="flex gap-2 flex-wrap">
-              {job.languages.map((lang) => (
-                <span key={lang} className="px-3 py-1 rounded-full bg-slate-700 text-white text-sm">
-                  {lang}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Price */}
-        {job.price && (
-          <p className="text-xl font-bold text-yellow-400">
-            {job.price.type === "fixed" && `${job.price.currency} ${job.price.value}`}
-            {job.price.type === "negotiable" &&
-              `${job.price.currency} ${job.price.min} – ${job.price.max}`}
-          </p>
-        )}
-      </div>
+{/* Description */}
+<div className="flex items-center gap-3 mt-2">
+  <p className="text-white/70">
+    {translated.description || job.description}
+  </p>
+  {job.description && (
+    <button
+      onClick={() => handleTranslate("description", job.description)}
+      className="text-sm text-indigo-400 underline hover:text-indigo-300"
+    >
+      {loadingTranslate === "description" ? "..." : t("Translate")}
+    </button>
+  )}
+</div>
 
       {/* Back & Chat */}
       <div className="mt-6 flex gap-4">

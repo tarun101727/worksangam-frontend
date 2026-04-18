@@ -41,6 +41,7 @@ export default function Home() {
   const jobSearchRef = useRef(null);
    const searchTimeoutRef = useRef(null);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [selectedDistance, setSelectedDistance] = useState(null);
 
 
 
@@ -557,8 +558,16 @@ const filtered = professions.filter((p) =>
     {[1, 2, 5, 20].map((km) => (
       <button
         key={km}
-        onClick={() => fetchOfflineJobsByDistance(km)}
-        className="px-3 py-1 rounded-xl bg-[#6366F1] text-white hover:bg-[#4f46e5]"
+        onClick={() => {
+  setSelectedDistance(km); // ✅ highlight selected
+  fetchOfflineJobsByDistance(km);
+}}
+        className={`px-4 py-1.5 rounded-xl text-sm font-medium transition-all duration-200
+  ${
+    selectedDistance === km
+      ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg scale-105"
+      : "bg-[#1f2937] text-white/70 hover:bg-[#374151] hover:text-white"
+  }`}
       >
         {km} {t("km")}
       </button>

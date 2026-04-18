@@ -37,20 +37,29 @@ export default function Home() {
   const { t } = useTranslation();
   const searchRef = useRef(null);
   const profTimeoutRef = useRef(null); // ✅ ADD THIS
+  const [cachedProfessions, setCachedProfessions] = useState({});
+  const jobSearchRef = useRef(null);
+   const searchTimeoutRef = useRef(null);
 
   useEffect(() => {
   return () => {
     if (profTimeoutRef.current) {
       clearTimeout(profTimeoutRef.current);
     }
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
   };
 }, []);
 
   useEffect(() => {
   const handleClickOutside = (event) => {
-    if (searchRef.current && !searchRef.current.contains(event.target)) {
-      setFilteredProfessions([]); // Hide the dropdown
-    }
+   if (
+  (!searchRef.current || !searchRef.current.contains(event.target)) &&
+  (!jobSearchRef.current || !jobSearchRef.current.contains(event.target))
+) {
+  setFilteredProfessions([]);
+}
   };
 
   document.addEventListener("mousedown", handleClickOutside);
@@ -188,34 +197,79 @@ export default function Home() {
       clearTimeout(profTimeoutRef.current);
     }
 
+    const tabAtRequestTime =
+      selectedTab === "online" || selectedTab === "online-jobs"
+        ? "online"
+        : selectedTab === "offline" || selectedTab === "offline-jobs"
+        ? "offline"
+        : null;
+
+    if (!tabAtRequestTime) {
+      setProfLoading(false);
+      return;
+    }
+
+    // ✅ CHECK CACHE FIRST
+    const cached = cachedProfessions[tabAtRequestTime];
+
+    if (cached) {
+      setProfessions(cached);
+      setFilteredProfessions(cached);
+      setProfLoading(false);
+      return;
+    }
+
+    // ✅ CLEAR ONLY IF NO CACHE
     setProfessions([]);
     setFilteredProfessions([]);
 
     let res;
-    const tabAtRequestTime = selectedTab; // ✅ FIX HERE
 
-    if (tabAtRequestTime === "online" || tabAtRequestTime === "online-jobs") {
+    if (tabAtRequestTime === "online") {
       res = await axios.get(`${BASE_URL}/api/online-professions`, {
         withCredentials: true,
       });
-    } else if (tabAtRequestTime === "offline" || tabAtRequestTime === "offline-jobs") {
+    } else if (tabAtRequestTime === "offline") {
       res = await axios.get(`${BASE_URL}/api/offline-professions`, {
         withCredentials: true,
       });
     }
 
-    profTimeoutRef.current = setTimeout(() => {
-      // ✅ Compare with latest selectedTab
-      if (tabAtRequestTime !== selectedTab) return;
+    const data = Array.isArray(res?.data?.professions)
+  ? res.data.professions
+  : [];
 
-      setProfessions(res?.data?.professions || []);
+    // ✅ SAVE TO CACHE
+    setCachedProfessions((prev) => ({
+      ...prev,
+      [tabAtRequestTime]: data,
+    }));
+
+    profTimeoutRef.current = setTimeout(() => {
+      const latestType =
+        selectedTab === "online" || selectedTab === "online-jobs"
+          ? "online"
+          : selectedTab === "offline" || selectedTab === "offline-jobs"
+          ? "offline"
+          : null;
+
+      // ✅ IMPORTANT FIX (prevent stuck loading)
+      if (!latestType || tabAtRequestTime !== latestType) {
+        setProfLoading(false);
+        return;
+      }
+
+      setProfessions(data);
+      setFilteredProfessions(data);
       setProfLoading(false);
-    }, 100);
+    }, 150);
 
   } catch (err) {
-    console.error(err);
-    setProfLoading(false);
-  }
+  console.error(err);
+  setProfessions([]);          // ✅ ADD
+  setFilteredProfessions([]);  // ✅ ADD
+  setProfLoading(false);
+}
 };
 
   // ======================= TAB CHANGE EFFECT =======================
@@ -226,7 +280,11 @@ export default function Home() {
     setFilteredProfessions([]);
     setEmployees([]);
     setJobs([]);
-    setProfessions([]);
+
+    if (searchTimeoutRef.current) {
+  clearTimeout(searchTimeoutRef.current); // ✅ ADD THIS
+}
+    
 
     if (selectedTab === "online" || selectedTab === "offline") {
       const professionType = selectedTab;
@@ -245,19 +303,32 @@ export default function Home() {
     if (selectedTab === "my-job-posts" && user.role === "hirer") fetchMyHirerJobs();
   }, [user, selectedTab]);
 
-  const handleSearch = (value) => {
+const handleSearch = (value) => {
   setSearch(value);
 
-  if (!value) {
-    // Show all professions when input is empty
-    setFilteredProfessions(professions);
-    return;
+  if (searchTimeoutRef.current) {
+    clearTimeout(searchTimeoutRef.current);
   }
 
-  const filtered = professions.filter((p) =>
-    p.name.toLowerCase().includes(value.toLowerCase())
-  );
-  setFilteredProfessions(filtered);
+  searchTimeoutRef.current = setTimeout(() => {
+   if (!value) {
+  if (!profLoading) {
+    setFilteredProfessions(professions);
+  }
+  return;
+}
+
+  if (!professions.length) {
+  setFilteredProfessions([]); // ✅ ADD THIS
+  return;
+}
+
+const filtered = professions.filter((p) =>
+  p?.name?.toLowerCase().includes(value.toLowerCase())
+);
+
+    setFilteredProfessions(filtered);
+  }, 200);
 };
 
   const selectProfession = (professionName) => {
@@ -348,7 +419,7 @@ export default function Home() {
   onChange={(e) => handleSearch(e.target.value)}
   onFocus={() => {
   if (!profLoading) {
-    setFilteredProfessions(professions);
+    setFilteredProfessions(professions || []);
   }
 }}
   className="w-full p-3 rounded-xl bg-[#0F172A] border border-white/10"
@@ -363,8 +434,8 @@ export default function Home() {
             <div className="absolute w-full bg-[#0F172A] border border-white/10 rounded-xl mt-1 max-h-60 overflow-y-auto z-50">
               {filteredProfessions.map((p) => (
                 <div
-                  key={p._id}
-                  onClick={() => selectProfession(p.name)}
+                  key={p._id || p.name}
+                  onClick={() => p?.name && selectProfession(p.name)}
                   className="p-3 hover:bg-[#1F2937] cursor-pointer"
                 >
                   {p.name}
@@ -427,15 +498,15 @@ export default function Home() {
 
       {/* ======================= ONLINE JOBS SEARCH ======================= */}
       {selectedTab === "online-jobs" && (
-       <div ref={searchRef} className="max-w-3xl mx-auto mb-4 relative">
+       <div ref={jobSearchRef} className="max-w-3xl mx-auto mb-4 relative">
           <input
   type="text"
   placeholder="Search online jobs by profession..."
   value={search}
   onChange={(e) => handleSearch(e.target.value)}
-  onFocus={() => {
+ onFocus={() => {
   if (!profLoading) {
-    setFilteredProfessions(professions);
+    setFilteredProfessions(professions || []);
   }
 }}
   className="w-full p-3 rounded-xl bg-[#0F172A] border border-white/10"
@@ -451,15 +522,16 @@ export default function Home() {
             <div className="absolute w-full bg-[#0F172A] border border-white/10 rounded-xl mt-1 max-h-60 overflow-y-auto z-50">
               {filteredProfessions.map((p) => (
                 <div
-                  key={p._id}
+                  key={p._id || p.name}
                   onClick={() => {
                     setSearch(p.name);
                     setFilteredProfessions([]);
                     setJobs((prevJobs) =>
-                      prevJobs.filter(
-                        (job) => job.profession.toLowerCase() === p.name.toLowerCase()
-                      )
-                    );
+  prevJobs.filter(
+    (job) =>
+      job?.profession?.toLowerCase() === (p?.name || "").toLowerCase()
+  )
+);
                   }}
                   className="p-3 hover:bg-[#1F2937] cursor-pointer"
                 >

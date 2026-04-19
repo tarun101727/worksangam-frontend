@@ -32,16 +32,26 @@ const CreditPlans = () => {
     loadCredits();
   }, []);
 
-  // Fetch after payment redirect if order_id exists
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("order_id")) {
-      const loadCredits = async () => {
-        await fetchCredits();
-      };
-      loadCredits();
-    }
-  }, []);
+
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  const orderId = params.get("order_id");
+
+  if (orderId) {
+    const interval = setInterval(async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/api/auth/user/credits`, {
+          withCredentials: true,
+        });
+        setCredits(res.data.credits);
+
+        if (res.data.credits > 0) clearInterval(interval); // stop polling once credits update
+      } catch (err) {
+        console.error("Failed to fetch credits after payment:", err);
+      }
+    }, 3000); // check every 3 seconds
+  }
+}, []);
 
   const handleBuy = async (amount) => {
     try {

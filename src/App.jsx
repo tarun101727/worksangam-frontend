@@ -492,7 +492,7 @@ d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03
           {/* Fallback if no notifications */}
     {[...notifications, ...chatNotifications].length === 0 && (
       <div className="p-4 text-center text-white/60">
-        No notifications
+        {t("No notifications")}
       </div>
     )}
   </div>

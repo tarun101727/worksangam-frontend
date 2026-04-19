@@ -4,13 +4,15 @@ import { useNavigate } from "react-router-dom";
 export default function NotificationDropdown({ notifications, close }) {
   const navigate = useNavigate();
 
-  if (!notifications.length) {
-    return (
-      <div className="absolute right-0 top-12 w-80 bg-[#0F172A] border border-white/10 rounded-xl p-4">
-        <p className="text-white/60 text-sm">No notifications</p>
-      </div>
-    );
-  }
+ if (!notifications.length) {
+  return (
+    <div className="absolute right-0 top-12 w-80 bg-[#0F172A] border border-white/10 rounded-xl p-4">
+      <p className="text-white/60 text-sm text-center">
+        You have no notifications yet. Stay tuned for updates!
+      </p>
+    </div>
+  );
+}
 
   return (
     <div className="absolute right-0 top-12 w-80 bg-[#0F172A] border border-white/10 rounded-xl shadow-xl max-h-96 overflow-y-auto scrollbar-dark">

@@ -4,7 +4,7 @@ import axios from "axios";
 import { BASE_URL } from "./config";
 import { socket } from "./utils/socket";
 import { useTranslation } from "react-i18next";
-
+import i18n from "./i18n";
 
 const getImageUrl = (img) => {
   if (!img) return null;
@@ -74,6 +74,14 @@ export default function Home() {
   };
 }, []);
 
+useEffect(() => {
+  if (!user) return;
+
+  // Only fetch professions for tabs that use professions
+  if (["online", "offline", "online-jobs", "offline-jobs"].includes(selectedTab)) {
+    fetchProfessions();
+  }
+}, [i18n.language]); // ✅ trigger whenever language changes
 
   const formatPrice = (price) => {
   if (!price) return "Contact for pricing";
@@ -236,16 +244,17 @@ export default function Home() {
     setFilteredProfessions([]);
 
     let res;
+const lang = i18n.language || "en"; // current language
 
-    if (tabAtRequestTime === "online") {
-      res = await axios.get(`${BASE_URL}/api/online-professions`, {
-        withCredentials: true,
-      });
-    } else if (tabAtRequestTime === "offline") {
-      res = await axios.get(`${BASE_URL}/api/offline-professions`, {
-        withCredentials: true,
-      });
-    }
+if (tabAtRequestTime === "online") {
+  res = await axios.get(`${BASE_URL}/api/online-professions?lang=${lang}`, {
+    withCredentials: true,
+  });
+} else if (tabAtRequestTime === "offline") {
+  res = await axios.get(`${BASE_URL}/api/offline-professions?lang=${lang}`, {
+    withCredentials: true,
+  });
+}
 
     const data = Array.isArray(res?.data?.professions)
   ? res.data.professions

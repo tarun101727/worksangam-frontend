@@ -42,7 +42,7 @@ export default function Home() {
    const searchTimeoutRef = useRef(null);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [selectedDistance, setSelectedDistance] = useState(null);
-
+  const [loadingData, setLoadingData] = useState(false); // ✅ add this
 
 
   useEffect(() => {
@@ -153,6 +153,7 @@ export default function Home() {
   // ======================= FETCH EMPLOYEES =======================
   const fetchEmployees = async (status, professionType, profession = "") => {
     try {
+      setLoadingData(true);
       let url = "";
 
       if (status === "offline" && !profession) {
@@ -167,20 +168,25 @@ export default function Home() {
       setEmployees(res.data.employees || []);
     } catch {
       setError("Failed to fetch employees");
-    }
+    }finally {
+    setLoadingData(false); // ✅ stop spinner
+  }
   };
 
   // ======================= FETCH JOBS =======================
   const fetchJobsByType = async (type) => {
-    try {
-      const res = await axios.get(`${BASE_URL}/api/jobs/all?type=${type}`, {
-        withCredentials: true,
-      });
-      setJobs(res.data.jobs || []);
-    } catch {
-      setError(`Failed to fetch ${type} jobs`);
-    }
-  };
+  try {
+    setLoadingData(true);
+    const res = await axios.get(`${BASE_URL}/api/jobs/all?type=${type}`, {
+      withCredentials: true,
+    });
+    setJobs(res.data.jobs || []);
+  } catch {
+    setError(`Failed to fetch ${type} jobs`);
+  } finally {
+    setLoadingData(false);
+  }
+};
 
   const fetchMyHirerJobs = async () => {
     try {
@@ -379,6 +385,11 @@ const filtered = professions.filter((p) =>
 
   return (
     <div className="pt-16">
+      {loadingData && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+  </div>
+)}
       {error && <p className="text-red-400 text-center mb-6">{error}</p>}
 
       {/* ======================= TABS ======================= */}

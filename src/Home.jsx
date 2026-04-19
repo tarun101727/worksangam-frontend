@@ -385,11 +385,6 @@ const filtered = professions.filter((p) =>
 
   return (
     <div className="pt-16">
-      {loadingData && (
-  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-  </div>
-)}
       {error && <p className="text-red-400 text-center mb-6">{error}</p>}
 
       {/* ======================= TABS ======================= */}
@@ -464,18 +459,21 @@ const filtered = professions.filter((p) =>
         </div>
       )}
 
-      {/* ======================= EMPLOYEES ======================= */}
-      {(selectedTab === "online" || selectedTab === "offline") && (
-        <div className="max-w-3xl mx-auto space-y-4">
-          {employees.length === 0 && (
-            <p className="text-center text-white/60 py-10">
-              {selectedTab === "online" && t("No online employees available")}
-              {selectedTab === "offline" && t("No offline employees available")}
-            </p>
-          )}
-
-          {employees.map((emp) => (
-            <div
+{/* ======================= EMPLOYEES ======================= */}
+{(selectedTab === "online" || selectedTab === "offline") && (
+  <div className="max-w-3xl mx-auto space-y-4">
+    {loadingData ? (
+      <div className="flex justify-center py-10">
+        <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    ) : employees.length === 0 ? (
+      <p className="text-center text-white/60 py-10">
+        {selectedTab === "online" && t("No online employees available")}
+        {selectedTab === "offline" && t("No offline employees available")}
+      </p>
+    ) : (
+      employees.map((emp) => (
+       <div
               key={emp._id}
               onClick={() => navigate(`/profile/${emp._id}`)}
               className="cursor-pointer p-5 rounded-2xl bg-[#0F172A] border border-white/10"
@@ -509,10 +507,11 @@ const filtered = professions.filter((p) =>
                   )}
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            </div> 
+      ))
+    )}
+  </div>
+)}
 
       {/* ======================= ONLINE JOBS SEARCH ======================= */}
       {selectedTab === "online-jobs" && (
@@ -586,19 +585,21 @@ const filtered = professions.filter((p) =>
   </div>
 )}
 
-      {/* ======================= JOB LIST ======================= */}
       {["online-jobs", "offline-jobs", "my-job-posts"].includes(selectedTab) && (
-        <div className="max-w-3xl mx-auto space-y-4">
-          {jobs.length === 0 && (
-            <p className="text-center text-white/60 py-10">
-              {selectedTab === "online-jobs" && t("No online jobs available")}
-              {selectedTab === "offline-jobs" && t("No offline jobs available")}
-              {selectedTab === "my-job-posts" && t("You haven't posted any jobs yet")}
-            </p>
-          )}
-
-          {jobs.map((job) => (
-            <div
+  <div className="max-w-3xl mx-auto space-y-4">
+    {loadingData ? (
+      <div className="flex justify-center py-10">
+        <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    ) : jobs.length === 0 ? (
+      <p className="text-center text-white/60 py-10">
+        {selectedTab === "online-jobs" && t("No online jobs available")}
+        {selectedTab === "offline-jobs" && t("No offline jobs available")}
+        {selectedTab === "my-job-posts" && t("You haven't posted any jobs yet")}
+      </p>
+    ) : (
+      jobs.map((job) => (
+        <div
               key={job._id}
               onClick={() => {
                 if (selectedTab === "online-jobs") {
@@ -655,9 +656,10 @@ const filtered = professions.filter((p) =>
                 </p>
               )}
             </div>
-          ))}
-        </div>
-      )}
+      ))
+    )}
+  </div>
+)}
     </div>
   );
 }

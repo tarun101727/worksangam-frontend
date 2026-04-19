@@ -189,15 +189,16 @@ export default function Home() {
 };
 
   const fetchMyHirerJobs = async () => {
-    try {
-      const res = await axios.get(`${BASE_URL}/api/jobs/hirer/my-posts`, {
-        withCredentials: true,
-      });
-      setJobs(res.data.jobs || []);
-    } catch {
-      setError("Failed to load your posts");
-    }
-  };
+  try {
+    setLoadingData(true); // ✅ start spinner
+    const res = await axios.get(`${BASE_URL}/api/jobs/hirer/my-posts`, { withCredentials: true });
+    setJobs(res.data.jobs || []);
+  } catch {
+    setError("Failed to load your posts");
+  } finally {
+    setLoadingData(false); // ✅ stop spinner
+  }
+};
 
   // ======================= FETCH PROFESSIONS =======================
   const fetchProfessions = async () => {
@@ -354,14 +355,10 @@ const filtered = professions.filter((p) =>
   };
 
   const fetchOfflineJobsByDistance = async (distanceKm) => {
-  if (!navigator.geolocation) {
-    alert("Geolocation not supported");
-    return;
-  }
-
+  if (!navigator.geolocation) { alert("Geolocation not supported"); return; }
+  setLoadingData(true); // ✅ start spinner
   navigator.geolocation.getCurrentPosition(
     async () => {
-
       try {
         const res = await axios.get(
           `${BASE_URL}/api/jobs/offline-nearby?distanceKm=${distanceKm}`,
@@ -371,11 +368,14 @@ const filtered = professions.filter((p) =>
       } catch (err) {
         console.error(err);
         setError("Failed to fetch offline jobs by distance");
+      } finally {
+        setLoadingData(false); // ✅ stop spinner
       }
     },
     (err) => {
       console.error("Geolocation error:", err);
       setError("Unable to get your location");
+      setLoadingData(false); // ✅ stop spinner even on error
     },
     { enableHighAccuracy: true }
   );

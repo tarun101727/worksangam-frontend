@@ -14,7 +14,7 @@ const CreditPlans = () => {
   // ✅ Fetch current credits
   const fetchCredits = async () => {
     try {
-      const res = await axios.get(`${BASE_URL}/api/user/credits`, {
+      const res = await axios.get(`${BASE_URL}/api/auth/user/credits`, {
         withCredentials: true,
       });
       setCredits(res.data.credits);

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
@@ -94,7 +93,7 @@ const Profile = () => {
 
         {/* ---------------- HEADER ---------------- */}
 
-        <div className="relative flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 mb-10">
+        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-10">
           
               {/* Right: Chat Button (only visible to hirers viewing an employee) */}
   {loggedInUser?.role === "hirer" &&
@@ -232,6 +231,27 @@ const Profile = () => {
           </div>
 
         </div>
+
+        {/* RIGHT SIDE PANEL (ONLY LAPTOP) */}
+{profileUser.isGuest && (
+  <div className="hidden sm:block min-w-[220px] bg-yellow-500/10 border border-yellow-400/30 p-4 rounded-xl">
+    
+    <p className="text-yellow-300 font-semibold text-sm">
+      ⚠️ Guest Account
+    </p>
+
+    <p className="text-xs text-white/60 mt-1">
+      Unlock all features by completing profile
+    </p>
+
+    <button
+      onClick={() => navigate("/signup/role")}
+      className="mt-3 w-full py-2 rounded-lg bg-green-500 hover:bg-green-600 text-sm font-semibold"
+    >
+      🚀 Complete Profile
+    </button>
+  </div>
+)}
 
         {/* ---------------- ROLE BASED CONTENT ---------------- */}
 

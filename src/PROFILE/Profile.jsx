@@ -212,9 +212,11 @@ const Profile = () => {
 
           {/* NAME */}
           <div>
-            <h2 className="text-3xl font-bold">
-              {profileUser.firstName} {profileUser.lastName}
-            </h2>
+            {!profileUser.isGuest && (
+    <h2 className="text-3xl font-bold">
+      {profileUser.firstName} {profileUser.lastName}
+    </h2>
+  )}
 
             <p className="text-sm text-white/60 capitalize">
               {profileUser.role}

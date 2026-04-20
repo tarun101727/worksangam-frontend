@@ -12,48 +12,71 @@ const GuestProfile = ({ user }) => {
           ⚠️ You are using a Guest Account
         </p>
         <p className="text-sm text-white/60 mt-1">
-          Some features are restricted. Complete your profile to unlock everything.
+          Choose how you want to use Worksangam 👇
         </p>
       </div>
 
-      {/* BASIC INFO */}
-      <div className="space-y-3">
-        <p><b>Role:</b> Guest</p>
-        <p><b>Status:</b> Limited Access</p>
-        <p><b>Experience:</b> —</p>
-        <p><b>Skills:</b> —</p>
+      {/* ROLE SELECTION */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+        {/* EMPLOYEE CARD */}
+        <div className="bg-[#0F172A]/80 p-5 rounded-xl border border-white/10 hover:border-green-400 transition">
+          <h3 className="text-lg font-semibold mb-2">👷 Employee</h3>
+
+          <ul className="text-sm text-white/60 space-y-1 mb-4">
+            <li>✔ Find jobs nearby</li>
+            <li>✔ Chat with hirers</li>
+            <li>✔ Earn money</li>
+            <li>✔ Build your profile</li>
+          </ul>
+
+          <button
+            onClick={() => navigate("/signup/employee")}
+            className="w-full py-2 rounded-lg bg-green-500 hover:bg-green-600 font-semibold"
+          >
+            Continue as Employee
+          </button>
+        </div>
+
+        {/* HIRER CARD */}
+        <div className="bg-[#0F172A]/80 p-5 rounded-xl border border-white/10 hover:border-indigo-400 transition">
+          <h3 className="text-lg font-semibold mb-2">🧑‍💼 Hirer</h3>
+
+          <ul className="text-sm text-white/60 space-y-1 mb-4">
+            <li>✔ Post jobs</li>
+            <li>✔ Hire instantly</li>
+            <li>✔ Chat with workers</li>
+            <li>✔ Manage applications</li>
+          </ul>
+
+          <button
+            onClick={() => navigate("/signup/hirer")}
+            className="w-full py-2 rounded-lg bg-indigo-500 hover:bg-indigo-600 font-semibold"
+          >
+            Continue as Hirer
+          </button>
+        </div>
+
       </div>
 
       {/* LOCKED FEATURES */}
       <div className="bg-[#0F172A]/80 p-4 rounded-xl">
         <h3 className="font-semibold mb-3">🔒 Locked Features</h3>
 
-        <ul className="space-y-2 text-white/60">
+        <ul className="space-y-2 text-white/60 text-sm">
           <li>• Chat with users</li>
-          <li>• Apply for jobs</li>
-          <li>• Post jobs</li>
+          <li>• Apply / Post jobs</li>
           <li>• Rating & reviews</li>
+          <li>• Real-time job notifications</li>
         </ul>
       </div>
 
-      {/* BENEFITS */}
-      <div className="bg-indigo-500/10 p-4 rounded-xl">
-        <h3 className="font-semibold mb-2">Why create account?</h3>
-
-        <ul className="text-sm text-white/70 space-y-1">
-          <li>✔ Get hired faster</li>
-          <li>✔ Chat with hirers</li>
-          <li>✔ Earn money</li>
-          <li>✔ Build your profile</li>
-        </ul>
-      </div>
-
-      {/* CTA BUTTON */}
+      {/* OPTIONAL QUICK CTA */}
       <button
         onClick={() => navigate("/signup/role")}
-        className="w-full py-3 rounded-xl bg-green-500 hover:bg-green-600 font-semibold"
+        className="w-full py-3 rounded-xl bg-gradient-to-r from-green-500 to-indigo-500 hover:opacity-90 font-semibold"
       >
-        🚀 Complete Profile
+        🚀 Complete Profile (Quick Setup)
       </button>
 
     </div>

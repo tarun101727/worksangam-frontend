@@ -50,7 +50,7 @@ const GuestProfile = ({ user }) => {
 
       {/* CTA BUTTON */}
       <button
-        onClick={() => navigate("/signup")}
+        onClick={() => navigate("/signup/role")}
         className="w-full py-3 rounded-xl bg-green-500 hover:bg-green-600 font-semibold"
       >
         🚀 Complete Profile

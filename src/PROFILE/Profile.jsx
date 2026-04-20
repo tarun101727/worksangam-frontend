@@ -212,15 +212,16 @@ const Profile = () => {
 
           {/* NAME */}
           <div>
-            {!profileUser.isGuest && (
+        
     <h2 className="text-3xl font-bold">
       {profileUser.firstName} {profileUser.lastName}
     </h2>
-  )}
-
+            
+            {!profileUser.isGuest && (
             <p className="text-sm text-white/60 capitalize">
               {profileUser.role}
             </p>
+            )}
 
             {!isOwnProfile && (
               <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full bg-yellow-400/20 text-yellow-300">

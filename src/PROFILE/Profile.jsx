@@ -93,7 +93,7 @@ const Profile = () => {
 
         {/* ---------------- HEADER ---------------- */}
 
-        <div className="relative flex flex-col sm:flex-row items-start gap-6 mb-10">
+        <div className="relative flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 mb-10">
           
               {/* Right: Chat Button (only visible to hirers viewing an employee) */}
   {loggedInUser?.role === "hirer" &&
@@ -188,55 +188,52 @@ const Profile = () => {
             </button>
           )}
 
-         <div className="flex items-center gap-4">
+          {/* PROFILE IMAGE */}
+          {profileUser.profileImage ? (
+            <img
+              src={
+  profileUser.profileImage?.startsWith("http")
+    ? profileUser.profileImage
+    : `${BASE_URL}${profileUser.profileImage}`
+}
+              alt="Profile"
+              onClick={() => setShowImage(true)}
+              className="w-24 h-24 rounded-full object-cover cursor-pointer hover:opacity-80 transition"
+            />
+          ) : (
+            <div
+              className="w-24 h-24 rounded-full flex items-center justify-center
+              text-3xl font-bold text-white"
+              style={{ background: profileUser.avatarColor }}
+            >
+              {profileUser.avatarInitial}
+            </div>
+          )}
 
-  {/* PROFILE IMAGE */}
-  {profileUser.profileImage ? (
-    <img
-      src={
-        profileUser.profileImage?.startsWith("http")
-          ? profileUser.profileImage
-          : `${BASE_URL}${profileUser.profileImage}`
-      }
-      alt="Profile"
-      onClick={() => setShowImage(true)}
-      className="w-24 h-24 rounded-full object-cover cursor-pointer hover:opacity-80 transition"
-    />
-  ) : (
-    <div
-      className="w-24 h-24 rounded-full flex items-center justify-center
-      text-3xl font-bold text-white"
-      style={{ background: profileUser.avatarColor }}
-    >
-      {profileUser.avatarInitial}
-    </div>
-  )}
-
-  {/* NAME */}
-  <div>
+          {/* NAME */}
+          <div>
+        
     <h2 className="text-3xl font-bold">
       {profileUser.firstName} {profileUser.lastName}
     </h2>
+            
+            {!profileUser.isGuest && (
+            <p className="text-sm text-white/60 capitalize">
+              {profileUser.role}
+            </p>
+            )}
 
-    {!profileUser.isGuest && (
-      <p className="text-sm text-white/60 capitalize">
-        {profileUser.role}
-      </p>
-    )}
-
-    {!isOwnProfile && (
-      <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full bg-yellow-400/20 text-yellow-300">
-        {t("Viewing profile")}
-      </span>
-    )}
-  </div>
-
-</div>
+            {!isOwnProfile && (
+              <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full bg-yellow-400/20 text-yellow-300">
+                {t("Viewing profile")}
+              </span>
+            )}
+          </div>
 
         </div>
 
         {profileUser.isGuest && (
-  <div className="hidden sm:block max-w-md text-white/80 border-l-2 border-green-500 pl-6">
+  <div className="hidden sm:block max-w-md text-white/80">
     <h3 className="text-xl font-semibold mb-2">
       👋 Welcome to Worksangam
     </h3>

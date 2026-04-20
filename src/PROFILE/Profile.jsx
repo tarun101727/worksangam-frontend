@@ -126,7 +126,7 @@ const Profile = () => {
   )}
 
           {/* SETTINGS BUTTON */}
-          {isOwnProfile && (
+          {isOwnProfile && !profileUser.isGuest && (
             <button
               onClick={() => navigate("/settings")}
               className="absolute top-0 right-0 p-2 rounded-full hover:bg-white/10 transition"

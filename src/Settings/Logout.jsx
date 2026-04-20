@@ -11,34 +11,33 @@ const [loading,setLoading] = useState(false);
     const { t } = useTranslation();
 
 const logoutUser = async () => {
-if(!window.confirm("Are you sure you want to logout?")){
-return;
-}
+  if (!window.confirm("Are you sure you want to logout?")) {
+    return;
+  }
 
-try{
+  try {
+    setLoading(true);
 
-setLoading(true);
+    await axios.post(
+      `${BASE_URL}/api/auth/logout`,
+      {},
+      { withCredentials: true }
+    );
 
-await axios.post(
-`${BASE_URL}/api/auth/logout`,
-{},
-{ withCredentials:true }
-);
+    alert("Logged out successfully");
 
-alert("Logged out successfully");
+    // ✅ ADD THIS
+    localStorage.clear();
+    sessionStorage.clear();
 
-navigate("/");
+    navigate("/");
+    window.location.reload(); // 🔥 IMPORTANT
 
-}catch(err){
-
-alert(err?.response?.data?.msg || "Logout failed");
-
-}finally{
-
-setLoading(false);
-
-}
-
+  } catch (err) {
+    alert(err?.response?.data?.msg || "Logout failed");
+  } finally {
+    setLoading(false);
+  }
 };
 
 return(

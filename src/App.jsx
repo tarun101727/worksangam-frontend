@@ -498,25 +498,33 @@ d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03
   </div>
 )}
 
-  {user.profileImage ? (
-  <img
-    src={getImageUrl(user.profileImage)}
-    alt="Profile"
-    className="w-full h-full object-cover rounded-full"
-  />
-) : (
+  {/* Profile */}
+{user && (
   <div
-    className="w-full h-full rounded-full flex items-center justify-center"
-    style={{
-      backgroundColor:
-        user.professionType === "guest"
-          ? "#9CA3AF" // ✅ gray for guest
-          : user.avatarColor || "#6B7280", // fallback gray
-    }}
+    onClick={() => navigate(`/profile/${user._id}`)}
+    className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
   >
-    <span className="text-white font-bold">
-      {user.avatarInitial || "G"}
-    </span>
+    {user.profileImage ? (
+      <img
+        src={getImageUrl(user.profileImage)}
+        alt="Profile"
+        className="w-full h-full object-cover"
+      />
+    ) : (
+      <div
+        className="w-full h-full flex items-center justify-center"
+        style={{
+          backgroundColor:
+            user.professionType === "guest"
+              ? "#9CA3AF" // ✅ gray perfect circle
+              : user.avatarColor || "#6B7280",
+        }}
+      >
+        <span className="text-white font-bold text-sm">
+          {user.avatarInitial || "G"}
+        </span>
+      </div>
+    )}
   </div>
 )}
 </div>

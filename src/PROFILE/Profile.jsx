@@ -232,24 +232,6 @@ const Profile = () => {
 
         </div>
 
-        {profileUser.isGuest && (
-  <div className="hidden sm:block max-w-md text-white/80">
-    <h3 className="text-xl font-semibold mb-2">
-      👋 Welcome to Worksangam
-    </h3>
-
-    <p className="text-sm text-white/60 leading-relaxed">
-      Worksangam connects workers and hirers in real-time.
-      <br /><br />
-      👉 Looking for work? Become an Employee and start earning.
-      <br />
-      👉 Want to hire? Join as a Hirer and find workers instantly.
-      <br /><br />
-      Choose your path below 👇
-    </p>
-  </div>
-)}
-
         {/* ---------------- ROLE BASED CONTENT ---------------- */}
 
 {profileUser.isGuest && (

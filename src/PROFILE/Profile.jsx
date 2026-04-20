@@ -7,6 +7,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import EmployeeProfile from "./EmployeeProfile";
 import HirerProfile from "./HirerProfile";
 import AdminProfile from "../AdminProfile";
+import GuestProfile from "./GuestProfile";
 import { useTranslation } from "react-i18next";
 
 
@@ -230,19 +231,21 @@ const Profile = () => {
 
         {/* ---------------- ROLE BASED CONTENT ---------------- */}
 
-        {profileUser.role === "employee" && (
-          <EmployeeProfile user={profileUser} readOnly={!isOwnProfile} />
-        )}
+{profileUser.isGuest && (
+  <GuestProfile user={profileUser} />
+)}
 
-      
+{!profileUser.isGuest && profileUser.role === "employee" && (
+  <EmployeeProfile user={profileUser} readOnly={!isOwnProfile} />
+)}
 
-        {profileUser.role === "hirer" && (
-          <HirerProfile user={profileUser} />
-        )}
+{!profileUser.isGuest && profileUser.role === "hirer" && (
+  <HirerProfile user={profileUser} />
+)}
 
-        {["admin", "owner"].includes(profileUser.role) && (
-          <AdminProfile user={profileUser} />
-        )}
+{!profileUser.isGuest && ["admin", "owner"].includes(profileUser.role) && (
+  <AdminProfile user={profileUser} />
+)}
 
       </div>
 

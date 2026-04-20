@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
 
-const GuestProfile = ({user}) => {
+const GuestProfile = ({ user }) => {
   const navigate = useNavigate();
 
   return (
     <div className="text-white space-y-6">
 
-      {/* GUEST BADGE */}
+      {/* ---------------- GUEST BADGE ---------------- */}
       <div className="bg-yellow-500/10 border border-yellow-400/30 p-4 rounded-xl">
         <p className="text-yellow-300 font-semibold">
           ⚠️ You are using a Guest Account
@@ -16,7 +16,33 @@ const GuestProfile = ({user}) => {
         </p>
       </div>
 
-      {/* ROLE SELECTION */}
+      {/* ---------------- TEMPORARY WARNING ---------------- */}
+      <div className="bg-red-500/10 border border-red-400/30 p-4 rounded-xl">
+        <p className="text-red-300 font-semibold">
+          ⏳ Temporary Account
+        </p>
+        <p className="text-sm text-white/60 mt-1">
+          Your data may be lost anytime. Complete your profile to save progress.
+        </p>
+      </div>
+
+      {/* ---------------- GUEST INFO ---------------- */}
+      <div className="text-sm text-white/50">
+        Guest ID: {user?._id?.slice(-6)}
+      </div>
+
+      {/* ---------------- PROGRESS BAR ---------------- */}
+      <div>
+        <p className="text-sm text-white/60 mb-1">Profile Completion</p>
+        <div className="w-full bg-white/10 h-2 rounded-full">
+          <div className="bg-green-500 h-2 rounded-full w-[20%]" />
+        </div>
+        <p className="text-xs text-white/40 mt-1">
+          Complete signup to unlock 100%
+        </p>
+      </div>
+
+      {/* ---------------- ROLE SELECTION ---------------- */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
         {/* EMPLOYEE CARD */}
@@ -59,7 +85,7 @@ const GuestProfile = ({user}) => {
 
       </div>
 
-      {/* LOCKED FEATURES */}
+      {/* ---------------- LOCKED FEATURES ---------------- */}
       <div className="bg-[#0F172A]/80 p-4 rounded-xl">
         <h3 className="font-semibold mb-3">🔒 Locked Features</h3>
 
@@ -71,12 +97,20 @@ const GuestProfile = ({user}) => {
         </ul>
       </div>
 
-      {/* OPTIONAL QUICK CTA */}
+      {/* ---------------- PRIMARY CTA ---------------- */}
       <button
         onClick={() => navigate("/signup/role")}
         className="w-full py-3 rounded-xl bg-gradient-to-r from-green-500 to-indigo-500 hover:opacity-90 font-semibold"
       >
         🚀 Complete Profile (Quick Setup)
+      </button>
+
+      {/* ---------------- EXPLORE OPTION ---------------- */}
+      <button
+        onClick={() => navigate("/jobs")}
+        className="w-full py-2 rounded-lg border border-white/20 hover:bg-white/10"
+      >
+        👀 Explore Jobs as Guest
       </button>
 
     </div>

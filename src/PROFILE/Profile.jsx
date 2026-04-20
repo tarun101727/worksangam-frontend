@@ -93,7 +93,7 @@ const Profile = () => {
 
         {/* ---------------- HEADER ---------------- */}
 
-        <div className="relative flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 mb-10">
+        <div className={`relative flex flex-col ${profileUser.isGuest ? "items-center text-center" : "sm:flex-row items-start sm:items-center"} gap-4 sm:gap-6 mb-10`}>
           
               {/* Right: Chat Button (only visible to hirers viewing an employee) */}
   {loggedInUser?.role === "hirer" &&

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-const GuestProfile = ({ user }) => {
+const GuestProfile = () => {
   const navigate = useNavigate();
 
   return (

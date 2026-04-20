@@ -71,13 +71,12 @@ const GuestProfile = ({user}) => {
         </ul>
       </div>
 
-      {/* OPTIONAL QUICK CTA */}
       <button
-        onClick={() => navigate("/signup/role")}
-        className="w-full py-3 rounded-xl bg-gradient-to-r from-green-500 to-indigo-500 hover:opacity-90 font-semibold"
-      >
-        🚀 Complete Profile (Quick Setup)
-      </button>
+  onClick={() => navigate("/login")}
+  className="w-full py-3 rounded-xl bg-gradient-to-r from-green-500 to-indigo-500 hover:opacity-90 font-semibold"
+>
+  🚀 Login to Continue
+</button>
 
     </div>
   );

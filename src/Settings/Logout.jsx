@@ -40,6 +40,14 @@ const logoutUser = async () => {
   }
 };
 
+if (loading) {
+  return (
+    <div className="min-h-screen flex justify-center items-center">
+      <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+}
+
 return(
 
 <div className="min-h-screen text-white px-4 py-6 max-w-3xl mx-auto">
@@ -77,7 +85,7 @@ onClick={logoutUser}
 disabled={loading}
 className="flex-1 bg-yellow-600 hover:bg-yellow-700 p-3 rounded-xl font-semibold"
 >
-{loading ? t("Logging out...") : t("Logout")}
+{t("Logout")}
 </button>
 
 <button

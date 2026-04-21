@@ -7,3 +7,5 @@ export const socket = io(BASE_URL, {
   withCredentials: true,
   auth: { userId: Cookies.get("userId") },
 });
+
+console.log("🧠 Socket sending userId:", Cookies.get("userId"));

@@ -380,7 +380,7 @@ const openNotifications = async () => {
               {t("WORKSANGAM")}
             </h1>
 
-           <div className="flex items-center gap-4 sm:gap-5 md:gap-6 lg:gap-7 xl:gap-8 relative">
+           <div className="flex items-center gap-2 sm:gap-4 md:gap-6 lg:gap-7 xl:gap-8 relative">
 
             <HeaderLanguageSelect /> 
 
@@ -391,7 +391,7 @@ className="cursor-pointer"
 
 <svg
 xmlns="http://www.w3.org/2000/svg"
-className="w-7 h-7"
+className="w-5 h-5 sm:w-7 sm:h-7"
 fill="none"
 viewBox="0 0 24 24"
 stroke="currentColor"
@@ -415,7 +415,7 @@ d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03
 >
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="w-7 h-7 sm:w-8 sm:h-8 text-white hover:text-yellow-400 transition"
+    className="w-5 h-5 sm:w-8 sm:h-8 text-white hover:text-yellow-400 transition"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -501,7 +501,7 @@ d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03
 {user && (
   <div
     onClick={() => navigate(`/profile/${user._id}`)}
-    className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
+    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
   >
     {user.profileImage ? (
       <img

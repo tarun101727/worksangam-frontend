@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
 import { useNavigate } from "react-router-dom";
@@ -10,11 +10,19 @@ export default function HirerDelete() {
   const [reason, setReason] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
   const { t } = useTranslation();
 
   // For translation
   const translateTimer = useRef(null);
   const latestTypedValue = useRef("");
+
+  useEffect(() => {
+  // simulate small delay OR wait for any future API
+  setTimeout(() => {
+    setPageLoading(false);
+  }, 300); // smooth UX
+}, []);
 
   const translateText = async (text) => {
     const lang = i18n.language || "en";
@@ -85,6 +93,14 @@ export default function HirerDelete() {
       setLoading(false);
     }
   };
+
+  if (pageLoading) {
+  return (
+    <div className="min-h-screen flex justify-center items-center">
+      <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+}
 
   return (
     <div className="min-h-screen text-white px-4 py-6 max-w-3xl mx-auto">

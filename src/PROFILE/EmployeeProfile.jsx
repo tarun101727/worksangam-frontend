@@ -34,7 +34,7 @@ const Star = memo(({ index, value, setRating, setHover }) => {
     <svg
       onClick={handleClick}
       onMouseMove={handleHover}
-      onMouseLeave={() => setHover(0)}
+      onMouseLeave={() => setHover(null)}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       className="w-7 h-7 cursor-pointer"
@@ -65,7 +65,7 @@ const Star = memo(({ index, value, setRating, setHover }) => {
   );
 });
 
-const EmployeeProfile = ({ user, notification, clear, readOnly }) => {
+const EmployeeProfile = ({ user, clear, readOnly }) => {
 
   const navigate = useNavigate();
 
@@ -73,7 +73,7 @@ const EmployeeProfile = ({ user, notification, clear, readOnly }) => {
   const [loading, setLoading] = useState(false);
 
   const [rating, setRating] = useState(0);
-  const [hover, setHover] = useState(0);
+  const [hover, setHover] = useState(null);
 
   const [avgRating, setAvgRating] = useState(0);
   const [myRating, setMyRating] = useState(0);
@@ -88,9 +88,10 @@ const [loadingTranslate, setLoadingTranslate] = useState(null);
 
 const currentLang = localStorage.getItem("lang") || "en";
 const { user: loggedUser } = useAuth();
+const [notification, setNotification] = useState(null);
+const [ratingLoading, setRatingLoading] = useState(false);
 
-
-const handleTranslate = async (field, text) => {
+const handleTranslate = useCallback(async (field, text) => {
   if (!text) return;
 
   try {
@@ -114,15 +115,41 @@ const handleTranslate = async (field, text) => {
   } finally {
     setLoadingTranslate(null);
   }
-};
+}, [currentLang]); // ✅ important dependency
   
 
-  /* Join socket room */
+useEffect(() => {
+  const handleNewJob = (job) => {
+    setNotification(job);
+  };
+
+  socket.off("new-job-popup", handleNewJob); // ✅ fix
+  socket.on("new-job-popup", handleNewJob);
+
+  return () => {
+    socket.off("new-job-popup", handleNewJob);
+  };
+}, []);
+
   useEffect(() => {
-    if (user?._id) {
-      socket.emit("join-profile", user._id);
-    }
-  }, [user?._id]);
+  if (!user?._id) return;
+
+  socket.emit("join-profile", user._id);
+
+  return () => {
+    socket.emit("leave-profile", user._id);
+  };
+}, [user?._id]);
+
+useEffect(() => {
+  if (!notification) return;
+
+  const timer = setTimeout(() => {
+    setNotification(null);
+  }, 10000); // 10 sec
+
+  return () => clearTimeout(timer);
+}, [notification]);
 
   /* Rating updates */
   useEffect(() => {
@@ -133,7 +160,8 @@ const handleTranslate = async (field, text) => {
       }
     };
 
-    socket.on("employee-rating-updated", handleRatingUpdate);
+    socket.off("employee-rating-updated", handleRatingUpdate);
+socket.on("employee-rating-updated", handleRatingUpdate);
 
     return () => {
       socket.off("employee-rating-updated", handleRatingUpdate);
@@ -150,7 +178,8 @@ const handleTranslate = async (field, text) => {
       }
     };
 
-    socket.on("employee-availability-changed", handleAvailabilityChange);
+    socket.off("employee-availability-changed", handleAvailabilityChange);
+socket.on("employee-availability-changed", handleAvailabilityChange);
 
     return () => {
       socket.off("employee-availability-changed", handleAvailabilityChange);
@@ -202,13 +231,25 @@ const handleTranslate = async (field, text) => {
       if (!isAvailable) {
 
         if (!navigator.geolocation) {
-          alert("Geolocation not supported");
-          return;
-        }
+  alert("Geolocation not supported");
+  setLoading(false);
+  return;
+}
 
-        const pos = await new Promise((resolve, reject) =>
-          navigator.geolocation.getCurrentPosition(resolve, reject)
-        );
+        let pos;
+
+try {
+  pos = await new Promise((resolve, reject) =>
+    navigator.geolocation.getCurrentPosition(resolve, reject, {
+      enableHighAccuracy: true,
+      timeout: 10000,
+    })
+  );
+} catch (geoErr) {
+  alert("Location permission denied");
+  setLoading(false);
+  return;
+}
 
         await axios.post(
           `${BASE_URL}/api/auth/save-location`,
@@ -231,7 +272,7 @@ const handleTranslate = async (field, text) => {
     } catch (err) {
 
       console.error(err);
-      alert("Location permission required");
+      alert(err.message || "Location permission required");
 
     } finally {
       setLoading(false);
@@ -241,6 +282,7 @@ const handleTranslate = async (field, text) => {
 
   /* Accept job */
   const acceptJob = useCallback(async () => {
+    if (!notification?.postId) return;
 
     try {
 
@@ -251,7 +293,8 @@ const handleTranslate = async (field, text) => {
       );
 
       clear?.();
-      navigate(`/chat/${notification.hirer._id}`);
+      if (!notification?.hirer?._id) return;
+navigate(`/chat/${notification.hirer._id}`);
 
     } catch (err) {
       console.error("Accept job failed", err);
@@ -261,9 +304,10 @@ const handleTranslate = async (field, text) => {
 
   /* Submit rating */
   const submitRating = async () => {
-
+    if (!rating || rating < 0.5) return;
+    if (ratingLoading) return;
     try {
-
+      setRatingLoading(true);
       const res = await axios.post(
         `${BASE_URL}/api/auth/rate-employee`,
         { employeeId: user._id, rating },
@@ -272,15 +316,22 @@ const handleTranslate = async (field, text) => {
 
       setAvgRating(res.data.ratingAverage);
       setMyRating(rating);
+      setHover(0); 
       setRating(0);
 
     } catch (err) {
       console.error("Rating failed", err);
-    }
+    }finally {
+    setRatingLoading(false);
+  }
 
   };
 
-  const starValue = hover || rating || myRating;
+ const starValue = hover || rating || myRating;
+
+  const clearNotification = () => {
+  setNotification(null);
+};
 
   return (
     <>
@@ -299,9 +350,11 @@ const handleTranslate = async (field, text) => {
 
         {!readOnly && (
           <button
-            disabled={loading}
-            onClick={toggleAvailability}
-            className={`px-5 py-2 rounded-xl font-semibold ${
+  disabled={loading}
+  onClick={toggleAvailability}
+  className={`px-5 py-2 rounded-xl font-semibold ${
+    loading ? "opacity-50 cursor-not-allowed" : ""
+  } ${
               isAvailable
                 ? "bg-red-500 hover:bg-red-600"
                 : "bg-green-500 hover:bg-green-600"
@@ -332,9 +385,12 @@ const handleTranslate = async (field, text) => {
 
           {rating > 0 && (
             <button
-              onClick={submitRating}
-              className="mt-3 px-4 py-2 bg-indigo-500 rounded-lg"
-            >
+  disabled={ratingLoading}
+  onClick={submitRating}
+  className={`mt-3 px-4 py-2 bg-indigo-500 rounded-lg ${
+    ratingLoading ? "opacity-50 cursor-not-allowed" : ""
+  }`}
+>
               {t("Submit")}
             </button>
           )}
@@ -422,7 +478,7 @@ const handleTranslate = async (field, text) => {
           </p>
 
           <p className="text-sm text-white/70">
-            {notification.hirer.firstName} {notification.hirer.lastName}
+            {notification?.hirer?.firstName} {notification?.hirer?.lastName}
           </p>
 
           <p className="mt-3 text-sm">{notification.description}</p>
@@ -441,7 +497,7 @@ const handleTranslate = async (field, text) => {
             </button>
 
             <button
-              onClick={clear}
+             onClick={clearNotification}
               className="flex-1 bg-gray-800 py-2 rounded-xl"
             >
               {t("Deny")}

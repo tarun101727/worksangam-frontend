@@ -186,18 +186,6 @@ useEffect(() => {
   location.pathname.startsWith(route)
 );
 
-
-useEffect(() => {
-  if (user?._id) {
-    console.log("🟢 Connecting socket for:", user._id);
-
-    socket.auth = { userId: user._id }; // ✅ SET AUTH
-    socket.connect(); // ✅ CONNECT AFTER USER READY
-
-    socket.emit("join-user", user._id); // ✅ JOIN ROOM
-  }
-}, [user?._id]);
-
   /* 🔥 RESUME SIGNUP REDIRECT */
   useEffect(() => {
     if (!loading && isAuthenticated && user?.isGuest) {
@@ -267,22 +255,6 @@ useEffect(() => {
   }
 });
   return () => socket.off("new-chat-notification");
-}, []);
-
-
-useEffect(() => {
-  socket.on("new-job-notification", (notification) => {
-    console.log("🔥 RECEIVED JOB:", notification); 
-    setNotifications(prev => [notification, ...prev]);
-
-    if (Notification.permission === "granted") {
-      new Notification("New Job 🚀", {
-        body: `${notification.job.profession} job available`,
-      });
-    }
-  });
-
-  return () => socket.off("new-job-notification");
 }, []);
 
   useEffect(() => {
@@ -506,14 +478,6 @@ d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03
             {n.type === "job_application" && (
               <><b>{n.sender?.firstName} {n.sender?.lastName}</b> applied for your job</>
             )}
-            {n.type === "new_job" && (
-  <>
-    <b>{n.sender?.firstName}</b> posted a job:{" "}
-    <span className="text-yellow-400">
-      {n.job?.profession}
-    </span>
-  </>
-)}
             {n.type === "application_accepted" && (
               <>Your application was <span className="text-green-400">accepted</span> by <b>{n.sender?.firstName} {n.sender?.lastName}</b></>
             )}

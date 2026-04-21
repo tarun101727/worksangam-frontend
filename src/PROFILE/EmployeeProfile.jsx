@@ -34,7 +34,7 @@ const Star = memo(({ index, value, setRating, setHover }) => {
     <svg
       onClick={handleClick}
       onMouseMove={handleHover}
-      onMouseLeave={() => setHover(null)}
+      onMouseLeave={() => setHover(0)}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       className="w-7 h-7 cursor-pointer"
@@ -65,7 +65,7 @@ const Star = memo(({ index, value, setRating, setHover }) => {
   );
 });
 
-const EmployeeProfile = ({ user, clear, readOnly }) => {
+const EmployeeProfile = ({ user, notification, clear, readOnly }) => {
 
   const navigate = useNavigate();
 
@@ -73,7 +73,7 @@ const EmployeeProfile = ({ user, clear, readOnly }) => {
   const [loading, setLoading] = useState(false);
 
   const [rating, setRating] = useState(0);
-  const [hover, setHover] = useState(null);
+  const [hover, setHover] = useState(0);
 
   const [avgRating, setAvgRating] = useState(0);
   const [myRating, setMyRating] = useState(0);
@@ -88,10 +88,9 @@ const [loadingTranslate, setLoadingTranslate] = useState(null);
 
 const currentLang = localStorage.getItem("lang") || "en";
 const { user: loggedUser } = useAuth();
-const [notification, setNotification] = useState(null);
-const [ratingLoading, setRatingLoading] = useState(false);
 
-const handleTranslate = useCallback(async (field, text) => {
+
+const handleTranslate = async (field, text) => {
   if (!text) return;
 
   try {
@@ -115,41 +114,15 @@ const handleTranslate = useCallback(async (field, text) => {
   } finally {
     setLoadingTranslate(null);
   }
-}, [currentLang]); // ✅ important dependency
+};
   
 
-useEffect(() => {
-  const handleNewJob = (job) => {
-    setNotification(job);
-  };
-
-  socket.off("new-job-popup", handleNewJob); // ✅ fix
-  socket.on("new-job-popup", handleNewJob);
-
-  return () => {
-    socket.off("new-job-popup", handleNewJob);
-  };
-}, []);
-
+  /* Join socket room */
   useEffect(() => {
-  if (!user?._id) return;
-
-  socket.emit("join-profile", user._id);
-
-  return () => {
-    socket.emit("leave-profile", user._id);
-  };
-}, [user?._id]);
-
-useEffect(() => {
-  if (!notification) return;
-
-  const timer = setTimeout(() => {
-    setNotification(null);
-  }, 10000); // 10 sec
-
-  return () => clearTimeout(timer);
-}, [notification]);
+    if (user?._id) {
+      socket.emit("join-profile", user._id);
+    }
+  }, [user?._id]);
 
   /* Rating updates */
   useEffect(() => {
@@ -160,8 +133,7 @@ useEffect(() => {
       }
     };
 
-    socket.off("employee-rating-updated", handleRatingUpdate);
-socket.on("employee-rating-updated", handleRatingUpdate);
+    socket.on("employee-rating-updated", handleRatingUpdate);
 
     return () => {
       socket.off("employee-rating-updated", handleRatingUpdate);
@@ -178,8 +150,7 @@ socket.on("employee-rating-updated", handleRatingUpdate);
       }
     };
 
-    socket.off("employee-availability-changed", handleAvailabilityChange);
-socket.on("employee-availability-changed", handleAvailabilityChange);
+    socket.on("employee-availability-changed", handleAvailabilityChange);
 
     return () => {
       socket.off("employee-availability-changed", handleAvailabilityChange);
@@ -231,25 +202,13 @@ socket.on("employee-availability-changed", handleAvailabilityChange);
       if (!isAvailable) {
 
         if (!navigator.geolocation) {
-  alert("Geolocation not supported");
-  setLoading(false);
-  return;
-}
+          alert("Geolocation not supported");
+          return;
+        }
 
-        let pos;
-
-try {
-  pos = await new Promise((resolve, reject) =>
-    navigator.geolocation.getCurrentPosition(resolve, reject, {
-      enableHighAccuracy: true,
-      timeout: 10000,
-    })
-  );
-} catch (geoErr) {
-  alert("Location permission denied");
-  setLoading(false);
-  return;
-}
+        const pos = await new Promise((resolve, reject) =>
+          navigator.geolocation.getCurrentPosition(resolve, reject)
+        );
 
         await axios.post(
           `${BASE_URL}/api/auth/save-location`,
@@ -272,7 +231,7 @@ try {
     } catch (err) {
 
       console.error(err);
-      alert(err.message || "Location permission required");
+      alert("Location permission required");
 
     } finally {
       setLoading(false);
@@ -282,7 +241,6 @@ try {
 
   /* Accept job */
   const acceptJob = useCallback(async () => {
-    if (!notification?.postId) return;
 
     try {
 
@@ -293,8 +251,7 @@ try {
       );
 
       clear?.();
-      if (!notification?.hirer?._id) return;
-navigate(`/chat/${notification.hirer._id}`);
+      navigate(`/chat/${notification.hirer._id}`);
 
     } catch (err) {
       console.error("Accept job failed", err);
@@ -304,10 +261,9 @@ navigate(`/chat/${notification.hirer._id}`);
 
   /* Submit rating */
   const submitRating = async () => {
-    if (!rating || rating < 0.5) return;
-    if (ratingLoading) return;
+
     try {
-      setRatingLoading(true);
+
       const res = await axios.post(
         `${BASE_URL}/api/auth/rate-employee`,
         { employeeId: user._id, rating },
@@ -316,22 +272,15 @@ navigate(`/chat/${notification.hirer._id}`);
 
       setAvgRating(res.data.ratingAverage);
       setMyRating(rating);
-      setHover(0); 
       setRating(0);
 
     } catch (err) {
       console.error("Rating failed", err);
-    }finally {
-    setRatingLoading(false);
-  }
+    }
 
   };
 
- const starValue = hover || rating || myRating;
-
-  const clearNotification = () => {
-  setNotification(null);
-};
+  const starValue = hover || rating || myRating;
 
   return (
     <>
@@ -350,11 +299,9 @@ navigate(`/chat/${notification.hirer._id}`);
 
         {!readOnly && (
           <button
-  disabled={loading}
-  onClick={toggleAvailability}
-  className={`px-5 py-2 rounded-xl font-semibold ${
-    loading ? "opacity-50 cursor-not-allowed" : ""
-  } ${
+            disabled={loading}
+            onClick={toggleAvailability}
+            className={`px-5 py-2 rounded-xl font-semibold ${
               isAvailable
                 ? "bg-red-500 hover:bg-red-600"
                 : "bg-green-500 hover:bg-green-600"
@@ -385,12 +332,9 @@ navigate(`/chat/${notification.hirer._id}`);
 
           {rating > 0 && (
             <button
-  disabled={ratingLoading}
-  onClick={submitRating}
-  className={`mt-3 px-4 py-2 bg-indigo-500 rounded-lg ${
-    ratingLoading ? "opacity-50 cursor-not-allowed" : ""
-  }`}
->
+              onClick={submitRating}
+              className="mt-3 px-4 py-2 bg-indigo-500 rounded-lg"
+            >
               {t("Submit")}
             </button>
           )}
@@ -478,7 +422,7 @@ navigate(`/chat/${notification.hirer._id}`);
           </p>
 
           <p className="text-sm text-white/70">
-            {notification?.hirer?.firstName} {notification?.hirer?.lastName}
+            {notification.hirer.firstName} {notification.hirer.lastName}
           </p>
 
           <p className="mt-3 text-sm">{notification.description}</p>
@@ -497,7 +441,7 @@ navigate(`/chat/${notification.hirer._id}`);
             </button>
 
             <button
-             onClick={clearNotification}
+              onClick={clear}
               className="flex-1 bg-gray-800 py-2 rounded-xl"
             >
               {t("Deny")}

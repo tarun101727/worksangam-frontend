@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 export default function HirerEmailChanging(){
 
 const [user,setUser] = useState(null);
-
+const [loading, setLoading] = useState(true);
 const [otp,setOtp] = useState("");
 const [newEmail,setNewEmail] = useState("");
 const [newEmailOtp,setNewEmailOtp] = useState("");
@@ -19,14 +19,16 @@ const { t } = useTranslation();
 
 /* GET USER */
 
-useEffect(()=>{
-
-axios.get(`${BASE_URL}/api/auth/get-current-user`,{
-withCredentials:true
-})
-.then(res=>setUser(res.data.user))
-
-},[])
+useEffect(() => {
+  axios.get(`${BASE_URL}/api/auth/get-current-user`, {
+    withCredentials: true
+  })
+  .then(res => setUser(res.data.user))
+  .catch(() => {})
+  .finally(() => {
+    setLoading(false); // ✅ STOP LOADING
+  });
+}, []);
 
 
 
@@ -97,7 +99,13 @@ window.location.reload()
 
 }
 
-
+if (loading) {
+  return (
+    <div className="min-h-screen flex justify-center items-center">
+      <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+}
 
 return(
 

@@ -189,9 +189,12 @@ useEffect(() => {
 
 useEffect(() => {
   if (user?._id) {
-    console.log("🟢 Joining socket room:", user._id);
+    console.log("🟢 Connecting socket for:", user._id);
 
-    socket.emit("join-user", user._id);   // ✅ REQUIRED
+    socket.auth = { userId: user._id }; // ✅ SET AUTH
+    socket.connect(); // ✅ CONNECT AFTER USER READY
+
+    socket.emit("join-user", user._id); // ✅ JOIN ROOM
   }
 }, [user?._id]);
 

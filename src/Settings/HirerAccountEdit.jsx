@@ -30,6 +30,8 @@ const [image,setImage] = useState(null);
 const [preview,setPreview] = useState("");
 
 const [loading,setLoading] = useState(false);
+const [userLoading, setUserLoading] = useState(true); 
+
 
 /* =======================
    LOAD USER DATA
@@ -54,7 +56,7 @@ setPreview(
     : `${BASE_URL}${user.profileImage}`
 );
 }
-
+setUserLoading(false);
 },[user]);
 
 
@@ -209,6 +211,14 @@ if (form.genderLabel !== user.genderLabel) {
     setLoading(false);
   }
 };
+
+if (userLoading) {
+  return (
+    <div className="min-h-screen flex justify-center items-center">
+      <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+}
 
 
 return(

@@ -186,6 +186,15 @@ useEffect(() => {
   location.pathname.startsWith(route)
 );
 
+
+useEffect(() => {
+  if (user?._id) {
+    console.log("🟢 Joining socket room:", user._id);
+
+    socket.emit("join-user", user._id);   // ✅ REQUIRED
+  }
+}, [user?._id]);
+
   /* 🔥 RESUME SIGNUP REDIRECT */
   useEffect(() => {
     if (!loading && isAuthenticated && user?.isGuest) {
@@ -260,6 +269,7 @@ useEffect(() => {
 
 useEffect(() => {
   socket.on("new-job-notification", (notification) => {
+    console.log("🔥 RECEIVED JOB:", notification); 
     setNotifications(prev => [notification, ...prev]);
 
     if (Notification.permission === "granted") {

@@ -20,7 +20,6 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showImage, setShowImage] = useState(false);
-  const [notification, setNotification] = useState(null);
   const { t } = useTranslation();
 
   const isOwnProfile = !userId || userId === loggedInUser?._id;
@@ -240,12 +239,7 @@ const Profile = () => {
 )}
 
 {!profileUser.isGuest && profileUser.role === "employee" && (
-  <EmployeeProfile 
-  user={profileUser} 
-  notification={notification}
-  clear={() => setNotification(null)}
-  readOnly={!isOwnProfile}
-/>
+  <EmployeeProfile user={profileUser} readOnly={!isOwnProfile} />
 )}
 
 {!profileUser.isGuest && profileUser.role === "hirer" && (

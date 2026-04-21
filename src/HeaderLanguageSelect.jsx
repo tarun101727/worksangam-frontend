@@ -83,9 +83,10 @@ export default function HeaderLanguageSelect() {
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="px-3 py-2 bg-gray-800 rounded-lg text-sm hover:bg-gray-700 flex items-center justify-between w-28"
+        className="px-2 py-1 sm:px-3 sm:py-2 bg-gray-800 rounded-lg text-xs sm:text-sm hover:bg-gray-700 flex items-center gap-1 max-w-[90px] sm:max-w-[120px]"
       >
-        <span>{currentLanguageLabel}</span>
+        <span className="hidden sm:inline">{currentLanguageLabel}</span>
+<span className="sm:hidden">🌐</span>
         {loadingLang && (
           <span className="ml-2 animate-spin border-b-2 border-white rounded-full w-3 h-3"></span>
         )}

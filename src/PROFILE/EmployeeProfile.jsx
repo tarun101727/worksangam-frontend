@@ -88,7 +88,16 @@ const [loadingTranslate, setLoadingTranslate] = useState(null);
 
 const currentLang = localStorage.getItem("lang") || "en";
 const { user: loggedUser } = useAuth();
+const [incomingJob, setIncomingJob] = useState(null);
 
+
+useEffect(() => {
+  socket.on("new-job-notification", (job) => {
+    setIncomingJob(job);
+  });
+
+  return () => socket.off("new-job-notification");
+}, []);
 
 const handleTranslate = async (field, text) => {
   if (!text) return;
@@ -245,7 +254,7 @@ const handleTranslate = async (field, text) => {
     try {
 
       await axios.post(
-        `${BASE_URL}/api/hirer-post/accept/${notification.postId}`,
+        `${BASE_URL}/api/jobs/accept/${incomingJob.postId}`,
         {},
         { withCredentials: true }
       );
@@ -413,7 +422,7 @@ const handleTranslate = async (field, text) => {
       </div>
 
       {/* JOB NOTIFICATION */}
-      {notification && isAvailable && (
+      {incomingJob && isAvailable && (
 
         <div className="fixed bottom-6 right-6 w-80 p-5 bg-[#0F172A]/90 rounded-2xl text-white">
 

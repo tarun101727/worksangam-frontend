@@ -241,6 +241,34 @@ useEffect(() => {
     };
   }, []);
 
+
+  useEffect(() => {
+  socket.on("new-job-notification", (job) => {
+    console.log("🔥 New Job:", job);
+
+    setNotifications(prev => [
+      {
+        ...job,
+        type: "new_job",
+        isRead: false,
+        createdAt: new Date()
+      },
+      ...prev
+    ]);
+
+    // 🔔 Browser notification
+    if (Notification.permission === "granted") {
+      new Notification("New Job Available 🚀", {
+        body: `${job.profession} job posted`,
+      });
+    }
+  });
+
+  return () => {
+    socket.off("new-job-notification");
+  };
+}, []);
+
   // Socket listener
 useEffect(() => {
   socket.on("new-chat-notification", (notif) => {

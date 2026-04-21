@@ -46,6 +46,7 @@ const latestTransliterateValue = useRef("");
 
 const [languageSearch, setLanguageSearch] = useState("");
 const [showDropdown, setShowDropdown] = useState(false);
+const [initialLoading, setInitialLoading] = useState(true);
 
 const genders = [
   { id: "Male", name: t("Male") },
@@ -209,6 +210,8 @@ useEffect(() => {
     );
   }
 
+  setInitialLoading(false);
+
 }, [user, i18n.language]); // 🔥 VERY IMPORTANT
 
   // -------------------------
@@ -342,6 +345,16 @@ useEffect(() => {
 
   const buttonPrimary =
     "w-full py-3 rounded-xl font-semibold text-white bg-[#6366F1] shadow-lg shadow-[#6366F1]/30 transition-all duration-300 hover:bg-[#4F46E5] active:scale-95 disabled:opacity-50";
+  
+
+    if (initialLoading) {
+  return (
+    <div className="min-h-screen flex justify-center items-center">
+      <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+}
+
 
   // -------------------------
   // JSX

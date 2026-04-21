@@ -139,12 +139,6 @@ useEffect(() => {
   fetchChatNotifications();
 }, [isAuthenticated]);
 
-  const removeNotification = (postId) => {
-    setNotifications((prev) =>
-      prev.filter((n) => n.postId !== postId)
-    );
-  };
-
   const params = new URLSearchParams(location.search);
   const isSwitchMode = params.get("mode") === "switch";
 
@@ -213,42 +207,39 @@ useEffect(() => {
     }
   }, [loading, isAuthenticated, user, location.pathname, navigate]);
 
-  useEffect(() => {
+ useEffect(() => {
   if (user?._id) {
-    console.log("🟢 Joining socket room:", user._id); // DEBUG
-    socket.emit("join-user", user._id);
+    console.log("🟢 Connecting socket with user:", user._id);
+
+    socket.auth = { userId: user._id }; // ✅ SET USER ID
+    socket.connect();                  // ✅ CONNECT SOCKET
+
+    socket.emit("join-user", user._id); // (optional but fine)
   }
 }, [user]);
 
+useEffect(() => {
+  return () => {
+    socket.disconnect(); // ✅ CLEANUP
+  };
+}, []);
+
   /* 🔔 SOCKET LISTENERS */
   useEffect(() => {
-    socket.on("new-job-notification", (notification) => {
-  console.log("🔥 RECEIVED new-job-notification:", notification); // ✅ ADD
+  socket.on("new-job-notification", (notification) => {
+    console.log("🔥 RECEIVED new-job-notification:", notification);
 
-  setNotifications(prev => [notification, ...prev]);
+    setNotifications(prev => [notification, ...prev]);
 
-  if (Notification.permission === "granted") {
-    new Notification("New Job 🚀", {
-      body: `${notification.job.profession} job available`,
-    });
-  }
-});
+    if (Notification.permission === "granted") {
+      new Notification("New Job 🚀", {
+        body: `${notification.job.profession} job available`,
+      });
+    }
+  });
 
-    socket.on("job-taken", ({ postId }) => {
-      removeNotification(postId);
-      alert("Another employee accepted this job");
-    });
-
-    socket.on("job-expired", ({ postId }) => {
-      removeNotification(postId);
-    });
-
-    return () => {
-      socket.off("new-notification");
-      socket.off("job-taken");
-      socket.off("job-expired");
-    };
-  }, []);
+  return () => socket.off("new-job-notification");
+}, []);
 
   // Socket listener
 useEffect(() => {

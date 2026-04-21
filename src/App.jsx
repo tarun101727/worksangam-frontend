@@ -213,14 +213,23 @@ useEffect(() => {
     }
   }, [loading, isAuthenticated, user, location.pathname, navigate]);
 
+  useEffect(() => {
+  if (user?._id) {
+    console.log("🟢 Joining socket room:", user._id); // DEBUG
+    socket.emit("join-user", user._id);
+  }
+}, [user]);
+
   /* 🔔 SOCKET LISTENERS */
   useEffect(() => {
-    socket.on("new-notification", (notification) => {
-  setNotifications((prev) => [notification, ...prev]);
+    socket.on("new-job-notification", (notification) => {
+  console.log("🔥 RECEIVED new-job-notification:", notification); // ✅ ADD
+
+  setNotifications(prev => [notification, ...prev]);
 
   if (Notification.permission === "granted") {
-    new Notification("New Job Application", {
-      body: `${notification.sender.firstName} applied for your job`,
+    new Notification("New Job 🚀", {
+      body: `${notification.job.profession} job available`,
     });
   }
 });

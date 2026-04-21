@@ -327,14 +327,13 @@ const openNotifications = async () => {
   }
 };
 
-  /* 🔒 WAIT FOR AUTH CHECK */
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-white">
-        Checking authentication...
-      </div>
-    );
-  }
+ if (loading) {
+  return (
+    <div className="min-h-screen flex justify-center items-center">
+      <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+}
 
   /* 🧠 ALLOW VALID ONBOARDING ROUTES */
   const isOnCorrectOnboardingRoute =

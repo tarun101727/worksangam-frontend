@@ -239,7 +239,11 @@ const Profile = () => {
 )}
 
 {!profileUser.isGuest && profileUser.role === "employee" && (
-  <EmployeeProfile user={profileUser} readOnly={!isOwnProfile} />
+  <EmployeeProfile 
+  user={profileUser} 
+  readOnly={!isOwnProfile} 
+  notification={null} // temporary fix (see below)
+/>
 )}
 
 {!profileUser.isGuest && profileUser.role === "hirer" && (

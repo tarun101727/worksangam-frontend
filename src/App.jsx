@@ -260,14 +260,11 @@ useEffect(() => {
 
 useEffect(() => {
   socket.on("new-job-notification", (notification) => {
-
-    console.log("🔥 RECEIVED JOB:", notification); // ✅ ADD THIS
-
     setNotifications(prev => [notification, ...prev]);
 
     if (Notification.permission === "granted") {
       new Notification("New Job 🚀", {
-        body: `${notification.job?.profession} job available`,
+        body: `${notification.job.profession} job available`,
       });
     }
   });

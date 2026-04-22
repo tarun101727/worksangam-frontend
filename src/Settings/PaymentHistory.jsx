@@ -63,9 +63,7 @@ const PaymentHistory = () => {
                     {new Date(p.createdAt).toLocaleString()}
                   </p>
 
-                  <p className="text-sm text-white/50">
-                    Method: {p.paymentMethod || "N/A"}
-                  </p>
+                  
                 </div>
 
                 <div>

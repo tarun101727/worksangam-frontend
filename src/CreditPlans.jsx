@@ -23,35 +23,32 @@ const CreditPlans = () => {
     }
   };
 
-  // Fetch on component mount
   useEffect(() => {
-    // Wrap async call inside effect
-    const loadCredits = async () => {
-      await fetchCredits();
-    };
-    loadCredits();
+    fetchCredits();
   }, []);
 
+  // ✅ Poll after payment redirect
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get("order_id");
 
-useEffect(() => {
-  const params = new URLSearchParams(window.location.search);
-  const orderId = params.get("order_id");
+    if (orderId) {
+      const interval = setInterval(async () => {
+        try {
+          const res = await axios.get(`${BASE_URL}/api/auth/user/credits`, {
+            withCredentials: true,
+          });
+          setCredits(res.data.credits);
 
-  if (orderId) {
-    const interval = setInterval(async () => {
-      try {
-        const res = await axios.get(`${BASE_URL}/api/auth/user/credits`, {
-          withCredentials: true,
-        });
-        setCredits(res.data.credits);
+          if (res.data.credits > 0) clearInterval(interval);
+        } catch (err) {
+          console.error("Failed to fetch credits after payment:", err);
+        }
+      }, 3000);
 
-        if (res.data.credits > 0) clearInterval(interval); // stop polling once credits update
-      } catch (err) {
-        console.error("Failed to fetch credits after payment:", err);
-      }
-    }, 3000); // check every 3 seconds
-  }
-}, []);
+      return () => clearInterval(interval);
+    }
+  }, []);
 
   const handleBuy = async (amount) => {
     try {
@@ -76,25 +73,40 @@ useEffect(() => {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Buy Credits</h2>
-      <p>Total Credits: {credits}</p>
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center py-10 px-4">
+      {/* Title */}
+      <h2 className="text-3xl font-bold mb-4 text-gray-800">
+        Buy Credits
+      </h2>
 
-      <div style={{ display: "flex", gap: "20px" }}>
+      {/* Credits Display */}
+      <div className="bg-white shadow-md rounded-xl px-6 py-3 mb-8">
+        <p className="text-lg font-medium text-gray-700">
+          Total Credits: <span className="text-blue-600 font-bold">{credits}</span>
+        </p>
+      </div>
+
+      {/* Plans */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {plans.map((plan) => (
           <div
             key={plan.amount}
-            style={{
-              border: "1px solid #ccc",
-              padding: "20px",
-              borderRadius: "10px",
-              width: "150px",
-            }}
+            className="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center hover:scale-105 transition-transform duration-300"
           >
-            <h3>₹{plan.amount}</h3>
-            <p>{plan.credits} Credits</p>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">
+              ₹{plan.amount}
+            </h3>
 
-            <button onClick={() => handleBuy(plan.amount)}>Buy Now</button>
+            <p className="text-gray-600 mb-4">
+              {plan.credits} Credits
+            </p>
+
+            <button
+              onClick={() => handleBuy(plan.amount)}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 w-full"
+            >
+              Buy Now
+            </button>
           </div>
         ))}
       </div>

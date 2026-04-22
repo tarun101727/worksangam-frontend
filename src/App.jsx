@@ -180,7 +180,8 @@ useEffect(() => {
     "/hirer-online-urgent-post",
     "/online-worker-urgent-posts",
     "/profile-preview/Employee-edit",
-    "/select-language"
+    "/select-language",
+    "/payments-history"
   ];
 
   const shouldHideHeader = hideHeaderOnRoutes.some((route) =>
@@ -691,6 +692,9 @@ element={<ProfilePreviewforhirerEdit/>}
    <Route path="/buy-credits" element={<BuyCredits/>}/>
   <Route path="/payment-success" element={<CreditPlans />} />
   <Route path="/payments-history" element={<PaymentHistory />} />
+
+
+
         <Route path="*" element={<Navigate to="/select-language" replace />} />
       </Routes>
       </div>

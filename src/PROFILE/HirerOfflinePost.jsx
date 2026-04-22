@@ -60,8 +60,6 @@ const HirerOfflinePost = () => {
   const [mediaPreviews, setMediaPreviews] = useState([]);
   const [activeMedia, setActiveMedia] = useState(null);
   const { t } = useTranslation();
-  const [showConfirm, setShowConfirm] = useState(false);
-const [credits, setCredits] = useState(null);
 
   const inputBase =
     "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700/60 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition";
@@ -175,14 +173,15 @@ const [credits, setCredits] = useState(null);
     { label: t("Inspect first, then quote"), value: "inspect_quote" },
   ];
 
-const submitWithCredits = async () => {
+  /* ================= SUBMIT ================= */
+  const submit = async () => {
   try {
     setLoading(true);
 
     const formData = new FormData();
 
+    // 🔥 Construct price object properly
     let priceObj = null;
-
     if (form.priceType) {
       if (form.priceType === "fixed" || form.priceType === "hourly") {
         priceObj = {
@@ -202,6 +201,7 @@ const submitWithCredits = async () => {
       }
     }
 
+    // 🔥 Construct payload including price
     const payload = {
       ...form,
       price: priceObj,
@@ -216,10 +216,12 @@ const submitWithCredits = async () => {
       }
     });
 
-    form.media.forEach((file) => formData.append("media", file));
+    form.media.forEach((file) =>
+      formData.append("media", file)
+    );
 
     const res = await axios.post(
-      `${BASE_URL}/api/jobs/create-offline-post`, // ✅ IMPORTANT CHANGE
+      `${BASE_URL}/api/hirer-post/create`,
       formData,
       {
         withCredentials: true,
@@ -227,23 +229,15 @@ const submitWithCredits = async () => {
       }
     );
 
-    // ✅ update credits in UI
-    setCredits(res.data.remainingCredits);
-
-    setShowConfirm(false);
-
     navigate(`/job/${res.data.job._id}`);
-
-  } catch (err) {
-    if (err.response?.data?.msg) {
-      setError(err.response.data.msg);
-    } else {
-      setError("Failed to create post");
-    }
+  } catch {
+    setError("Failed to create post");
   } finally {
     setLoading(false);
   }
 };
+
+
 
 let latestRequest = "";
 let timer;
@@ -388,49 +382,12 @@ const handleTranslatableChange = (value, field) => {
 
         {/* SUBMIT */}
         <button
-  onClick={() => setShowConfirm(true)}
-  disabled={loading}
-  className="w-full py-3 rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-500"
->
-  {loading ? t("Please wait...") : t("Submit Job Post")}
-</button>
-
-{showConfirm && (
-  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-    <div className="bg-slate-900 p-6 rounded-2xl border border-slate-700 w-[90%] max-w-md space-y-4">
-
-      <h2 className="text-lg font-semibold text-white">
-        ⚠️ Confirm Action
-      </h2>
-
-      <p className="text-slate-300 text-sm">
-        This action will cost <b>7 credits</b>. Do you want to continue?
-      </p>
-
-      {credits !== null && (
-        <p className="text-xs text-slate-400">
-          Available credits: {credits}
-        </p>
-      )}
-
-      <div className="flex gap-3 justify-end">
-        <button
-          onClick={() => setShowConfirm(false)}
-          className="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600"
+          onClick={submit}
+          disabled={loading}
+          className="w-full py-3 rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-500"
         >
-          Cancel
+          {loading ? t("Please wait...") : t("Submit Job Post")}
         </button>
-
-        <button
-          onClick={submitWithCredits}
-          className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500"
-        >
-          Confirm & Use 7 Credits
-        </button>
-      </div>
-    </div>
-  </div>
-)}
 
       </div>
     </div>

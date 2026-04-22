@@ -60,17 +60,25 @@ const HirerOfflinePost = () => {
   const [mediaPreviews, setMediaPreviews] = useState([]);
   const [activeMedia, setActiveMedia] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [userCredits, setUserCredits] = useState(0);
+const [credits, setCredits] = useState(0);
   const { t } = useTranslation();
 
   const inputBase =
     "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700/60 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition";
 
-    useEffect(() => {
-  axios
-    .get(`${BASE_URL}/api/auth/user/credits`, { withCredentials: true })
-    .then((res) => setUserCredits(res.data.credits))
-    .catch(() => {});
+      useEffect(() => {
+  const fetchCredits = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/api/auth/user/credits`, {
+        withCredentials: true,
+      });
+      setCredits(res.data.credits || 0);
+    } catch (err) {
+      console.error("Failed to fetch credits" , err );
+    }
+  };
+
+  fetchCredits();
 }, []);
 
   /* ================= MAP INIT ================= */
@@ -237,9 +245,7 @@ const HirerOfflinePost = () => {
         headers: { "Content-Type": "multipart/form-data" },
       }
     );
-
-    
-    setUserCredits(res.data.remainingCredits);
+    setCredits(res.data.remainingCredits);
     navigate(`/job/${res.data.job._id}`);
   } catch {
     setError("Failed to create post");
@@ -387,7 +393,7 @@ const handleTranslatableChange = (value, field) => {
           }
         />
 
-        <div className="overflow-hidden rounded-xl border border-slate-700">
+        <div className="overflow-hidden rounded-xl border border-slate-700 relative z-0">
           <div id="map" style={{ height: 280 }} />
         </div>
 
@@ -399,21 +405,21 @@ const handleTranslatableChange = (value, field) => {
         >
           {loading ? t("Please wait...") : t("Submit Job Post")}
         </button>
+       
+       {showConfirm && (
+  <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[9999]">
+    <div className="bg-slate-900 p-6 rounded-2xl border border-slate-700 w-[90%] max-w-md space-y-4">
 
-        {showConfirm && (
-  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-    <div className="bg-slate-900 p-6 rounded-2xl w-[90%] max-w-md border border-slate-700">
-      
-      <h2 className="text-lg font-semibold text-white mb-3">
+      <h2 className="text-lg font-semibold text-white">
         Confirm Action
       </h2>
 
-      <p className="text-slate-300 mb-2">
-        This action will cost <span className="text-indigo-400 font-bold">7 credits</span>.
+      <p className="text-sm text-slate-300">
+        This action will cost <b>7 credits</b>. Do you want to continue?
       </p>
 
-      <p className="text-sm text-slate-400 mb-4">
-        Available Credits: {userCredits}
+      <p className="text-xs text-slate-400">
+        Available Credits: <b>{credits}</b>
       </p>
 
       <div className="flex gap-3">
@@ -422,14 +428,15 @@ const handleTranslatableChange = (value, field) => {
             setShowConfirm(false);
             await submit();
           }}
-          className="flex-1 py-2 bg-indigo-600 rounded-lg"
+          disabled={credits < 7}
+          className="flex-1 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold disabled:opacity-50"
         >
           Confirm & Use 7 Credits
         </button>
 
         <button
           onClick={() => setShowConfirm(false)}
-          className="flex-1 py-2 bg-slate-700 rounded-lg"
+          className="flex-1 py-2 rounded-lg bg-slate-700 text-slate-300"
         >
           Cancel
         </button>

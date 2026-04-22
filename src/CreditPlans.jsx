@@ -57,24 +57,35 @@ const CreditPlans = () => {
     fetchCredits();
   }, []);
 
+  // ✅ Optimized polling (limited runs)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const orderId = params.get("order_id");
 
-    if (orderId) {
-      const interval = setInterval(async () => {
-        try {
-          const res = await axios.get(`${BASE_URL}/api/auth/user/credits`, {
-            withCredentials: true,
-          });
-          setCredits(res.data.credits);
+    if (!orderId) return;
 
-          if (res.data.credits > 0) clearInterval(interval);
-        } catch (err) {
-          console.error("Failed to fetch credits after payment:", err);
+    let count = 0;
+
+    const interval = setInterval(async () => {
+      count++;
+
+      try {
+        const res = await axios.get(`${BASE_URL}/api/auth/user/credits`, {
+          withCredentials: true,
+        });
+
+        setCredits(res.data.credits);
+
+        // stop polling after success OR 30 sec
+        if (res.data.credits > 0 || count >= 10) {
+          clearInterval(interval);
         }
-      }, 3000);
-    }
+      } catch (err) {
+        console.error("Polling error:", err);
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const handleBuy = async (amount) => {
@@ -99,16 +110,16 @@ const CreditPlans = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-10 text-white">
+    <div className="min-h-screen overflow-y-auto flex flex-col items-center px-4 py-10 text-white">
       
       {/* Title */}
       <h2 className="text-3xl font-bold mb-2">Buy Credits</h2>
-      <p className="text-white/60 mb-6">
+      <p className="text-white/60 mb-6 text-center">
         Use credits to post jobs and reach workers instantly 🚀
       </p>
 
       {/* Credits Card */}
-      <div className="mb-8 bg-white/5 border border-white/10 backdrop-blur-xl px-6 py-4 rounded-2xl shadow-lg">
+      <div className="mb-8 bg-white/5 border border-white/10 px-6 py-4 rounded-2xl shadow-md">
         <p className="text-sm text-white/60">Your Balance</p>
         <h3 className="text-2xl font-semibold text-yellow-400">
           {credits} Credits
@@ -123,7 +134,7 @@ const CreditPlans = () => {
           return (
             <div
               key={plan.amount}
-              className={`relative p-6 rounded-2xl border backdrop-blur-xl transition hover:scale-105 
+              className={`relative p-6 rounded-2xl border transition-transform duration-300 hover:scale-105 
               ${
                 plan.popular
                   ? "border-yellow-400 bg-yellow-400/10"

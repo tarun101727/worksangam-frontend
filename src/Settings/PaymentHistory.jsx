@@ -148,51 +148,74 @@ const PaymentHistory = () => {
         // 💳 LIST
         <div className="max-w-4xl mx-auto space-y-4">
           {filteredPayments.map((p) => (
-            <div
-              key={p._id}
-              className="bg-white/5 border border-white/10 p-4 rounded-xl hover:bg-white/10 transition"
-            >
-              <div className="flex justify-between items-center">
-                <div>
-                  {/* 💰 */}
-                  <p className="text-lg font-semibold">
-                    ₹{p.amount} → {p.credits} Credits
-                  </p>
+  <div
+    key={p._id}
+    className="bg-gradient-to-br from-white/5 to-white/10 border border-white/10 p-5 rounded-2xl hover:scale-[1.01] hover:bg-white/10 transition-all duration-300 shadow-lg backdrop-blur-md"
+  >
+    <div className="flex justify-between items-start gap-4">
 
-                  {/* 🕒 */}
-                  <p className="text-sm text-white/60">
-                    {new Date(p.createdAt).toLocaleString()}
-                  </p>
+      {/* LEFT */}
+      <div className="space-y-1">
 
-                  {/* 🔑 */}
-                  <p className="text-xs text-white/40 mt-1">
-                    Order ID: {p.orderId}
-                  </p>
+        {/* 💰 AMOUNT */}
+        <p className="text-xl font-bold tracking-wide">
+          ₹{p.amount}
+          <span className="text-sm text-white/60 font-normal ml-2">
+            → {p.credits} credits
+          </span>
+        </p>
 
-                  {/* ❌ FAILED MESSAGE */}
-                  {p.status === "FAILED" && (
-                    <p className="text-xs text-red-400 mt-1">
-                      Payment failed. No credits added.
-                    </p>
-                  )}
+        {/* 🕒 DATE */}
+        <p className="text-sm text-white/50">
+          {new Date(p.createdAt).toLocaleString()}
+        </p>
 
-                  {/* ⏳ PENDING */}
-                  {p.status === "PENDING" && (
-                    <p className="text-xs text-yellow-400 mt-1">
-                      Payment is pending confirmation...
-                    </p>
-                  )}
-                </div>
+        {/* 🔑 ORDER ID */}
+        <p className="text-xs text-white/40">
+          Order: {p.orderId}
+        </p>
 
-                {/* STATUS */}
-                <span
-                  className={`px-3 py-1 rounded-full text-sm font-medium ${statusStyles[p.status]}`}
-                >
-                  {p.status}
-                </span>
-              </div>
-            </div>
-          ))}
+        {/* STATUS MESSAGE */}
+        {p.status === "FAILED" && (
+          <p className="text-xs text-red-400 mt-1">
+            ❌ Payment failed. No credits added.
+          </p>
+        )}
+
+        {p.status === "PENDING" && (
+          <p className="text-xs text-yellow-400 mt-1">
+            ⏳ Waiting for confirmation...
+          </p>
+        )}
+
+        {p.status === "SUCCESS" && (
+          <p className="text-xs text-green-400 mt-1">
+            ✅ Credits added successfully
+          </p>
+        )}
+      </div>
+
+      {/* RIGHT */}
+      <div className="flex flex-col items-end gap-2">
+
+        {/* STATUS BADGE */}
+        <span
+          className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${statusStyles[p.status]}`}
+        >
+          {p.status}
+        </span>
+
+        {/* OPTIONAL ICON */}
+        <div className="text-2xl">
+          {p.status === "SUCCESS" && "💚"}
+          {p.status === "FAILED" && "💔"}
+          {p.status === "PENDING" && "⏳"}
+        </div>
+      </div>
+
+    </div>
+  </div>
+))}
         </div>
       )}
 

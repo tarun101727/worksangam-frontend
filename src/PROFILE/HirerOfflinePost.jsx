@@ -237,7 +237,7 @@ const HirerOfflinePost = () => {
     );
 
     const res = await axios.post(
-  `${BASE_URL}/api/hirer-post/create`,
+  `${BASE_URL}/api/jobs/create-offline-post`,
   formData,
   {
     withCredentials: true,

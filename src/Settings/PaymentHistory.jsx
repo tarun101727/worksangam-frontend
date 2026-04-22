@@ -4,9 +4,12 @@ import { useEffect, useState } from "react";
 
 const PaymentHistory = () => {
   const [payments, setPayments] = useState([]);
+  const [loading, setLoading] = useState(true); // ✅ ADD THIS
 
   const fetchPayments = async () => {
     try {
+      setLoading(true); // ✅ START LOADING
+
       const res = await axios.get(
         `${BASE_URL}/api/payment/my-payments`,
         { withCredentials: true }
@@ -15,12 +18,23 @@ const PaymentHistory = () => {
       setPayments(res.data.payments);
     } catch (err) {
       console.error("Error fetching payments:", err);
+    } finally {
+      setLoading(false); // ✅ STOP LOADING
     }
   };
 
   useEffect(() => {
     fetchPayments();
   }, []);
+
+  // ✅ SHOW SPINNER FIRST
+  if (loading) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen px-4 py-10 text-white">

@@ -69,6 +69,7 @@ import LanguageSelect from "./LanguageSelect";
 import { useTranslation } from "react-i18next";
 import HeaderLanguageSelect from "./HeaderLanguageSelect";
 import CreditPlans from "./CreditPlans";
+import PaymentHistory from "./Settings/PaymentHistory";
 
 
 
@@ -689,6 +690,7 @@ element={<ProfilePreviewforhirerEdit/>}
       <Route path="/edit-job/:jobId" element={<EditJob />} />
    <Route path="/buy-credits" element={<BuyCredits/>}/>
   <Route path="/payment-success" element={<CreditPlans />} />
+  <Route path="/payments-history" element={<PaymentHistory />} />
         <Route path="*" element={<Navigate to="/select-language" replace />} />
       </Routes>
       </div>

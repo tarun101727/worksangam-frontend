@@ -59,23 +59,19 @@ const HirerOfflinePost = () => {
   const [error, setError] = useState("");
   const [mediaPreviews, setMediaPreviews] = useState([]);
   const [activeMedia, setActiveMedia] = useState(null);
-  const [showPopup, setShowPopup] = useState(false);
-  const [userCredits, setUserCredits] = useState(null);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [userCredits, setUserCredits] = useState(0);
   const { t } = useTranslation();
 
   const inputBase =
     "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700/60 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition";
-  
 
     useEffect(() => {
-  axios.get(`${BASE_URL}/api/auth/user/credits`, {
-    withCredentials: true,
-  })
-  .then(res => setUserCredits(res.data.credits))
-  .catch(() => {});
+  axios
+    .get(`${BASE_URL}/api/auth/user/credits`, { withCredentials: true })
+    .then((res) => setUserCredits(res.data.credits))
+    .catch(() => {});
 }, []);
-
-
 
   /* ================= MAP INIT ================= */
   useEffect(() => {
@@ -186,13 +182,14 @@ const HirerOfflinePost = () => {
     { label: t("Inspect first, then quote"), value: "inspect_quote" },
   ];
 
-const confirmSubmit = async () => {
+  /* ================= SUBMIT ================= */
+  const submit = async () => {
   try {
     setLoading(true);
-    setShowPopup(false);
 
     const formData = new FormData();
 
+    // 🔥 Construct price object properly
     let priceObj = null;
     if (form.priceType) {
       if (form.priceType === "fixed" || form.priceType === "hourly") {
@@ -213,7 +210,11 @@ const confirmSubmit = async () => {
       }
     }
 
-    const payload = { ...form, price: priceObj };
+    // 🔥 Construct payload including price
+    const payload = {
+      ...form,
+      price: priceObj,
+    };
 
     Object.keys(payload).forEach((key) => {
       if (key === "media") return;
@@ -224,10 +225,12 @@ const confirmSubmit = async () => {
       }
     });
 
-    form.media.forEach((file) => formData.append("media", file));
+    form.media.forEach((file) =>
+      formData.append("media", file)
+    );
 
     const res = await axios.post(
-      `${BASE_URL}/api/jobs/create-offline-post`, // ✅ FIXED ROUTE
+      `${BASE_URL}/api/hirer-post/create`,
       formData,
       {
         withCredentials: true,
@@ -235,19 +238,17 @@ const confirmSubmit = async () => {
       }
     );
 
+    
     setUserCredits(res.data.remainingCredits);
-
     navigate(`/job/${res.data.job._id}`);
-
-  } catch (err) {
-    setError(
-      err.response?.data?.msg ||
-      "Failed to create post"
-    );
+  } catch {
+    setError("Failed to create post");
   } finally {
     setLoading(false);
   }
 };
+
+
 
 let latestRequest = "";
 let timer;
@@ -392,41 +393,43 @@ const handleTranslatableChange = (value, field) => {
 
         {/* SUBMIT */}
         <button
-          onClick={() => setShowPopup(true)}
+          onClick={() => setShowConfirm(true)}
           disabled={loading}
           className="w-full py-3 rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-500"
         >
           {loading ? t("Please wait...") : t("Submit Job Post")}
         </button>
-   {showPopup && (
+
+        {showConfirm && (
   <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-    <div className="bg-slate-900 p-6 rounded-2xl w-full max-w-sm border border-slate-700 space-y-4">
+    <div className="bg-slate-900 p-6 rounded-2xl w-[90%] max-w-md border border-slate-700">
       
-      <h2 className="text-white text-lg font-semibold">
-        ⚠️ Confirm Action
+      <h2 className="text-lg font-semibold text-white mb-3">
+        Confirm Action
       </h2>
 
-      <p className="text-slate-300 text-sm">
-        This action will cost <b>7 credits</b>. Do you want to continue?
+      <p className="text-slate-300 mb-2">
+        This action will cost <span className="text-indigo-400 font-bold">7 credits</span>.
       </p>
 
-      {userCredits !== null && (
-        <p className="text-xs text-slate-400">
-          Available Credits: {userCredits}
-        </p>
-      )}
+      <p className="text-sm text-slate-400 mb-4">
+        Available Credits: {userCredits}
+      </p>
 
       <div className="flex gap-3">
         <button
-          onClick={confirmSubmit}
-          className="flex-1 bg-indigo-600 hover:bg-indigo-500 py-2 rounded-lg text-white font-medium"
+          onClick={async () => {
+            setShowConfirm(false);
+            await submit();
+          }}
+          className="flex-1 py-2 bg-indigo-600 rounded-lg"
         >
           Confirm & Use 7 Credits
         </button>
 
         <button
-          onClick={() => setShowPopup(false)}
-          className="flex-1 bg-slate-700 hover:bg-slate-600 py-2 rounded-lg text-white"
+          onClick={() => setShowConfirm(false)}
+          className="flex-1 py-2 bg-slate-700 rounded-lg"
         >
           Cancel
         </button>
@@ -434,6 +437,7 @@ const handleTranslatableChange = (value, field) => {
     </div>
   </div>
 )}
+
       </div>
     </div>
   );

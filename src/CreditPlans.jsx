@@ -3,9 +3,40 @@ import { BASE_URL } from "./config";
 import { useState, useEffect } from "react";
 
 const plans = [
-  { amount: 99, credits: 50 },
-  { amount: 199, credits: 120, popular: true },
-  { amount: 499, credits: 350 },
+  {
+    amount: 99,
+    credits: 50,
+    title: "Starter",
+    desc: "Perfect for trying out job posting",
+    features: [
+      "Post 10+ jobs",
+      "Basic visibility",
+      "Good for small hiring needs",
+    ],
+  },
+  {
+    amount: 199,
+    credits: 120,
+    title: "Standard",
+    popular: true,
+    desc: "Best for regular hiring",
+    features: [
+      "Post 25+ jobs",
+      "Better reach to workers",
+      "Priority visibility",
+    ],
+  },
+  {
+    amount: 499,
+    credits: 350,
+    title: "Premium",
+    desc: "For heavy and urgent hiring",
+    features: [
+      "Post 70+ jobs",
+      "Maximum reach",
+      "Top priority listing",
+    ],
+  },
 ];
 
 const CreditPlans = () => {
@@ -73,7 +104,7 @@ const CreditPlans = () => {
       {/* Title */}
       <h2 className="text-3xl font-bold mb-2">Buy Credits</h2>
       <p className="text-white/60 mb-6">
-        Boost your hiring with more credits 🚀
+        Use credits to post jobs and reach workers instantly 🚀
       </p>
 
       {/* Credits Card */}
@@ -86,41 +117,73 @@ const CreditPlans = () => {
 
       {/* Plans */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-5xl">
-        {plans.map((plan) => (
-          <div
-            key={plan.amount}
-            className={`relative p-6 rounded-2xl border backdrop-blur-xl transition hover:scale-105 
-            ${
-              plan.popular
-                ? "border-yellow-400 bg-yellow-400/10"
-                : "border-white/10 bg-white/5"
-            }`}
-          >
-            {/* Popular Badge */}
-            {plan.popular && (
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-yellow-400 text-black text-xs px-3 py-1 rounded-full font-semibold">
-                Most Popular
-              </span>
-            )}
+        {plans.map((plan) => {
+          const perCredit = (plan.amount / plan.credits).toFixed(2);
 
-            <h3 className="text-2xl font-bold mb-2">₹{plan.amount}</h3>
-            <p className="text-white/70 mb-4">
-              {plan.credits} Credits
-            </p>
-
-            <button
-              onClick={() => handleBuy(plan.amount)}
-              className={`w-full py-2 rounded-lg font-semibold transition 
+          return (
+            <div
+              key={plan.amount}
+              className={`relative p-6 rounded-2xl border backdrop-blur-xl transition hover:scale-105 
               ${
                 plan.popular
-                  ? "bg-yellow-400 text-black hover:bg-yellow-300"
-                  : "bg-white/10 hover:bg-white/20"
+                  ? "border-yellow-400 bg-yellow-400/10"
+                  : "border-white/10 bg-white/5"
               }`}
             >
-              Buy Now
-            </button>
-          </div>
-        ))}
+              {/* Popular Badge */}
+              {plan.popular && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-yellow-400 text-black text-xs px-3 py-1 rounded-full font-semibold">
+                  Most Popular
+                </span>
+              )}
+
+              {/* Title */}
+              <h3 className="text-lg font-semibold text-white/80 mb-1">
+                {plan.title}
+              </h3>
+
+              {/* Price */}
+              <h2 className="text-3xl font-bold mb-1">
+                ₹{plan.amount}
+              </h2>
+
+              {/* Credits */}
+              <p className="text-yellow-400 font-semibold mb-2">
+                {plan.credits} Credits
+              </p>
+
+              {/* Per credit */}
+              <p className="text-xs text-white/50 mb-3">
+                ₹{perCredit} per credit
+              </p>
+
+              {/* Description */}
+              <p className="text-sm text-white/60 mb-4">
+                {plan.desc}
+              </p>
+
+              {/* Features */}
+              <ul className="text-sm text-white/70 mb-5 space-y-1">
+                {plan.features.map((f, i) => (
+                  <li key={i}>✔ {f}</li>
+                ))}
+              </ul>
+
+              {/* Button */}
+              <button
+                onClick={() => handleBuy(plan.amount)}
+                className={`w-full py-2 rounded-lg font-semibold transition 
+                ${
+                  plan.popular
+                    ? "bg-yellow-400 text-black hover:bg-yellow-300"
+                    : "bg-white/10 hover:bg-white/20"
+                }`}
+              >
+                Buy Now
+              </button>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

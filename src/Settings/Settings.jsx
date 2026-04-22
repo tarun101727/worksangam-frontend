@@ -44,6 +44,12 @@ className="w-full text-left p-4 bg-green-900/30 rounded-xl border border-green-5
 {t("Buy Credits")} 💳
 </button>
 <button
+onClick={()=>navigate("/payments-history")}
+className="w-full text-left p-4 bg-green-900/30 rounded-xl border border-green-500/20"
+>
+{t("Payment History")} 
+</button>
+<button
 onClick={()=>navigate("/settings/account")}
 className="w-full text-left p-4 bg-[#111827] rounded-xl border border-white/10"
 >

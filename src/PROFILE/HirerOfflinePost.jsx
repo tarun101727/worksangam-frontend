@@ -393,7 +393,7 @@ const handleTranslatableChange = (value, field) => {
           }
         />
 
-        <div className="overflow-hidden rounded-xl border border-slate-700 relative z-0">
+        <div className="overflow-hidden rounded-xl border border-slate-700">
           <div id="map" style={{ height: 280 }} />
         </div>
 

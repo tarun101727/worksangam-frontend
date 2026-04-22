@@ -59,10 +59,21 @@ const HirerOfflinePost = () => {
   const [error, setError] = useState("");
   const [mediaPreviews, setMediaPreviews] = useState([]);
   const [activeMedia, setActiveMedia] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [userCredits, setUserCredits] = useState(0);
   const { t } = useTranslation();
 
   const inputBase =
     "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700/60 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition";
+
+    useEffect(() => {
+  axios
+    .get(`${BASE_URL}/api/auth/user/credits`, {
+      withCredentials: true,
+    })
+    .then((res) => setUserCredits(res.data.credits || 0))
+    .catch(() => {});
+}, []);
 
   /* ================= MAP INIT ================= */
   useEffect(() => {
@@ -173,14 +184,12 @@ const HirerOfflinePost = () => {
     { label: t("Inspect first, then quote"), value: "inspect_quote" },
   ];
 
-  /* ================= SUBMIT ================= */
-  const submit = async () => {
+const handleConfirm = async () => {
   try {
     setLoading(true);
 
     const formData = new FormData();
 
-    // 🔥 Construct price object properly
     let priceObj = null;
     if (form.priceType) {
       if (form.priceType === "fixed" || form.priceType === "hourly") {
@@ -201,11 +210,7 @@ const HirerOfflinePost = () => {
       }
     }
 
-    // 🔥 Construct payload including price
-    const payload = {
-      ...form,
-      price: priceObj,
-    };
+    const payload = { ...form, price: priceObj };
 
     Object.keys(payload).forEach((key) => {
       if (key === "media") return;
@@ -221,7 +226,7 @@ const HirerOfflinePost = () => {
     );
 
     const res = await axios.post(
-      `${BASE_URL}/api/hirer-post/create`,
+      `${BASE_URL}/api/hirer-post/create-with-credits`, // ✅ NEW API
       formData,
       {
         withCredentials: true,
@@ -229,15 +234,22 @@ const HirerOfflinePost = () => {
       }
     );
 
+    // ✅ update credits in UI
+    setUserCredits(res.data.credits);
+
+    setShowPopup(false);
+
     navigate(`/job/${res.data.job._id}`);
-  } catch {
-    setError("Failed to create post");
+
+  } catch (err) {
+    setError(
+      err.response?.data?.msg ||
+      "Failed to create post"
+    );
   } finally {
     setLoading(false);
   }
 };
-
-
 
 let latestRequest = "";
 let timer;
@@ -382,12 +394,48 @@ const handleTranslatableChange = (value, field) => {
 
         {/* SUBMIT */}
         <button
-          onClick={submit}
-          disabled={loading}
-          className="w-full py-3 rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-500"
+  onClick={() => setShowPopup(true)}
+  disabled={loading}
+  className="w-full py-3 rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-500"
+>
+  {loading ? t("Please wait...") : t("Submit Job Post")}
+</button>
+
+
+{showPopup && (
+  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[9999]">
+    <div className="bg-slate-900 p-6 rounded-2xl w-full max-w-sm border border-slate-700">
+      
+      <h2 className="text-lg font-semibold text-white mb-2">
+        Confirm Action
+      </h2>
+
+      <p className="text-slate-300 text-sm mb-4">
+        This action will cost <b>7 credits</b>. Do you want to continue?
+      </p>
+
+      <p className="text-xs text-slate-400 mb-4">
+        Available Credits: {userCredits}
+      </p>
+
+      <div className="flex gap-3">
+        <button
+          onClick={handleConfirm}
+          className="flex-1 bg-indigo-600 hover:bg-indigo-500 py-2 rounded-lg"
         >
-          {loading ? t("Please wait...") : t("Submit Job Post")}
+          Confirm & Use 7 Credits
         </button>
+
+        <button
+          onClick={() => setShowPopup(false)}
+          className="flex-1 bg-slate-700 hover:bg-slate-600 py-2 rounded-lg"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       </div>
     </div>

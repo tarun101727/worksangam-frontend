@@ -237,13 +237,13 @@ const HirerOfflinePost = () => {
     );
 
     const res = await axios.post(
-      `${BASE_URL}/api/jobs/create-offline-post`,
-      formData,
-      {
-        withCredentials: true,
-        headers: { "Content-Type": "multipart/form-data" },
-      }
-    );
+  `${BASE_URL}/api/hirer-post/create`,
+  formData,
+  {
+    withCredentials: true,
+    headers: { "Content-Type": "multipart/form-data" },
+  }
+);
 
     // ✅ UPDATE CREDIT UI
     setCredits(res.data.remainingCredits);

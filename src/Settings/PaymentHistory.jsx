@@ -39,10 +39,19 @@ const PaymentHistory = () => {
     return matchSearch && matchFilter;
   });
 
-  // 📊 SUMMARY
-  const totalSpent = payments.reduce((acc, p) => acc + p.amount, 0);
-  const totalCredits = payments.reduce((acc, p) => acc + p.credits, 0);
-  const successCount = payments.filter((p) => p.status === "SUCCESS").length;
+  // ✅ SUCCESS & FAILED SEPARATION (FIXED LOGIC)
+  const successPayments = payments.filter((p) => p.status === "SUCCESS");
+  const failedPayments = payments.filter((p) => p.status === "FAILED");
+
+  // 📊 CORRECT SUMMARY
+  const totalSpent = successPayments.reduce((acc, p) => acc + p.amount, 0);
+  const totalCredits = successPayments.reduce(
+    (acc, p) => acc + p.credits,
+    0
+  );
+
+  const successCount = successPayments.length;
+  const failedCount = failedPayments.length;
 
   const statusStyles = {
     SUCCESS: "bg-green-500/20 text-green-400",
@@ -59,20 +68,33 @@ const PaymentHistory = () => {
       </h2>
 
       {/* 📊 SUMMARY CARDS */}
-      <div className="grid md:grid-cols-3 gap-4 max-w-5xl mx-auto mb-6">
+      <div className="grid md:grid-cols-4 gap-4 max-w-5xl mx-auto mb-6">
+        {/* TOTAL SPENT */}
         <div className="bg-white/5 p-4 rounded-xl border border-white/10">
           <p className="text-white/60 text-sm">Total Spent</p>
           <h3 className="text-xl font-bold">₹{totalSpent}</h3>
         </div>
 
+        {/* CREDITS */}
         <div className="bg-white/5 p-4 rounded-xl border border-white/10">
           <p className="text-white/60 text-sm">Credits Bought</p>
           <h3 className="text-xl font-bold">{totalCredits}</h3>
         </div>
 
+        {/* SUCCESS */}
         <div className="bg-white/5 p-4 rounded-xl border border-white/10">
           <p className="text-white/60 text-sm">Successful Payments</p>
-          <h3 className="text-xl font-bold">{successCount}</h3>
+          <h3 className="text-xl font-bold text-green-400">
+            {successCount}
+          </h3>
+        </div>
+
+        {/* ❌ FAILED */}
+        <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+          <p className="text-white/60 text-sm">Failed Payments</p>
+          <h3 className="text-xl font-bold text-red-400">
+            {failedCount}
+          </h3>
         </div>
       </div>
 
@@ -98,7 +120,7 @@ const PaymentHistory = () => {
         </select>
       </div>
 
-      {/* ⚡ LOADING SKELETON */}
+      {/* ⚡ LOADING */}
       {loading ? (
         <div className="max-w-4xl mx-auto space-y-4">
           {[...Array(4)].map((_, i) => (
@@ -109,7 +131,7 @@ const PaymentHistory = () => {
           ))}
         </div>
       ) : filteredPayments.length === 0 ? (
-        // 📭 EMPTY STATE
+        // 📭 EMPTY
         <div className="text-center text-white/60 mt-20">
           <p className="text-lg font-semibold">No Payments Found</p>
           <p className="text-sm">
@@ -117,7 +139,7 @@ const PaymentHistory = () => {
           </p>
         </div>
       ) : (
-        // 💳 PAYMENT LIST
+        // 💳 LIST
         <div className="max-w-4xl mx-auto space-y-4">
           {filteredPayments.map((p) => (
             <div
@@ -126,23 +148,37 @@ const PaymentHistory = () => {
             >
               <div className="flex justify-between items-center">
                 <div>
-                  {/* 💰 MAIN */}
+                  {/* 💰 */}
                   <p className="text-lg font-semibold">
                     ₹{p.amount} → {p.credits} Credits
                   </p>
 
-                  {/* 🕒 DATE */}
+                  {/* 🕒 */}
                   <p className="text-sm text-white/60">
                     {new Date(p.createdAt).toLocaleString()}
                   </p>
 
-                  {/* 🔑 DETAILS */}
+                  {/* 🔑 */}
                   <p className="text-xs text-white/40 mt-1">
                     Order ID: {p.orderId}
                   </p>
+
+                  {/* ❌ FAILED MESSAGE */}
+                  {p.status === "FAILED" && (
+                    <p className="text-xs text-red-400 mt-1">
+                      Payment failed. No credits added.
+                    </p>
+                  )}
+
+                  {/* ⏳ PENDING */}
+                  {p.status === "PENDING" && (
+                    <p className="text-xs text-yellow-400 mt-1">
+                      Payment is pending confirmation...
+                    </p>
+                  )}
                 </div>
 
-                {/* STATUS BADGE */}
+                {/* STATUS */}
                 <span
                   className={`px-3 py-1 rounded-full text-sm font-medium ${statusStyles[p.status]}`}
                 >
@@ -154,7 +190,7 @@ const PaymentHistory = () => {
         </div>
       )}
 
-      {/* 🔐 TRUST TEXT */}
+      {/* 🔐 TRUST */}
       <p className="text-xs text-white/40 text-center mt-10">
         🔒 Secure payments powered by Cashfree
       </p>

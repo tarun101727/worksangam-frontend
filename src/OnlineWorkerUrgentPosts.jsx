@@ -55,6 +55,12 @@ const OnlineWorkerUrgentPosts = () => {
   }
 };
 
+const getImageUrl = (img) => {
+  if (!img) return "/default-avatar.png";
+  return img.startsWith("http") ? img : `${BASE_URL}${img}`;
+};
+
+
   if (!post) return <p className="text-center mt-10 text-white">Loading your post...</p>;
 
   return (
@@ -64,10 +70,10 @@ const OnlineWorkerUrgentPosts = () => {
         {post.hirer && (
           <div className="flex items-center gap-4 mb-4">
             <img
-              src={post.hirer.profileImage ? `${BASE_URL}${post.hirer.profileImage}` : "/default-avatar.png"}
-              alt={`${post.hirer.firstName} ${post.hirer.lastName}`}
-              className="w-16 h-16 rounded-full object-cover border-2 border-indigo-500"
-            />
+  src={getImageUrl(post.hirer.profileImage)}
+  alt={`${post.hirer.firstName} ${post.hirer.lastName}`}
+  className="w-16 h-16 rounded-full object-cover border-2 border-indigo-500"
+/>
             <p className="text-white font-medium">
               {post.hirer.firstName} {post.hirer.lastName}
             </p>
@@ -100,10 +106,10 @@ const OnlineWorkerUrgentPosts = () => {
       onClick={() => navigate(`/profile/${w._id}`)}
     >
       <img
-        src={w.profileImage ? `${BASE_URL}${w.profileImage}` : "/default-avatar.png"}
-        alt={w.name}
-        className="w-12 h-12 rounded-full object-cover"
-      />
+  src={getImageUrl(w.profileImage)}
+  alt={w.name}
+  className="w-12 h-12 rounded-full object-cover"
+/>
       <div>
         <p className="text-white font-medium">{w.name}</p>
         <p className="text-yellow-400 text-sm">{w.ratingAverage}⭐ ({w.ratingCount} reviews)</p>

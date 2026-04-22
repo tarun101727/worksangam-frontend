@@ -145,68 +145,55 @@ const PaymentHistory = () => {
           </p>
         </div>
       ) : (
+        // 💳 LIST
         <div className="max-w-4xl mx-auto space-y-4">
-  {filteredPayments.map((p) => (
-    <div
-      key={p._id}
-      className="bg-white/5 border border-white/10 p-5 rounded-2xl hover:bg-white/10 transition flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-    >
-      {/* LEFT SECTION */}
-      <div className="flex flex-col gap-2">
+          {filteredPayments.map((p) => (
+            <div
+              key={p._id}
+              className="bg-white/5 border border-white/10 p-4 rounded-xl hover:bg-white/10 transition"
+            >
+              <div className="flex justify-between items-center">
+                <div>
+                  {/* 💰 */}
+                  <p className="text-lg font-semibold">
+                    ₹{p.amount} → {p.credits} Credits
+                  </p>
 
-        {/* 💰 AMOUNT + CREDITS BOX */}
-        <div className="flex items-center gap-3 flex-wrap">
-          
-          <div className="bg-green-500/10 border border-green-500/30 px-4 py-2 rounded-lg">
-            <p className="text-xs text-green-400">Amount</p>
-            <p className="text-lg font-bold text-white">₹{p.amount}</p>
-          </div>
+                  {/* 🕒 */}
+                  <p className="text-sm text-white/60">
+                    {new Date(p.createdAt).toLocaleString()}
+                  </p>
 
-          <div className="text-white/50 font-bold">→</div>
+                  {/* 🔑 */}
+                  <p className="text-xs text-white/40 mt-1">
+                    Order ID: {p.orderId}
+                  </p>
 
-          <div className="bg-blue-500/10 border border-blue-500/30 px-4 py-2 rounded-lg">
-            <p className="text-xs text-blue-400">Credits</p>
-            <p className="text-lg font-bold text-white">{p.credits}</p>
-          </div>
+                  {/* ❌ FAILED MESSAGE */}
+                  {p.status === "FAILED" && (
+                    <p className="text-xs text-red-400 mt-1">
+                      Payment failed. No credits added.
+                    </p>
+                  )}
 
+                  {/* ⏳ PENDING */}
+                  {p.status === "PENDING" && (
+                    <p className="text-xs text-yellow-400 mt-1">
+                      Payment is pending confirmation...
+                    </p>
+                  )}
+                </div>
+
+                {/* STATUS */}
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${statusStyles[p.status]}`}
+                >
+                  {p.status}
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
-
-        {/* 🕒 DATE */}
-        <p className="text-sm text-white/60">
-          {new Date(p.createdAt).toLocaleString()}
-        </p>
-
-        {/* 🔑 ORDER ID */}
-        <p className="text-xs text-white/40">
-          Order ID: {p.orderId}
-        </p>
-
-        {/* ❌ FAILED */}
-        {p.status === "FAILED" && (
-          <p className="text-xs text-red-400">
-            Payment failed. No credits added.
-          </p>
-        )}
-
-        {/* ⏳ PENDING */}
-        {p.status === "PENDING" && (
-          <p className="text-xs text-yellow-400">
-            Payment is pending confirmation...
-          </p>
-        )}
-      </div>
-
-      {/* RIGHT SECTION (STATUS BADGE) */}
-      <div className="flex justify-end md:justify-center">
-        <span
-          className={`px-4 py-1.5 rounded-full text-sm font-semibold ${statusStyles[p.status]}`}
-        >
-          {p.status}
-        </span>
-      </div>
-    </div>
-  ))}
-</div>
       )}
 
       {/* 🔐 TRUST */}

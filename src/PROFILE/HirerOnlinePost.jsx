@@ -50,7 +50,8 @@ const [allLanguages, setAllLanguages] = useState([]);
 const translateTimer = useRef(null);
 const latestTypedValue = useRef({});
 const languageContainerRef = useRef(null);
-
+const [showConfirm, setShowConfirm] = useState(false);
+const [userCredits, setUserCredits] = useState(0);
 
 const urgentPriceOptions = [
   { label: t("Fixed Price"), value: "fixed" },
@@ -101,6 +102,21 @@ useEffect(() => {
   };
 
   fetchLanguages();
+}, []);
+
+useEffect(() => {
+  const fetchCredits = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/api/auth/user/credits`, {
+        withCredentials: true,
+      });
+      setUserCredits(res.data.credits);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  fetchCredits();
 }, []);
 
   /* ================= HANDLE CHANGE ================= */
@@ -439,12 +455,52 @@ const handleSentenceChange = (value, field) => {
         {/* ================= SUBMIT ================= */}
 
         <button
-          onClick={submit}
-          disabled={loading}
-          className="w-full py-3 rounded-xl font-semibold bg-red-600 hover:bg-red-500"
+  onClick={() => setShowConfirm(true)}
+  disabled={loading}
+  className="w-full py-3 rounded-xl font-semibold bg-red-600 hover:bg-red-500"
+>
+  {loading ? t("Please wait...") : t("Submit Job Post")}
+</button>
+
+
+{showConfirm && (
+  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+    <div className="bg-slate-900 p-6 rounded-xl w-[90%] max-w-md border border-slate-700">
+      
+      <h3 className="text-lg font-semibold text-white mb-3">
+        Confirm Action
+      </h3>
+
+      <p className="text-sm text-slate-300 mb-4">
+        This action will cost <b>5 credits</b>. Do you want to continue?
+      </p>
+
+      <p className="text-xs text-slate-400 mb-4">
+        Available Credits: {userCredits}
+      </p>
+
+      <div className="flex gap-3">
+        <button
+          onClick={async () => {
+            setShowConfirm(false);
+            await submit(); // 🔥 call submit after confirm
+          }}
+          className="flex-1 bg-green-600 py-2 rounded-lg"
         >
-          {loading ? t("Please wait...") : t("Submit Job Post")}
+          Confirm & Use 5 Credits
         </button>
+
+        <button
+          onClick={() => setShowConfirm(false)}
+          className="flex-1 bg-gray-700 py-2 rounded-lg"
+        >
+          Cancel
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
 
       </div>
       

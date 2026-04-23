@@ -212,15 +212,6 @@ useEffect(() => {
   /* ================= RENDER ================= */
   return (
     <div className="max-w-4xl mx-auto px-4 py-10 space-y-8">
-
-      {/* 🔄 FULL PAGE LOADER (FIRST FEW SECONDS) */}
-    {searching && (
-      <div className="flex justify-center items-center py-20">
-        <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    )}
-
-    
       {hirerPost && (
   <div className="p-6 rounded-3xl bg-slate-900/90 border border-slate-700/50 shadow-xl space-y-4 max-w-full">
     {/* Profile */}

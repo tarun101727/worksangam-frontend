@@ -31,10 +31,16 @@ const maxAnimatedRadius = 2000; // 2 km max for the blinking animation
 
 
 /* ================= BLINKING RADIUS ANIMATION (SLOW & SMOOTH) ================= */
+/* ================= BLINKING RADIUS ANIMATION (FIXED) ================= */
 useEffect(() => {
-  if (!markerRef.current || !mapRef.current) return;
+  if (!hirerPost || !markerRef.current || !mapRef.current) return;
 
-  // Initialize the circle
+  // 🔥 remove old circle (prevents duplicates)
+  if (circleRef.current) {
+    circleRef.current.remove();
+  }
+
+  // create circle
   circleRef.current = L.circle(markerRef.current.getLatLng(), {
     radius: 0,
     color: "#4f46e5",
@@ -44,24 +50,25 @@ useEffect(() => {
   }).addTo(mapRef.current);
 
   let startTime = null;
-
-  const duration = 2000; // 2 seconds for full expansion
+  const duration = 2000;
   const maxRadius = maxAnimatedRadius;
 
   const animate = (timestamp) => {
     if (!startTime) startTime = timestamp;
-    const elapsed = timestamp - startTime;
 
-    // Calculate smooth radius using ease-in-out (optional)
-    const progress = Math.min(elapsed / duration, 1);
-    const radiusValue = maxRadius * progress;
+    const raw = Math.min((timestamp - startTime) / duration, 1);
 
-    circleRef.current.setRadius(radiusValue);
+    // ✅ smooth ease-in-out animation
+    const progress =
+      raw < 0.5
+        ? 2 * raw * raw
+        : 1 - Math.pow(-2 * raw + 2, 2) / 2;
 
-    if (progress < 1) {
+    circleRef.current.setRadius(maxRadius * progress);
+
+    if (raw < 1) {
       requestAnimationFrame(animate);
     } else {
-      // Reset and repeat
       startTime = null;
       requestAnimationFrame(animate);
     }
@@ -73,7 +80,7 @@ useEffect(() => {
     circleRef.current?.remove();
     circleRef.current = null;
   };
-}, [markerRef.current]);
+}, [hirerPost]);
 
   /* ================= INIT MAP ================= */
   useEffect(() => {
@@ -212,7 +219,24 @@ useEffect(() => {
   /* ================= RENDER ================= */
   return (
     <div className="max-w-4xl mx-auto px-4 py-10 space-y-8">
-      {hirerPost && (
+      {!hirerPost ? (
+  // 🔥 LOADING SKELETON (shows instantly)
+  <div className="p-6 rounded-3xl bg-slate-900/90 border border-slate-700/50 shadow-xl animate-pulse">
+    <div className="flex items-center gap-4">
+      <div className="w-16 h-16 bg-slate-700 rounded-full" />
+      <div className="space-y-2">
+        <div className="w-32 h-4 bg-slate-700 rounded" />
+        <div className="w-24 h-3 bg-slate-700 rounded" />
+      </div>
+    </div>
+
+    <div className="mt-4 space-y-2">
+      <div className="w-full h-3 bg-slate-700 rounded" />
+      <div className="w-5/6 h-3 bg-slate-700 rounded" />
+    </div>
+  </div>
+) : (
+  // ✅ ORIGINAL BOX
   <div className="p-6 rounded-3xl bg-slate-900/90 border border-slate-700/50 shadow-xl space-y-4 max-w-full">
     {/* Profile */}
     <div className="flex items-center gap-4">

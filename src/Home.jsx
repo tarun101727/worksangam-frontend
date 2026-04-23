@@ -43,7 +43,7 @@ export default function Home() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [selectedDistance, setSelectedDistance] = useState(null);
   const [loadingData, setLoadingData] = useState(false); // ✅ add this
-
+  const [allJobs, setAllJobs] = useState([]);
 
   useEffect(() => {
   return () => {
@@ -189,6 +189,7 @@ useEffect(() => {
       withCredentials: true,
     });
     setJobs(res.data.jobs || []);
+    setAllJobs(res.data.jobs || []);
   } catch {
     setError(`Failed to fetch ${type} jobs`);
   } finally {
@@ -201,6 +202,7 @@ useEffect(() => {
     setLoadingData(true); // ✅ start spinner
     const res = await axios.get(`${BASE_URL}/api/jobs/hirer/my-posts`, { withCredentials: true });
     setJobs(res.data.jobs || []);
+    setAllJobs(res.data.jobs || []);
   } catch {
     setError("Failed to load your posts");
   } finally {
@@ -374,6 +376,7 @@ const filtered = professions.filter((p) =>
           { withCredentials: true }
         );
         setJobs(res.data.jobs || []);
+        setAllJobs(res.data.jobs || []);
       } catch (err) {
         console.error(err);
         setError("Failed to fetch offline jobs by distance");
@@ -558,15 +561,18 @@ const filtered = professions.filter((p) =>
                 <div
                   key={p._id || p.name}
                   onClick={() => {
-                    setSearch(p.name);
-                    setFilteredProfessions([]);
-                    setJobs((prevJobs) =>
-  prevJobs.filter(
-    (job) =>
-      job?.profession?.toLowerCase() === (p?.name || "").toLowerCase()
-  )
-);
-                  }}
+  setSearch(p.name);
+  setFilteredProfessions([]);
+
+  setJobs(
+    allJobs.filter(
+      (job) =>
+        job?.profession?.toLowerCase().includes(
+          (p?.name || "").toLowerCase()
+        )
+    )
+  );
+}}
                   className="p-3 hover:bg-[#1F2937] cursor-pointer"
                 >
                   {p.name}

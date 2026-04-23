@@ -272,7 +272,12 @@ const HirerOfflineUrgentPost = () => {
           disabled={loading}
           className="w-full py-3 rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-500"
         >
-          {loading ? t("Please wait...") : t("Submit Job Post")}
+          {loading
+  ? t("Please wait...")
+  : form.profession
+    ? `${t("Search for")} ${form.profession} ${t("employee")}`
+    : t("Search for employee")
+}
         </button>
 
       </div>

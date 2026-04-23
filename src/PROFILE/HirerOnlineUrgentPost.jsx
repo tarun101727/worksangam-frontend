@@ -31,7 +31,6 @@ const HirerOnlineUrgentPost = () => {
   const navigate = useNavigate();
 
   const [form, setForm] = useState(emptyForm());
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const [onlineProfessions, setOnlineProfessions] = useState([]);
@@ -41,11 +40,28 @@ const HirerOnlineUrgentPost = () => {
   const [languageInput, setLanguageInput] = useState("");
   const [languages, setLanguages] = useState([]);
   const [languageSuggestions, setLanguageSuggestions] = useState([]);
+  const [showConfirm, setShowConfirm] = useState(false);
+const [userCredits, setUserCredits] = useState(0);
   const { t } = useTranslation();
 const wrapperRef = useRef(null);
 const translateTimer = useRef(null);
 const latestTypedValue = useRef({});
 const languageRef = useRef(null);
+
+useEffect(() => {
+  const fetchCredits = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/api/auth/user/credits`, {
+        withCredentials: true,
+      });
+      setUserCredits(res.data.credits);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  fetchCredits();
+}, []);
 
 useEffect(() => {
   const handleClickOutside = (e) => {
@@ -149,7 +165,6 @@ const submit = async () => {
   }
 
   try {
-    setLoading(true);
     setError("");
 
     // Auto-add typed language if not empty
@@ -158,7 +173,7 @@ const submit = async () => {
       : [...languages];
 
     await axios.post(
-      `${BASE_URL}/api/jobs/create-online-post`,
+  `${BASE_URL}/api/jobs/create-online-urgent-post`,
       { ...form, languages: allLanguages },
       { withCredentials: true }
     );
@@ -168,7 +183,6 @@ const submit = async () => {
   } catch {
     setError("Failed to create job post");
   } finally {
-    setLoading(false);
     setLanguageInput(""); // clear input
   }
 };
@@ -476,16 +490,51 @@ const handleSentenceChange = (value, field) => {
         {/* ================= SUBMIT ================= */}
 
         {/* ================= SUBMIT ================= */}
-
 <button
-  onClick={submit}
-  disabled={loading}
-  className="w-full py-3 rounded-xl font-semibold bg-red-600 hover:bg-red-500"
+  onClick={() => setShowConfirm(true)}
+  className="w-full py-3 rounded-xl font-semibold bg-red-600"
 >
-  {loading
-    ? t("Please wait...")
-    : `${t("Search for online")}${form.profession ? ` ${form.profession}` : ""}`}
+  🚨 Post Urgent Job (10 Credits)
 </button>
+
+{showConfirm && (
+  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+    <div className="bg-slate-900 p-6 rounded-xl w-[90%] max-w-md border border-slate-700">
+      
+      <h3 className="text-lg font-semibold text-white mb-3">
+        Confirm Urgent Post
+      </h3>
+
+      <p className="text-sm text-slate-300 mb-4">
+        This will cost <b>10 credits</b> and boost your job visibility.
+      </p>
+
+      <p className="text-xs text-slate-400 mb-4">
+        Available Credits: {userCredits}
+      </p>
+
+      <div className="flex gap-3">
+        <button
+          onClick={async () => {
+            setShowConfirm(false);
+            await submit();
+          }}
+          className="flex-1 bg-green-600 py-2 rounded-lg"
+        >
+          Confirm & Use 10 Credits
+        </button>
+
+        <button
+          onClick={() => setShowConfirm(false)}
+          className="flex-1 bg-gray-700 py-2 rounded-lg"
+        >
+          Cancel
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
 
       </div>
 

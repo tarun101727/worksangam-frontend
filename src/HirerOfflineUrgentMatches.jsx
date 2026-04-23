@@ -161,19 +161,13 @@ useEffect(() => {
           },
         });
 
-       if (res.data.employees.length) {
-  setEmployees(res.data.employees);
-  setSearching(false);
-  clearInterval(interval);
-} else {
-  setRadius(nextRadius);
-
-  if (nextRadius >= 10000) {
-    setSearching(false);
-    setMaxRadiusReached(true);
-    clearInterval(interval);
-  }
-}
+        if (res.data.employees.length) {
+          setEmployees(res.data.employees);
+          setSearching(false);
+          clearInterval(interval);
+        } else {
+          setRadius(nextRadius);
+        }
       } catch (err) {
         console.error(err);
       }
@@ -213,15 +207,15 @@ useEffect(() => {
       console.error(err);
     }
   };
+  
 
- if (searching && employees.length === 0) {
+  if (searching && employees.length === 0) {
   return (
     <div className="min-h-screen flex justify-center items-center">
       <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
     </div>
   );
 }
-
 
   /* ================= RENDER ================= */
   return (

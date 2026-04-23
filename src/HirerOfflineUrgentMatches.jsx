@@ -30,50 +30,59 @@ const maxAnimatedRadius = 2000; // 2 km max for the blinking animation
     const { t } = useTranslation();
 
 
-/* ================= BLINKING RADIUS ANIMATION (SLOW & SMOOTH) ================= */
+/* ================= RADAR / ROTATING PULSE EFFECT ================= */
 useEffect(() => {
   if (!markerRef.current || !mapRef.current) return;
 
-  // Initialize the circle
+  // Remove old circle if exists
+  if (circleRef.current) {
+    circleRef.current.remove();
+  }
+
   circleRef.current = L.circle(markerRef.current.getLatLng(), {
     radius: 0,
-    color: "#4f46e5",
-    fillColor: "#4f46e5",
-    fillOpacity: 0.2,
+    color: "#6366F1",
+    fillColor: "#6366F1",
+    fillOpacity: 0.25,
     weight: 2,
   }).addTo(mapRef.current);
 
   let startTime = null;
-
-  const duration = 2000; // 2 seconds for full expansion
+  const duration = 1800; // smoother loop
   const maxRadius = maxAnimatedRadius;
 
   const animate = (timestamp) => {
     if (!startTime) startTime = timestamp;
-    const elapsed = timestamp - startTime;
 
-    // Calculate smooth radius using ease-in-out (optional)
-    const progress = Math.min(elapsed / duration, 1);
-    const radiusValue = maxRadius * progress;
+    const elapsed = timestamp - startTime;
+    const progress = (elapsed % duration) / duration;
+
+    // Smooth ease (like Home spinner smoothness)
+    const eased = 0.5 - 0.5 * Math.cos(Math.PI * progress);
+
+    const radiusValue = maxRadius * eased;
+
+    // Fade out as it expands
+    const opacity = 0.3 * (1 - progress);
 
     circleRef.current.setRadius(radiusValue);
+    circleRef.current.setStyle({
+      fillOpacity: opacity,
+      opacity: opacity,
+    });
 
-    if (progress < 1) {
-      requestAnimationFrame(animate);
-    } else {
-      // Reset and repeat
-      startTime = null;
-      requestAnimationFrame(animate);
-    }
+    requestAnimationFrame(animate);
   };
 
   requestAnimationFrame(animate);
 
   return () => {
-    circleRef.current?.remove();
-    circleRef.current = null;
+    if (circleRef.current) {
+      circleRef.current.remove();
+      circleRef.current = null;
+    }
   };
-}, [markerRef.current]);
+}, [hirerPost]);
 
   /* ================= INIT MAP ================= */
   useEffect(() => {

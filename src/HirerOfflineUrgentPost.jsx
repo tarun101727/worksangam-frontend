@@ -268,17 +268,17 @@ const HirerOfflineUrgentPost = () => {
 
         {/* SUBMIT */}
         <button
-          onClick={submit}
-          disabled={loading}
-          className="w-full py-3 rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-500"
-        >
-          {loading
-  ? t("Please wait...")
-  : form.profession
-    ? `${t("Search for")} ${form.profession} ${t("employee")}`
-    : t("Search for employee")
-}
-        </button>
+  onClick={submit}
+  disabled={loading}
+  className="w-full py-3 rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-500"
+>
+  {loading
+    ? t("Please wait...")
+    : form.profession
+      ? `${t("Search for")} ${form.profession}`
+      : t("Search for employee")
+  }
+</button>
 
       </div>
     </div>

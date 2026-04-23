@@ -27,8 +27,16 @@ const HirerOfflineUrgentMatches = () => {
   const [maxRadiusReached, setMaxRadiusReached] = useState(false);
   const circleRef = useRef(null);
 const maxAnimatedRadius = 2000; // 2 km max for the blinking animation
+const [showUI, setShowUI] = useState(false);
     const { t } = useTranslation();
 
+    useEffect(() => {
+  const timer = setTimeout(() => {
+    setShowUI(true);
+  }, 2500); // ⏱️ 2.5 seconds (you can change)
+
+  return () => clearTimeout(timer);
+}, []);
 
 /* ================= BLINKING RADIUS ANIMATION (SLOW & SMOOTH) ================= */
 useEffect(() => {
@@ -207,7 +215,14 @@ useEffect(() => {
       console.error(err);
     }
   };
-
+  
+  if (!showUI) {
+  return (
+    <div className="min-h-screen flex justify-center items-center bg-[#020617]">
+      <div className="w-14 h-14 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+}
 
   /* ================= RENDER ================= */
   return (

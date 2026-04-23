@@ -207,15 +207,7 @@ useEffect(() => {
       console.error(err);
     }
   };
-  
 
-  if (searching && employees.length === 0) {
-  return (
-    <div className="min-h-screen flex justify-center items-center">
-      <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-    </div>
-  );
-}
 
   /* ================= RENDER ================= */
   return (

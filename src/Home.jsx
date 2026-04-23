@@ -43,6 +43,7 @@ export default function Home() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [selectedDistance, setSelectedDistance] = useState(null);
   const [loadingData, setLoadingData] = useState(false); // ✅ add this
+  const [professionLoading, setProfessionLoading] = useState(false);
   const [allJobs, setAllJobs] = useState([]);
 
   useEffect(() => {
@@ -354,16 +355,26 @@ const filtered = professions.filter((p) =>
   }, 200);
 };
 
-  const selectProfession = (professionName) => {
-    setSearch(professionName);
-    setFilteredProfessions([]);
-    setEmployees([]); // clear old employees immediately
+  const selectProfession = async (professionName) => {
+  setSearch(professionName);
+  setFilteredProfessions([]);
+  setEmployees([]);
 
+  setProfessionLoading(true); // ✅ START SPINNER
+
+  try {
     if (selectedTab === "online" || selectedTab === "offline") {
       const professionType = selectedTab;
-      fetchEmployees(selectedTab, professionType, professionName);
+      await fetchEmployees(selectedTab, professionType, professionName);
     }
-  };
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setTimeout(() => {
+      setProfessionLoading(false); // ✅ STOP SPINNER
+    }, 500); // smooth UX
+  }
+};
 
   const fetchOfflineJobsByDistance = async (distanceKm) => {
   if (!navigator.geolocation) { alert("Geolocation not supported"); return; }
@@ -437,30 +448,32 @@ const filtered = professions.filter((p) =>
       {/* ======================= SEARCH BAR ======================= */}
       {(selectedTab === "online" || selectedTab === "offline") && (
         <div ref={searchRef} className="max-w-3xl mx-auto mb-4 relative">
-         <input
-  type="text"
-  placeholder={
-    selectedTab === "online"
-      ? t("Search online profession...")
-      : t("Search offline profession...")
-  }
-  value={search}
-  onChange={(e) => handleSearch(e.target.value)}
-  onFocus={() => {
-  setIsSearchFocused(true); // ✅ track focus
+         <div className="relative">
+  <input
+    type="text"
+    placeholder={
+      selectedTab === "online"
+        ? t("Search online profession...")
+        : t("Search offline profession...")
+    }
+    value={search}
+    onChange={(e) => handleSearch(e.target.value)}
+    onFocus={() => {
+      setIsSearchFocused(true);
+      if (!profLoading) {
+        setFilteredProfessions(professions || []);
+      }
+    }}
+    className="w-full p-3 rounded-xl bg-[#0F172A] border border-white/10"
+  />
 
-  if (!profLoading) {
-    setFilteredProfessions(professions || []);
-  }
-}}
-  className="w-full p-3 rounded-xl bg-[#0F172A] border border-white/10"
-/>
-
-{isSearchFocused && profLoading && (
-  <div className="absolute w-full bg-[#0F172A] border border-white/10 rounded-xl mt-1 p-3 text-white/60">
-    Loading professions...
-  </div>
-)}
+  {/* ✅ SPINNER INSIDE INPUT */}
+  {professionLoading && (
+    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  )}
+</div>
           {isSearchFocused && !profLoading && filteredProfessions.length > 0 && (
             <div className="absolute w-full bg-[#0F172A] border border-white/10 rounded-xl mt-1 max-h-60 overflow-y-auto z-50">
               {filteredProfessions.map((p) => (

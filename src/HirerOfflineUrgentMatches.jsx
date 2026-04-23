@@ -25,9 +25,37 @@ const HirerOfflineUrgentMatches = () => {
   const [radius, setRadius] = useState(1000); // initial 1 km
   const [searching, setSearching] = useState(true);
   const [maxRadiusReached, setMaxRadiusReached] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+const [creditError, setCreditError] = useState("");
   const circleRef = useRef(null);
 const maxAnimatedRadius = 2000; // 2 km max for the blinking animation
     const { t } = useTranslation();
+
+
+    const handleConfirmUrgent = async () => {
+  try {
+    setConfirming(true);
+    setCreditError("");
+
+    await axios.post(
+      `${BASE_URL}/api/hirer-post/confirm-urgent/${postId}`,
+      {},
+      { withCredentials: true }
+    );
+
+    // optional UI update
+    alert("✅ Urgent activated");
+
+  } catch (err) {
+    if (err.response?.status === 400) {
+      setCreditError("❌ Insufficient Credits");
+    } else {
+      setCreditError("Something went wrong");
+    }
+  } finally {
+    setConfirming(false);
+  }
+};
 
 
 /* ================= BLINKING RADIUS ANIMATION (SLOW & SMOOTH) ================= */
@@ -347,6 +375,27 @@ useEffect(() => {
     </div>
   </div>
 )}
+
+
+    <div className="p-6 rounded-3xl bg-red-900/20 border border-red-500/30 shadow-xl space-y-3">
+  <p className="text-red-400 font-semibold">
+    🚨 Make this job urgent for faster responses
+  </p>
+
+  <button
+    onClick={handleConfirmUrgent}
+    disabled={confirming}
+    className="w-full py-3 rounded-xl font-semibold bg-red-600 hover:bg-red-500"
+  >
+    {confirming ? "Processing..." : "Confirm Urgent Post (15 Credits)"}
+  </button>
+
+  {creditError && (
+    <p className="text-red-400 text-sm">{creditError}</p>
+  )}
+</div>
+
+
 
       {/* Map & Radius */}
       <div className="p-6 rounded-3xl bg-slate-900/90 border border-slate-700/50 shadow-xl space-y-3">

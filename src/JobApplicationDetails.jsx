@@ -8,6 +8,9 @@ export default function JobApplicationDetails() {
   const [data, setData] = useState(null);
   const [selectedMedia, setSelectedMedia] = useState(null);
 
+  const isOnline = job?.languages && job.languages.length > 0;
+const isOffline = !isOnline;
+
   useEffect(() => {
     axios
       .get(`${BASE_URL}/api/jobs/notifications/${notificationId}`, {
@@ -136,122 +139,162 @@ const getImageUrl = (img) => {
 
       </div>
 
-      {/* ================= JOB DETAILS ================= */}
-      <div className="bg-white/5 rounded-2xl p-6 space-y-8">
+     
+<div className="bg-white/5 rounded-2xl p-6 space-y-8">
 
-        {/* PROFESSION */}
-        <h1 className="text-2xl font-bold">
-          Profession :
-          <span className="text-indigo-400 ml-2">
-            {job.profession}
-          </span>
-        </h1>
+  {/* ================= COMMON ================= */}
+  <h1 className="text-2xl font-bold">
+    Profession :
+    <span className="text-indigo-400 ml-2">
+      {job.profession}
+    </span>
+  </h1>
 
-        {/* DESCRIPTION */}
-        <p className="text-white/70">{job.description}</p>
+  <p className="text-white/70">{job.description}</p>
 
-        {/* TIME */}
-        {job.preferredTime && (
-          <p className="text-white/60">
-            <span className="font-semibold text-white/80">
-              Preferred Time :
-            </span>{" "}
-            {job.preferredTime.type === "asap" && "As soon as possible"}
-            {job.preferredTime.type === "today" && "Today"}
-            {job.preferredTime.type === "custom" && (
-              <>
-                {new Date(job.preferredTime.from).toLocaleString()} —{" "}
-                {new Date(job.preferredTime.to).toLocaleString()}
-              </>
+
+  {/* ================= ONLINE JOB ================= */}
+  {isOnline && (
+    <>
+      {/* PRICE */}
+      {job.price && (
+        <div className="border-t border-white/10 pt-4">
+          <p className="text-xl font-bold text-yellow-400">
+            {job.price.type === "fixed" &&
+              `${job.price.currency} ${job.price.value}`}
+            {job.price.type === "negotiable" &&
+              `${job.price.currency} ${job.price.min} – ${job.price.max}`}
+          </p>
+        </div>
+      )}
+
+      {/* LANGUAGES */}
+      {job.languages?.length > 0 && (
+        <div>
+          <p className="text-sm font-semibold text-white/80 mb-2">
+            Languages Required
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {job.languages.map((lang, i) => (
+              <span
+                key={i}
+                className="bg-indigo-600 px-3 py-1 rounded-full text-sm"
+              >
+                {lang}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </>
+  )}
+
+
+  {/* ================= OFFLINE JOB ================= */}
+  {isOffline && (
+    <>
+      {/* TIME */}
+      {job.preferredTime && (
+        <p className="text-white/60">
+          <span className="font-semibold text-white/80">
+            Preferred Time :
+          </span>{" "}
+          {job.preferredTime.type === "asap" && "As soon as possible"}
+          {job.preferredTime.type === "today" && "Today"}
+          {job.preferredTime.type === "custom" && (
+            <>
+              {new Date(job.preferredTime.from).toLocaleString()} —{" "}
+              {new Date(job.preferredTime.to).toLocaleString()}
+            </>
+          )}
+        </p>
+      )}
+
+      {/* MEDIA */}
+      {job.media?.length > 0 && (
+        <div>
+          <p className="text-sm font-semibold text-white/80 mb-3">
+            Images
+          </p>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {job.media.map((m, i) =>
+              m.type === "image" ? (
+                <img
+                  key={i}
+                  src={`${BASE_URL}${m.url}`}
+                  onClick={() => setSelectedMedia(m)}
+                  className="h-28 w-full object-cover rounded-xl cursor-pointer"
+                />
+              ) : (
+                <video
+                  key={i}
+                  onClick={() => setSelectedMedia(m)}
+                  className="h-28 w-full object-cover rounded-xl cursor-pointer"
+                >
+                  <source src={`${BASE_URL}${m.url}`} />
+                </video>
+              )
             )}
-          </p>
-        )}
-
-        {/* MEDIA */}
-        {job.media?.length > 0 && (
-          <div>
-            <p className="text-sm font-semibold text-white/80 mb-3">
-              Images
-            </p>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {job.media.map((m, i) =>
-                m.type === "image" ? (
-                  <img
-                    key={i}
-                    src={`${BASE_URL}${m.url}`}
-                    alt="job"
-                    onClick={() => setSelectedMedia(m)}
-                    className="h-28 w-full object-cover rounded-xl cursor-pointer hover:opacity-80"
-                  />
-                ) : (
-                  <video
-                    key={i}
-                    onClick={() => setSelectedMedia(m)}
-                    className="h-28 w-full object-cover rounded-xl cursor-pointer"
-                  >
-                    <source src={`${BASE_URL}${m.url}`} />
-                  </video>
-                )
-              )}
-            </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* WARNINGS */}
-        {job.safetyWarnings && (
-          <div className="bg-red-500/10 rounded-xl p-4">
-            <p className="font-semibold text-red-400 mb-2">
-              Warnings
-            </p>
-
-            <div className="text-sm text-red-300 space-y-1">
-              {job.safetyWarnings.children && <p>• Children present</p>}
-              {job.safetyWarnings.elderly && <p>• Elderly present</p>}
-              {job.safetyWarnings.pets && <p>• Pets present</p>}
-              {job.safetyWarnings.safetyConcerns && (
-                <p>• Safety concerns</p>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* PRICE */}
-        {job.price && (
-          <div className="border-t border-white/10 pt-4">
-            <p className="text-xl font-bold text-yellow-400">
-              {job.price.type === "fixed" &&
-                `${job.price.currency} ${job.price.value}`}
-              {job.price.type === "hourly" &&
-                `${job.price.currency} ${job.price.value}/hr`}
-              {job.price.type === "negotiable" &&
-                `${job.price.currency} ${job.price.min} – ${job.price.max}`}
-              {job.price.type === "inspect_quote" && "Inspect & Quote"}
-            </p>
-          </div>
-        )}
-
-        {/* ADDRESS */}
-        {job.addressDetails && (
-          <p className="text-white/60">
-            <span className="font-semibold text-white/80">
-              Address / Landmark :
-            </span>{" "}
-            {job.addressDetails}
+      {/* WARNINGS */}
+      {job.safetyWarnings && (
+        <div className="bg-red-500/10 rounded-xl p-4">
+          <p className="font-semibold text-red-400 mb-2">
+            Warnings
           </p>
-        )}
 
-        {/* LOCATION */}
-        {job.location?.address && (
-          <p className="text-white/60">
-            <span className="font-semibold text-white/80">
-              Location :
-            </span>{" "}
-            {job.location.address}
+          <div className="text-sm text-red-300 space-y-1">
+            {job.safetyWarnings.children && <p>• Children present</p>}
+            {job.safetyWarnings.elderly && <p>• Elderly present</p>}
+            {job.safetyWarnings.pets && <p>• Pets present</p>}
+            {job.safetyWarnings.safetyConcerns && (
+              <p>• Safety concerns</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* PRICE */}
+      {job.price && (
+        <div className="border-t border-white/10 pt-4">
+          <p className="text-xl font-bold text-yellow-400">
+            {job.price.type === "fixed" &&
+              `${job.price.currency} ${job.price.value}`}
+            {job.price.type === "hourly" &&
+              `${job.price.currency} ${job.price.value}/hr`}
+            {job.price.type === "negotiable" &&
+              `${job.price.currency} ${job.price.min} – ${job.price.max}`}
+            {job.price.type === "inspect_quote" && "Inspect & Quote"}
           </p>
-        )}
+        </div>
+      )}
 
-      </div>
+      {/* LANDMARK */}
+      {job.addressDetails && (
+        <p className="text-white/60">
+          <span className="font-semibold text-white/80">
+            Address / Landmark :
+          </span>{" "}
+          {job.addressDetails}
+        </p>
+      )}
+
+      {/* LOCATION */}
+      {job.location?.address && (
+        <p className="text-white/60">
+          <span className="font-semibold text-white/80">
+            Location :
+          </span>{" "}
+          {job.location.address}
+        </p>
+      )}
+    </>
+  )}
+</div>
 
       {/* ================= ACTION BUTTONS (HIRER ONLY) ================= */}
       {notificationType === "job_application" && (

@@ -49,6 +49,16 @@ const HirerOfflineUrgentPost = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [userCredits, setUserCredits] = useState(0);
   const { t } = useTranslation();
+  const errorRef = useRef(null);
+
+  useEffect(() => {
+  if (error && errorRef.current) {
+    errorRef.current.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }
+}, [error]);
 
   const inputBase =
     "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700/60 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition";
@@ -248,10 +258,13 @@ const handleSearchClick = () => {
 </p>
 
         {error && (
-          <p className="rounded-lg bg-red-500/10 border border-red-500/30 px-4 py-2 text-sm text-red-400">
-            {error}
-          </p>
-        )}
+  <p
+    ref={errorRef}
+    className="rounded-lg bg-red-500/10 border border-red-500/30 px-4 py-2 text-sm text-red-400"
+  >
+    {error}
+  </p>
+)}
 
         <CreateOfflineWorkerPostPage
           form={form}
@@ -306,6 +319,13 @@ const handleSearchClick = () => {
         <div className="overflow-hidden rounded-xl border border-slate-700">
           <div id="map" style={{ height: 280 }} />
         </div>
+     
+      {error && (
+  <p className="text-red-400 text-sm text-center">
+    {error}
+  </p>
+)}
+
 
         {/* SUBMIT */}
       <button

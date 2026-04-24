@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -18,19 +17,30 @@ export default function OfflineJobDetails() {
   const [error, setError] = useState("");
   const [applying, setApplying] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!jobId) return;
-    const fetchJob = async () => {
-      try {
-        const res = await axios.get(`${BASE_URL}/api/jobs/${jobId}`, { withCredentials: true });
-        setJob(res.data.job);
-      } catch {
-        setError("Failed to load job details");
-      }
-    };
-    fetchJob();
-  }, [jobId]);
+  if (!jobId) return;
+
+  const fetchJob = async () => {
+    try {
+      setLoading(true); // ✅ start spinner
+
+      const res = await axios.get(
+        `${BASE_URL}/api/jobs/${jobId}`,
+        { withCredentials: true }
+      );
+
+      setJob(res.data.job);
+    } catch {
+      setError("Failed to load job details");
+    } finally {
+      setLoading(false); // ✅ stop spinner
+    }
+  };
+
+  fetchJob();
+}, [jobId]);
 
   const applyJob = async () => {
     if (applying) return;
@@ -43,7 +53,13 @@ export default function OfflineJobDetails() {
   };
 
   if (error) return <p className="text-red-400 text-center">{error}</p>;
-  if (!job) return null;
+  if (loading) {
+  return (
+    <div className="min-h-screen flex justify-center items-center">
+      <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+}
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 text-white">

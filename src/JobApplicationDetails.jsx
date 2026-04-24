@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
@@ -38,6 +37,12 @@ export default function JobApplicationDetails() {
     );
   };
 
+
+const getImageUrl = (img) => {
+  if (!img) return "";
+  if (img.startsWith("http")) return img;
+  return `${BASE_URL}${img}`;
+};
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 text-white">
 
@@ -49,9 +54,9 @@ export default function JobApplicationDetails() {
           <>
             {data.employee.profileImage ? (
               <img
-                src={`${BASE_URL}${data.employee.profileImage}`}
-                className="w-14 h-14 rounded-full"
-              />
+  src={getImageUrl(data.employee.profileImage)}
+  className="w-14 h-14 rounded-full"
+/>
             ) : (
               <div
                 className="w-14 h-14 rounded-full flex items-center justify-center"
@@ -77,9 +82,9 @@ export default function JobApplicationDetails() {
           <>
             {job.hirer?.profileImage ? (
               <img
-                src={`${BASE_URL}${job.hirer.profileImage}`}
-                className="w-14 h-14 rounded-full"
-              />
+  src={getImageUrl(job.hirer.profileImage)}
+  className="w-14 h-14 rounded-full"
+/>
             ) : (
               <div
                 className="w-14 h-14 rounded-full flex items-center justify-center"
@@ -105,9 +110,9 @@ export default function JobApplicationDetails() {
   <>
     {job.hirer?.profileImage ? (
       <img
-        src={`${BASE_URL}${job.hirer.profileImage}`}
-        className="w-14 h-14 rounded-full"
-      />
+  src={getImageUrl(job.hirer.profileImage)}
+  className="w-14 h-14 rounded-full"
+/>
     ) : (
       <div
         className="w-14 h-14 rounded-full flex items-center justify-center"

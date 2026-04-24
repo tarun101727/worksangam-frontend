@@ -35,6 +35,7 @@ const userId = user?._id;
 const [selectedMedia, setSelectedMedia] = useState(null);
 const messagesContainerRef = useRef(null);
 const [isTyping, setIsTyping] = useState(false);
+const [loading, setLoading] = useState(true);
 const isTypingRef = useRef(false);
 const { t } = useTranslation();
 
@@ -54,59 +55,65 @@ useLayoutEffect(() => {
   messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
 }, [messages]);
 
-/* LOAD CHAT + SOCKET */
-useEffect(()=>{
+useEffect(() => {
 
-socket.emit("join-chat",chatId);
+  socket.emit("join-chat", chatId);
 
-axios.get(`${BASE_URL}/api/chat/messages/${chatId}`,{
-withCredentials:true
-})
-.then(res=>{
+  axios
+    .get(`${BASE_URL}/api/chat/messages/${chatId}`, {
+      withCredentials: true,
+    })
+    .then((res) => {
+      setMessages(res.data.messages);
 
-setMessages(res.data.messages);
+      const otherUser = res.data.participants.find(
+        (p) => p._id.toString() !== userId?.toString()
+      );
 
-const otherUser = res.data.participants.find(
-  (p) => p._id.toString() !== userId?.toString()
-);
+      setReceiver(otherUser);
+    })
+    .catch((err) => {
+      console.error(err);
+    })
+    .finally(() => {
+      setLoading(false); // ✅ ONLY THIS IS NEEDED
+    });
 
-setReceiver(otherUser);
+  socket.off("receive-message").on("receive-message", (msg) => {
+    setMessages((prev) => {
+      const exists = prev.some(
+        (m) =>
+          m.message === msg.message &&
+          m.sender?._id === msg.sender?._id
+      );
 
-});
+      if (exists) return prev;
 
-socket.off("receive-message").on("receive-message", (msg) => {
-  setMessages(prev => {
-    // ❌ prevent duplicate (important)
-    const exists = prev.some(
-      m =>
-        m.message === msg.message &&
-        m.sender?._id === msg.sender?._id
-    );
-
-    if (exists) return prev;
-
-    return [...prev, msg];
+      return [...prev, msg];
+    });
   });
-});
 
-socket.off("user-typing").on("user-typing", ({ userId: typingUserId }) => {
-  if (typingUserId !== userId) {
-    setIsTyping(true);
-  }
-});
+  socket.off("user-typing").on("user-typing", ({ userId: typingUserId }) => {
+    if (typingUserId !== userId) {
+      setIsTyping(true);
+    }
+  });
 
-socket.off("user-stop-typing").on("user-stop-typing", ({ userId: typingUserId }) => {
-  if (typingUserId !== userId) {
-    setIsTyping(false);
-  }
-});
+  socket
+    .off("user-stop-typing")
+    .on("user-stop-typing", ({ userId: typingUserId }) => {
+      if (typingUserId !== userId) {
+        setIsTyping(false);
+      }
+    });
 
-return () => {
-  socket.off("receive-message");
-  socket.off("user-typing");
-  socket.off("user-stop-typing");
-};
-},[chatId]);
+  return () => {
+    socket.off("receive-message");
+    socket.off("user-typing");
+    socket.off("user-stop-typing");
+  };
+
+}, [chatId]);
 
 const sendMessage = () => {
   if (!text.trim()) return;
@@ -269,6 +276,14 @@ const handleKeyDown = (e) => {
     sendMessage();
   }
 };
+
+if (loading && messages.length === 0) {
+  return (
+    <div className="min-h-screen flex justify-center items-center">
+      <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+}
 
 return(
 

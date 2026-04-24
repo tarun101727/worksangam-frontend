@@ -170,37 +170,6 @@ const HirerOfflineUrgentPost = () => {
   ];
 
   const submit = async () => {
-  // 🔴 VALIDATION FIRST
-  if (!form.profession) {
-    return setError("Please add a profession");
-  }
-
-  if (!form.description) {
-    return setError("Please add a description");
-  }
-
-  if (!form.priceType) {
-    return setError("Please select a pricing type");
-  }
-
-  if (
-    form.priceType === "fixed" &&
-    !form.expectedPrice
-  ) {
-    return setError("Please enter expected price");
-  }
-
-  if (
-    form.priceType === "hourly" &&
-    (!form.minPrice || !form.maxPrice)
-  ) {
-    return setError("Please enter min and max price");
-  }
-
-  if (!form.location.coordinates.length) {
-    return setError("Please select your location");
-  }
-
   try {
     setLoading(true);
 
@@ -215,32 +184,24 @@ const HirerOfflineUrgentPost = () => {
       }
     });
 
-    form.media.forEach((file) =>
-      formData.append("media", file)
-    );
+    form.media.forEach((file) => formData.append("media", file));
 
-    const res = await axios.post(
-      `${BASE_URL}/api/hirer-post/create-urgent-with-credits`,
-      formData,
-      {
-        withCredentials: true,
-        headers: { "Content-Type": "multipart/form-data" },
-      }
-    );
-
-    setUserCredits(res.data.credits);
-
+   const res = await axios.post(
+  `${BASE_URL}/api/hirer-post/create-urgent-with-credits`,
+  formData,
+  {
+    withCredentials: true,
+    headers: { "Content-Type": "multipart/form-data" },
+  }
+);
+    setUserCredits(res.data.credits); // ✅ update UI instantly
     const newPostId = res.data.job._id;
+
+    // 2️⃣ Then, navigate to the urgent matches page (GET)
     navigate(`/urgent-matches/${newPostId}`);
   } catch (err) {
     console.error("Submit error:", err);
-
-    // ✅ Backend error (optional)
-    if (err.response?.data?.message) {
-      setError(err.response.data.message);
-    } else {
-      setError("Something went wrong. Please try again.");
-    }
+    setError("Failed to create post");
   } finally {
     setLoading(false);
   }

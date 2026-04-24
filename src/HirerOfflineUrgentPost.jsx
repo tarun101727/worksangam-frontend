@@ -46,6 +46,7 @@ const HirerOfflineUrgentPost = () => {
   const [error, setError] = useState("");
   const [mediaPreviews, setMediaPreviews] = useState([]);
   const [activeMedia, setActiveMedia] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
   const { t } = useTranslation();
 
   const inputBase =
@@ -175,10 +176,14 @@ const HirerOfflineUrgentPost = () => {
 
     form.media.forEach((file) => formData.append("media", file));
 
-   const res = await axios.post(`${BASE_URL}/api/hirer-post/create`, formData, {
-      withCredentials: true,
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+   const res = await axios.post(
+  `${BASE_URL}/api/hirer-post/create-urgent-with-credits`,
+  formData,
+  {
+    withCredentials: true,
+    headers: { "Content-Type": "multipart/form-data" },
+  }
+);
 
     const newPostId = res.data.job._id;
 
@@ -267,18 +272,23 @@ const HirerOfflineUrgentPost = () => {
         </div>
 
         {/* SUBMIT */}
-        <button
-  onClick={submit}
-  disabled={loading}
-  className="w-full py-3 rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-500"
+       <button
+  onClick={() => setShowPopup(true)}
+  className="w-full py-3 rounded-xl bg-indigo-600"
 >
-  {loading
-    ? t("Please wait...")
-    : form.profession
-      ? `${t("Search for")} ${form.profession}`
-      : t("Search for employee")
-  }
+  Search for employee
 </button>
+
+{showPopup && (
+  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[9999]">
+    <div className="bg-slate-900 p-6 rounded-xl">
+      <p>This will cost <b>15 credits</b></p>
+
+      <button onClick={submit}>Confirm</button>
+      <button onClick={() => setShowPopup(false)}>Cancel</button>
+    </div>
+  </div>
+)}
 
       </div>
     </div>

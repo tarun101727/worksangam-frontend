@@ -169,6 +169,32 @@ const HirerOfflineUrgentPost = () => {
     { label: t("Inspect first, then quote"), value: "inspect_quote" },
   ];
 
+
+  // 🔴 ADD THIS FUNCTION
+const handleSearchClick = () => {
+  // CLEAR OLD ERROR
+  setError("");
+
+  if (!form.profession) {
+    return setError("Please add a profession");
+  }
+
+  if (!form.description) {
+    return setError("Please add a description");
+  }
+
+  if (!form.addressDetails) {
+    return setError("Please enter your address");
+  }
+
+  if (!form.location?.coordinates?.length) {
+    return setError("Please select your location");
+  }
+
+  // ✅ ONLY OPEN POPUP IF ALL VALID
+  setShowPopup(true);
+};
+
   const submit = async () => {
   try {
     setLoading(true);
@@ -282,8 +308,8 @@ const HirerOfflineUrgentPost = () => {
         </div>
 
         {/* SUBMIT */}
-       <button
-  onClick={() => setShowPopup(true)}
+      <button
+  onClick={handleSearchClick}
   className="w-full py-3 rounded-xl bg-indigo-600"
 >
   Search for employee

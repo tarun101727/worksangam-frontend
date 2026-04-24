@@ -168,34 +168,8 @@ const HirerOfflineUrgentPost = () => {
     { label: t("Negotiable"), value: "negotiable" },
     { label: t("Inspect first, then quote"), value: "inspect_quote" },
   ];
-  
-
-  const validateForm = () => {
-  if (!form.profession) return "Please add a profession";
-
-  if (!form.description) return "Please add a description";
-
-  if (!form.priceType) return "Please select a pricing type";
-
-  if (form.priceType === "fixed" && !form.expectedPrice)
-    return "Please enter expected price";
-
-  if (
-    form.priceType === "hourly" &&
-    (!form.minPrice || !form.maxPrice)
-  )
-    return "Please enter min and max price";
-
-  if (!form.location.coordinates.length)
-    return "Please select your location";
-
-  return null;
-};
-
 
   const submit = async () => {
-  setError(""); // ✅ clear previous errors
-
   // 🔴 VALIDATION FIRST
   if (!form.profession) {
     return setError("Please add a profession");
@@ -209,7 +183,10 @@ const HirerOfflineUrgentPost = () => {
     return setError("Please select a pricing type");
   }
 
-  if (form.priceType === "fixed" && !form.expectedPrice) {
+  if (
+    form.priceType === "fixed" &&
+    !form.expectedPrice
+  ) {
     return setError("Please enter expected price");
   }
 
@@ -220,7 +197,7 @@ const HirerOfflineUrgentPost = () => {
     return setError("Please enter min and max price");
   }
 
-  if (!form.location?.coordinates?.length) {
+  if (!form.location.coordinates.length) {
     return setError("Please select your location");
   }
 
@@ -231,7 +208,6 @@ const HirerOfflineUrgentPost = () => {
 
     Object.keys(form).forEach((key) => {
       if (key === "media") return;
-
       if (typeof form[key] === "object") {
         formData.append(key, JSON.stringify(form[key]));
       } else {
@@ -239,9 +215,9 @@ const HirerOfflineUrgentPost = () => {
       }
     });
 
-    form.media.forEach((file) => {
-      formData.append("media", file);
-    });
+    form.media.forEach((file) =>
+      formData.append("media", file)
+    );
 
     const res = await axios.post(
       `${BASE_URL}/api/hirer-post/create-urgent-with-credits`,
@@ -255,13 +231,11 @@ const HirerOfflineUrgentPost = () => {
     setUserCredits(res.data.credits);
 
     const newPostId = res.data.job._id;
-
-    // ✅ Only navigate AFTER success
     navigate(`/urgent-matches/${newPostId}`);
-
   } catch (err) {
     console.error("Submit error:", err);
 
+    // ✅ Backend error (optional)
     if (err.response?.data?.message) {
       setError(err.response.data.message);
     } else {
@@ -348,17 +322,7 @@ const HirerOfflineUrgentPost = () => {
 
         {/* SUBMIT */}
        <button
-  onClick={() => {
-    const errorMsg = validateForm();
-
-    if (errorMsg) {
-      setError(errorMsg); // ❌ show error
-      return;
-    }
-
-    setError("");
-    setShowPopup(true); // ✅ only open popup if valid
-  }}
+  onClick={() => setShowPopup(true)}
   className="w-full py-3 rounded-xl bg-indigo-600"
 >
   Search for employee

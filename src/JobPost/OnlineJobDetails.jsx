@@ -22,6 +22,9 @@ export default function OnlineJobDetails() {
   // Translation states
   const [translated, setTranslated] = useState({ profession: null, description: null });
   const [loadingTranslate, setLoadingTranslate] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+
   const currentLang = localStorage.getItem("lang") || "en";
 
   const handleTranslate = async (field, text) => {
@@ -42,17 +45,22 @@ export default function OnlineJobDetails() {
   };
 
   useEffect(() => {
-    if (!jobId) return;
-    const fetchJob = async () => {
-      try {
-        const res = await axios.get(`${BASE_URL}/api/jobs/${jobId}`, { withCredentials: true });
-        setJob(res.data.job);
-      } catch {
-        setError("Failed to load job details");
-      }
-    };
-    fetchJob();
-  }, [jobId]);
+  if (!jobId) return;
+
+  const fetchJob = async () => {
+    try {
+      setLoading(true); // ✅ START spinner
+      const res = await axios.get(`${BASE_URL}/api/jobs/${jobId}`, { withCredentials: true });
+      setJob(res.data.job);
+    } catch {
+      setError("Failed to load job details");
+    } finally {
+      setLoading(false); // ✅ STOP spinner
+    }
+  };
+
+  fetchJob();
+}, [jobId]);
 
   const applyJob = async () => {
     if (applying) return;
@@ -67,7 +75,13 @@ export default function OnlineJobDetails() {
   };
 
   if (error) return <p className="text-red-400 text-center">{error}</p>;
-  if (!job) return null;
+  if (loading) {
+  return (
+    <div className="min-h-screen flex justify-center items-center">
+      <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+}
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 text-white">

@@ -93,6 +93,24 @@ const [notifications, setNotifications] = useState([]); // job notifications
 const [chatNotifications, setChatNotifications] = useState([]); // chat notifications
   const { t } = useTranslation();
 
+useEffect(() => {
+  if (!user?._id) return;
+
+  // attach userId
+  socket.auth = { userId: user._id };
+
+  socket.connect();
+
+  // join personal room
+  socket.emit("join-user", user._id);
+
+  console.log("✅ Socket connected:", user._id);
+
+  return () => {
+    socket.disconnect();
+  };
+}, [user?._id]);
+
 
 // Combined unread count for the bell
 const unreadCount =

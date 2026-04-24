@@ -53,7 +53,13 @@ export default function JobDetails() {
     }
   };
 
-  if (loading) return <p className="text-center mt-10">Loading...</p>;
+  if (loading) {
+  return (
+    <div className="min-h-screen flex justify-center items-center">
+      <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+}
   if (!job) return <p className="text-center mt-10">Job not found</p>;
 
   return (
@@ -82,10 +88,7 @@ export default function JobDetails() {
         </h1>
 
         {/* Description */}
-        <p className="text-white/70">
-          <span className="font-semibold">Description: </span>
-          {job.description}
-        </p>
+        <p className="text-white/70">{job.description}</p>
 
         {/* Preferred Time & Date */}
         {job.preferredTime && (

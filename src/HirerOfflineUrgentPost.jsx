@@ -2,10 +2,23 @@ import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import L from "leaflet";
-import { useTranslation } from "react-i18next";
 
-import { BASE_URL } from "./config";
-import CreateOfflineWorkerPostPage from "./PROFILE/CreateOfflineWorkerPostPage";
+import "leaflet/dist/leaflet.css";
+
+// 🔥 FIX: Leaflet marker icon issue
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+});
+
+
+import { useTranslation } from "react-i18next";
+import { BASE_URL } from "../config";
+import CreateOfflineWorkerPostPage from "./CreateOfflineWorkerPostPage";
+import i18n from "../i18n.js";
 
 /* ================= EMPTY FORM ================= */
 const emptyForm = () => ({
@@ -33,7 +46,7 @@ const emptyForm = () => ({
   },
 });
 
-const HirerOfflineUrgentPost = () => {
+const HirerOfflinePost = () => {
   const navigate = useNavigate();
 
   const mapRef = useRef(null);
@@ -49,16 +62,6 @@ const HirerOfflineUrgentPost = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [userCredits, setUserCredits] = useState(0);
   const { t } = useTranslation();
-  const errorRef = useRef(null);
-
-  useEffect(() => {
-  if (error && errorRef.current) {
-    errorRef.current.scrollIntoView({
-      behavior: "smooth",
-      block: "center",
-    });
-  }
-}, [error]);
 
   const inputBase =
     "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700/60 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition";
@@ -168,79 +171,154 @@ const HirerOfflineUrgentPost = () => {
   const openNativePicker = (e) => {
     try {
       e.target.showPicker?.();
-    } catch {}
+    } catch {
+      /* error */
+    }
   };
 
   const standardPriceOptions = [
     { label: t("No Budget"), value: null },
     { label: t("Fixed Price"), value: "fixed" },
-    { label: t("Hourly"), value: "hourly" },
-    { label: t("Negotiable"), value: "negotiable" },
+    { label: t("hourly"), value: "hourly" },
+    { label: t("negotiable"), value: "negotiable" },
     { label: t("Inspect first, then quote"), value: "inspect_quote" },
   ];
 
-
-  // 🔴 ADD THIS FUNCTION
-const handleSearchClick = () => {
-  // CLEAR OLD ERROR
-  setError("");
-
-  if (!form.profession) {
-    return setError("Please add a profession");
-  }
-
-  if (!form.description) {
-    return setError("Please add a description");
-  }
-
-  if (!form.addressDetails) {
-    return setError("Please enter your address");
-  }
-
-  if (!form.location?.coordinates?.length) {
-    return setError("Please select your location");
-  }
-
-  // ✅ ONLY OPEN POPUP IF ALL VALID
-  setShowPopup(true);
-};
-
-  const submit = async () => {
+const handleConfirm = async () => {
   try {
     setLoading(true);
 
     const formData = new FormData();
 
-    Object.keys(form).forEach((key) => {
+    let priceObj = null;
+    if (form.priceType) {
+      if (form.priceType === "fixed" || form.priceType === "hourly") {
+        priceObj = {
+          type: form.priceType,
+          value: Number(form.expectedPrice),
+          currency: form.currency,
+        };
+      } else if (form.priceType === "negotiable") {
+        priceObj = {
+          type: "negotiable",
+          min: Number(form.minPrice),
+          max: Number(form.maxPrice),
+          currency: form.currency,
+        };
+      } else if (form.priceType === "inspect_quote") {
+        priceObj = { type: "inspect_quote", currency: form.currency };
+      }
+    }
+
+    const payload = { ...form, price: priceObj };
+
+    Object.keys(payload).forEach((key) => {
       if (key === "media") return;
-      if (typeof form[key] === "object") {
-        formData.append(key, JSON.stringify(form[key]));
+      if (typeof payload[key] === "object") {
+        formData.append(key, JSON.stringify(payload[key]));
       } else {
-        formData.append(key, form[key]);
+        formData.append(key, payload[key]);
       }
     });
 
-    form.media.forEach((file) => formData.append("media", file));
+    form.media.forEach((file) =>
+      formData.append("media", file)
+    );
 
-   const res = await axios.post(
-  `${BASE_URL}/api/hirer-post/create-urgent-with-credits`,
-  formData,
-  {
-    withCredentials: true,
-    headers: { "Content-Type": "multipart/form-data" },
-  }
-);
-    setUserCredits(res.data.credits); // ✅ update UI instantly
-    const newPostId = res.data.job._id;
+    const res = await axios.post(
+      `${BASE_URL}/api/hirer-post/create-with-credits`, // ✅ NEW API
+      formData,
+      {
+        withCredentials: true,
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
 
-    // 2️⃣ Then, navigate to the urgent matches page (GET)
-    navigate(`/urgent-matches/${newPostId}`);
+    // ✅ update credits in UI
+    setUserCredits(res.data.credits);
+
+    setShowPopup(false);
+
+    navigate(`/job/${res.data.job._id}`);
+
   } catch (err) {
-    console.error("Submit error:", err);
-    setError("Failed to create post");
+    setError(
+      err.response?.data?.msg ||
+      "Failed to create post"
+    );
   } finally {
     setLoading(false);
   }
+};
+
+let latestRequest = "";
+let timer;
+
+const transliterate = async (value, field) => {
+  const currentLang = i18n.language || "en";
+
+  latestRequest = value;
+
+  const words = value.split(" ");
+  const lastWord = words[words.length - 1];
+
+  if (!lastWord) return;
+
+  try {
+    const res = await fetch(
+      `https://inputtools.google.com/request?text=${lastWord}&itc=${currentLang}-t-i0-und&num=5`
+    );
+
+    const data = await res.json();
+
+    // ❗ Ignore outdated responses
+    if (latestRequest !== value) return;
+
+    if (data[0] === "SUCCESS") {
+      const suggestions = data[1][0][1];
+      const bestMatch = suggestions[0];
+
+      words[words.length - 1] = bestMatch;
+
+      setForm((prev) => ({
+        ...prev,
+        [field]: words.join(" "),
+      }));
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const handleTranslatableChange = (value, field) => {
+  const currentLang = i18n.language || "en";
+
+  // Show raw typing first
+  setForm((prev) => ({
+    ...prev,
+    [field]: value,
+  }));
+
+  // Only for Indian languages
+  if (!["te", "hi", "ta", "kn"].includes(currentLang)) return;
+
+  clearTimeout(timer);
+
+  const words = value.split(" ");
+  const lastWord = words[words.length - 1];
+
+  // ✅ SPACE → instant transliteration
+  if (value.endsWith(" ") && lastWord.length >= 3) {
+    transliterate(value.trim(), field);
+    return;
+  }
+
+  // ✅ STOP typing → delayed transliteration
+  timer = setTimeout(() => {
+    if (lastWord.length >= 3) {
+      transliterate(value, field);
+    }
+  }, 1000);
 };
 
   /* ================= RENDER ================= */
@@ -250,7 +328,7 @@ const handleSearchClick = () => {
       <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/90 border border-slate-700/50 shadow-xl space-y-6">
 
       <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-  🧰 {t("Create OFFLINE Worker Post")}
+  🧰 {t("Create Offline Worker Post")}
 </h1>
 
 <p className="text-sm text-slate-400">
@@ -258,13 +336,10 @@ const handleSearchClick = () => {
 </p>
 
         {error && (
-  <p
-    ref={errorRef}
-    className="rounded-lg bg-red-500/10 border border-red-500/30 px-4 py-2 text-sm text-red-400"
-  >
-    {error}
-  </p>
-)}
+          <p className="rounded-lg bg-red-500/10 border border-red-500/30 px-4 py-2 text-sm text-red-400">
+            {error}
+          </p>
+        )}
 
         <CreateOfflineWorkerPostPage
           form={form}
@@ -285,18 +360,15 @@ const handleSearchClick = () => {
             📍 {t("Exact Address / Nearby Landmark")}
           </p>
 
-          <textarea
-            className={`${inputBase} h-32 resize-none overflow-y-auto`}
-            placeholder={t("Flat / House number, Building name Street / Area Nearby landmark Floor, gate, lift, access notes")}
-            value={form.addressDetails}
-            maxLength={500}
-            onChange={(e) =>
-              setForm((prev) => ({
-                ...prev,
-                addressDetails: e.target.value,
-              }))
-            }
-          />
+         <textarea
+  className={`${inputBase} h-32 resize-none overflow-y-auto`}
+  placeholder={t("addressDetailsPlaceholder")}
+  value={form.addressDetails}
+  maxLength={500}
+  onChange={(e) =>
+    handleTranslatableChange(e.target.value, "addressDetails")
+  }
+/>
 
           <div className="flex justify-between text-xs text-slate-500">
             <span>{t("Visible only after job acceptance.")}</span>
@@ -319,53 +391,39 @@ const handleSearchClick = () => {
         <div className="overflow-hidden rounded-xl border border-slate-700">
           <div id="map" style={{ height: 280 }} />
         </div>
-     
-      {error && (
-  <p className="text-red-400 text-sm text-center">
-    {error}
-  </p>
-)}
-
 
         {/* SUBMIT */}
-      <button
-  onClick={handleSearchClick}
-  className="w-full py-3 rounded-xl bg-indigo-600"
+        <button
+  onClick={() => setShowPopup(true)}
+  disabled={loading}
+  className="w-full py-3 rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-500"
 >
-  Search for employee
+  {loading ? t("Please wait...") : t("Submit Job Post")}
 </button>
+
 
 {showPopup && (
   <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[9999]">
     <div className="bg-slate-900 p-6 rounded-2xl w-full max-w-sm border border-slate-700">
-
+      
       <h2 className="text-lg font-semibold text-white mb-2">
         Confirm Action
       </h2>
 
       <p className="text-slate-300 text-sm mb-4">
-        This will cost <b>15 credits</b>. Do you want to continue?
+        This action will cost <b>7 credits</b>. Do you want to continue?
       </p>
 
-      {/* ✅ CREDIT BALANCE */}
       <p className="text-xs text-slate-400 mb-4">
-        Available Credits: <b>{userCredits}</b>
+        Available Credits: {userCredits}
       </p>
-
-      {/* ⚠️ LOW CREDIT WARNING */}
-      {userCredits < 15 && (
-        <p className="text-red-400 text-xs mb-3">
-          Not enough credits. Please recharge.
-        </p>
-      )}
 
       <div className="flex gap-3">
         <button
-          onClick={submit}
-          disabled={loading || userCredits < 15}
-          className="flex-1 bg-indigo-600 hover:bg-indigo-500 py-2 rounded-lg disabled:opacity-50"
+          onClick={handleConfirm}
+          className="flex-1 bg-indigo-600 hover:bg-indigo-500 py-2 rounded-lg"
         >
-          Confirm & Use 15 Credits
+          Confirm & Use 7 Credits
         </button>
 
         <button
@@ -375,7 +433,6 @@ const handleSearchClick = () => {
           Cancel
         </button>
       </div>
-
     </div>
   </div>
 )}
@@ -385,4 +442,4 @@ const handleSearchClick = () => {
   );
 };
 
-export default HirerOfflineUrgentPost;
+export default HirerOfflinePost;

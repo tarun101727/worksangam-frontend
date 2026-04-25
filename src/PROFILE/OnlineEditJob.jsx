@@ -11,7 +11,6 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
   const [languageInput, setLanguageInput] = useState("");
   const [allLanguages, setAllLanguages] = useState([]);
   const [languageSuggestions, setLanguageSuggestions] = useState([]);
-
   const languageContainerRef = useRef(null);
 
   const urgentPriceOptions = [
@@ -144,15 +143,15 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
       {/* ================= LANGUAGES ================= */}
       <div className="space-y-2 relative" ref={languageContainerRef}>
         
-        {/* Selected Languages Display (like job view UI) */}
-{languages && languages.length > 0 && (
-  <div className="mt-2">
+        {/* Languages */}
+{form.languages && form.languages.length > 0 && (
+  <div className="mt-4">
     <p className="text-sm text-white/60 mb-1">
       {t("Languages")}:
     </p>
 
     <div className="flex flex-wrap gap-2">
-      {languages.map((lang, i) => (
+      {form.languages.map((lang, i) => (
         <span
           key={i}
           className="px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-full text-xs"

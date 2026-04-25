@@ -18,10 +18,8 @@ export default function JobDetails() {
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedMedia, setSelectedMedia] = useState(null);
-  const [error, setError] = useState("");
-  const [applying, setApplying] = useState(false);
 
-  // 🌍 Translation
+  // 🔥 TRANSLATION STATE
   const [translated, setTranslated] = useState({
     profession: null,
     description: null,
@@ -32,16 +30,23 @@ export default function JobDetails() {
 
   const handleTranslate = async (field, text) => {
     if (!text) return;
+
     try {
       setLoadingTranslate(field);
+
       const res = await fetch(
         `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${currentLang}&dt=t&q=${encodeURIComponent(
           text
         )}`
       );
+
       const data = await res.json();
       const translatedText = data[0].map((item) => item[0]).join("");
-      setTranslated((prev) => ({ ...prev, [field]: translatedText }));
+
+      setTranslated((prev) => ({
+        ...prev,
+        [field]: translatedText,
+      }));
     } catch (err) {
       console.error("Translation failed", err);
     } finally {
@@ -50,57 +55,39 @@ export default function JobDetails() {
   };
 
   // 🔥 FETCH JOB
+  const fetchJob = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/api/jobs/${jobId}`, {
+        withCredentials: true,
+      });
+      setJob(res.data.job);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchJob = async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(`${BASE_URL}/api/jobs/${jobId}`, {
-          withCredentials: true,
-        });
-        setJob(res.data.job);
-      } catch (err) {
-        console.error(err);
-        setError("Failed to load job");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchJob();
-  }, [jobId]);
+  }, []);
 
-  // 🔥 DELETE
+  // 🔥 DELETE JOB
   const handleDelete = async () => {
-    if (!window.confirm("Are you sure to delete this job?")) return;
+    if (!window.confirm(t("delete_confirm"))) return;
 
     try {
       await axios.delete(`${BASE_URL}/api/jobs/delete/${jobId}`, {
         withCredentials: true,
       });
-      navigate("/");
-    } catch {
-      alert("Delete failed");
-    }
-  };
 
-  // 🔥 APPLY
-  const applyJob = async () => {
-    if (applying) return;
-    try {
-      setApplying(true);
-      await axios.post(
-        `${BASE_URL}/api/jobs/apply/${job._id}`,
-        {},
-        { withCredentials: true }
-      );
+      alert(t("job_deleted"));
+      navigate("/");
     } catch (err) {
       console.error(err);
-    } finally {
-      setApplying(false);
+      alert(t("delete_failed"));
     }
   };
-
-  if (error) return <p className="text-red-400 text-center">{error}</p>;
 
   if (loading) {
     return (
@@ -110,13 +97,13 @@ export default function JobDetails() {
     );
   }
 
-  if (!job) return <p className="text-center mt-10">Job not found</p>;
+  if (!job) return <p className="text-center mt-10">{t("job_not_found")}</p>;
 
   const isOnline = job.professionType === "online";
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 p-5 bg-[#0F172A] rounded-2xl border border-white/10 text-white">
-      
+    <div className="max-w-3xl mx-auto mt-10 p-5 bg-[#0F172A] rounded-2xl border border-white/10">
+
       {/* HEADER */}
       <div className="flex items-center gap-5 pb-6 border-b border-white/10 mb-8">
         {job.hirer?.profileImage ? (
@@ -139,19 +126,20 @@ export default function JobDetails() {
             {job.hirer?.firstName} {job.hirer?.lastName}
           </p>
           <p className="text-xs text-white/50">
-            Job posted by {job.hirer?.firstName}
+            {t("job_posted_by", { name: job.hirer?.firstName })}
           </p>
         </div>
       </div>
 
       {/* JOB CARD */}
-      <div className="bg-white/5 rounded-2xl p-6 space-y-5">
+      <div className="bg-white/5 rounded-2xl p-6 space-y-6">
 
-        {/* PROFESSION */}
+        {/* 🔵 PROFESSION */}
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-bold">
             {translated.profession || job.profession}
           </h1>
+
           <button
             onClick={() => handleTranslate("profession", job.profession)}
             className="text-sm text-indigo-400 underline"
@@ -160,11 +148,12 @@ export default function JobDetails() {
           </button>
         </div>
 
-        {/* DESCRIPTION */}
+        {/* 🔵 DESCRIPTION */}
         <div className="flex items-center gap-3">
           <p className="text-white/70">
             {translated.description || job.description}
           </p>
+
           <button
             onClick={() => handleTranslate("description", job.description)}
             className="text-sm text-indigo-400 underline"
@@ -173,21 +162,14 @@ export default function JobDetails() {
           </button>
         </div>
 
-        {/* LANGUAGES */}
-        {job.languages?.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {job.languages.map((lang, i) => (
-              <span
-                key={i}
-                className="px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-full text-xs"
-              >
-                {lang}
-              </span>
-            ))}
-          </div>
+        {/* 🔵 ONLINE */}
+        {isOnline && job.languages?.length > 0 && (
+          <p className="text-white/60">
+            {t("Languages")}: {job.languages.join(", ")}
+          </p>
         )}
 
-        {/* PRICE */}
+        {/* 🔵 PRICE */}
         {job.price && (
           <p className="text-xl font-bold text-yellow-400">
             {job.price.type === "fixed" &&
@@ -199,22 +181,22 @@ export default function JobDetails() {
           </p>
         )}
 
-        {/* OFFLINE EXTRA */}
+        {/* 🔵 MEDIA (OFFLINE ONLY) */}
         {!isOnline && job.media?.length > 0 && (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             {job.media.map((m, i) =>
               m.type === "image" ? (
                 <img
                   key={i}
                   src={getImageUrl(m.url)}
                   onClick={() => setSelectedMedia(m)}
-                  className="rounded-xl cursor-pointer"
+                  className="h-24 w-full object-cover rounded-lg cursor-pointer"
                 />
               ) : (
                 <video
                   key={i}
                   onClick={() => setSelectedMedia(m)}
-                  className="rounded-xl cursor-pointer"
+                  className="h-24 w-full object-cover rounded-lg cursor-pointer"
                 >
                   <source src={getImageUrl(m.url)} />
                 </video>
@@ -224,12 +206,12 @@ export default function JobDetails() {
         )}
       </div>
 
-      {/* ACTION BUTTONS */}
-      <div className="mt-6 flex flex-wrap gap-3">
-        
+      {/* 🔥 ACTION BUTTONS */}
+      <div className="mt-6 flex gap-4 flex-wrap">
+
         <button
           onClick={() => navigate(-1)}
-          className="px-5 py-2 rounded-lg bg-gray-700 hover:bg-gray-600"
+          className="px-5 py-2 rounded-lg bg-gray-700"
         >
           {t("Back")}
         </button>
@@ -246,14 +228,6 @@ export default function JobDetails() {
           className="px-5 py-2 rounded-xl bg-green-500"
         >
           {t("chat_with_user", { name: job.hirer.firstName })}
-        </button>
-
-        <button
-          onClick={applyJob}
-          disabled={applying}
-          className="px-5 py-2 rounded-xl bg-indigo-500 disabled:opacity-50"
-        >
-          {applying ? t("Applied") : t("Apply")}
         </button>
 
         <button

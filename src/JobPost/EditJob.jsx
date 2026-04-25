@@ -66,6 +66,7 @@ export default function EditJob() {
           addressDetails: job.addressDetails || "",
           safetyWarnings: job.safetyWarnings || emptyForm.safetyWarnings,
           location: job.location || emptyForm.location,
+          languages: job.languages || [],
         });
       } catch (err) {
         console.error(err);

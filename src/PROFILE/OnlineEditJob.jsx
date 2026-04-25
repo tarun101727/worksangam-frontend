@@ -132,39 +132,39 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
 
             {form.priceType === "fixed" && (
               <input
-                type="number"
-                className={inputBase}
-                placeholder="Fixed price"
-                value={form.expectedPrice}
-                onChange={(e) =>
-                  handleChange(
-                    "expectedPrice",
-                    e.target.value
-                  )
-                }
-              />
+  type="number"
+  className={inputBase}
+  placeholder="Fixed price"
+  value={form.expectedPrice}
+  onChange={(e) =>
+    handleChange("expectedPrice", e.target.value)
+  }
+  onWheel={(e) => e.target.blur()}   // ✅ ADD THIS
+/>
             )}
 
             {form.priceType === "negotiable" && (
               <div className="flex gap-3">
                 <input
-                  type="number"
-                  className={inputBase}
-                  placeholder="Min"
-                  value={form.minPrice}
-                  onChange={(e) =>
-                    handleChange("minPrice", e.target.value)
-                  }
-                />
-                <input
-                  type="number"
-                  className={inputBase}
-                  placeholder="Max"
-                  value={form.maxPrice}
-                  onChange={(e) =>
-                    handleChange("maxPrice", e.target.value)
-                  }
-                />
+  type="number"
+  className={inputBase}
+  placeholder="Min"
+  value={form.minPrice}
+  onChange={(e) =>
+    handleChange("minPrice", e.target.value)
+  }
+  onWheel={(e) => e.target.blur()}   // ✅ ADD
+/>
+               <input
+  type="number"
+  className={inputBase}
+  placeholder="Max"
+  value={form.maxPrice}
+  onChange={(e) =>
+    handleChange("maxPrice", e.target.value)
+  }
+  onWheel={(e) => e.target.blur()}   // ✅ ADD
+/>
               </div>
             )}
           </>

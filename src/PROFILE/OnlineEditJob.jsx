@@ -13,6 +13,15 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
   const [allLanguages, setAllLanguages] = useState([]);
   const [languageSuggestions, setLanguageSuggestions] = useState([]);
 
+  // ✅ Translation states
+  const [translated, setTranslated] = useState({
+    profession: null,
+    description: null,
+  });
+  const [loadingTranslate, setLoadingTranslate] = useState(null);
+
+  const currentLang = localStorage.getItem("lang") || "en";
+
   const languageContainerRef = useRef(null);
 
   const urgentPriceOptions = [
@@ -21,13 +30,43 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
   ];
 
   const inputBase =
-    "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700";
+    "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500";
+
+  /* ================= TRANSLATE ================= */
+  const handleTranslate = async (field, text) => {
+    if (!text) return;
+
+    try {
+      setLoadingTranslate(field);
+
+      const res = await fetch(
+        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${currentLang}&dt=t&q=${encodeURIComponent(
+          text
+        )}`
+      );
+
+      const data = await res.json();
+      const translatedText = data[0].map((item) => item[0]).join("");
+
+      setTranslated((prev) => ({
+        ...prev,
+        [field]: translatedText,
+      }));
+    } catch (err) {
+      console.error("Translation failed", err);
+    } finally {
+      setLoadingTranslate(null);
+    }
+  };
 
   /* ================= LOAD LANGUAGES ================= */
   useEffect(() => {
-    axios.get(`${BASE_URL}/api/languages`)
-      .then(res => {
-        const langs = res.data.map(l => `${l.nativeName} (${l.name})`);
+    axios
+      .get(`${BASE_URL}/api/languages`)
+      .then((res) => {
+        const langs = res.data.map(
+          (l) => `${l.nativeName} (${l.name})`
+        );
         setAllLanguages(langs);
       })
       .catch(() => setAllLanguages([]));
@@ -35,37 +74,89 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
 
   /* ================= SYNC FORM ================= */
   useEffect(() => {
-    setForm(prev => ({ ...prev, languages }));
+    setForm((prev) => ({ ...prev, languages }));
   }, [languages]);
 
   return (
-    <>
-      {/* PROFESSION */}
-      <input
-        className={inputBase}
-        placeholder="Profession"
-        value={form.profession}
-        onChange={(e) => handleChange("profession", e.target.value)}
-      />
+    <div className="space-y-6 text-white">
 
-      {/* DESCRIPTION */}
-      <textarea
-        className={`${inputBase} h-28`}
-        placeholder="Work description"
-        value={form.description}
-        onChange={(e) => handleChange("description", e.target.value)}
-      />
+      {/* ================= PROFESSION ================= */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-3">
+          <label className="text-sm text-white/60">
+            {t("Profession")}
+          </label>
 
-      {/* ================= PRICE (UPDATED UI) ================= */}
+          {form.profession && (
+            <button
+              onClick={() =>
+                handleTranslate("profession", form.profession)
+              }
+              className="text-xs text-indigo-400 underline hover:text-indigo-300"
+            >
+              {loadingTranslate === "profession"
+                ? "..."
+                : t("Translate")}
+            </button>
+          )}
+        </div>
+
+        <input
+          className={inputBase}
+          placeholder={t("Profession")}
+          value={translated.profession || form.profession}
+          onChange={(e) =>
+            handleChange("profession", e.target.value)
+          }
+        />
+      </div>
+
+      {/* ================= DESCRIPTION ================= */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-3">
+          <label className="text-sm text-white/60">
+            {t("Description")}
+          </label>
+
+          {form.description && (
+            <button
+              onClick={() =>
+                handleTranslate("description", form.description)
+              }
+              className="text-xs text-indigo-400 underline hover:text-indigo-300"
+            >
+              {loadingTranslate === "description"
+                ? "..."
+                : t("Translate")}
+            </button>
+          )}
+        </div>
+
+        <textarea
+          className={`${inputBase} h-28`}
+          placeholder={t("Work description")}
+          value={translated.description || form.description}
+          onChange={(e) =>
+            handleChange("description", e.target.value)
+          }
+        />
+      </div>
+
+      {/* ================= PRICE ================= */}
       <div className="space-y-3">
+        <label className="text-sm text-white/60">
+          {t("Pricing")}
+        </label>
 
         <div className="flex gap-3 flex-wrap">
           {urgentPriceOptions.map((opt) => (
             <button
               key={opt.value}
               type="button"
-              onClick={() => handleChange("priceType", opt.value)}
-              className={`flex-1 py-2 rounded-lg text-sm font-semibold ${
+              onClick={() =>
+                handleChange("priceType", opt.value)
+              }
+              className={`flex-1 py-2 rounded-xl text-sm font-semibold transition ${
                 form.priceType === opt.value
                   ? "bg-indigo-600 text-white"
                   : "bg-slate-800 text-slate-400 border border-slate-700"
@@ -81,7 +172,9 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
             <select
               className={inputBase}
               value={form.currency}
-              onChange={(e) => handleChange("currency", e.target.value)}
+              onChange={(e) =>
+                handleChange("currency", e.target.value)
+              }
             >
               {currencies.map((c) => (
                 <option key={c.code} value={c.code}>
@@ -94,7 +187,7 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
               <input
                 type="number"
                 className={inputBase}
-                placeholder="Fixed price"
+                placeholder={t("Fixed price")}
                 value={form.expectedPrice}
                 onChange={(e) =>
                   handleChange("expectedPrice", e.target.value)
@@ -107,7 +200,7 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
                 <input
                   type="number"
                   className={inputBase}
-                  placeholder="Min"
+                  placeholder={t("Min")}
                   value={form.minPrice}
                   onChange={(e) =>
                     handleChange("minPrice", e.target.value)
@@ -116,7 +209,7 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
                 <input
                   type="number"
                   className={inputBase}
-                  placeholder="Max"
+                  placeholder={t("Max")}
                   value={form.maxPrice}
                   onChange={(e) =>
                     handleChange("maxPrice", e.target.value)
@@ -129,49 +222,67 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
       </div>
 
       {/* ================= LANGUAGES ================= */}
-      <div ref={languageContainerRef} className="space-y-2">
-        <p className="text-sm text-red-400">Languages Required</p>
+      <div className="space-y-3" ref={languageContainerRef}>
+        <p className="text-sm text-white/60">
+          {t("Languages Required")}
+        </p>
 
         <div className="flex flex-wrap gap-2">
           {languages.map((lang, i) => (
-            <span key={i} className="bg-indigo-600 px-3 py-1 rounded-full flex items-center gap-2">
+            <span
+              key={i}
+              className="bg-indigo-600 px-3 py-1 rounded-full flex items-center gap-2 text-sm"
+            >
               {lang}
-              <button onClick={() => setLanguages(l => l.filter(x => x !== lang))}>✕</button>
+              <button
+                className="text-xs hover:text-red-300"
+                onClick={() =>
+                  setLanguages((l) =>
+                    l.filter((x) => x !== lang)
+                  )
+                }
+              >
+                ✕
+              </button>
             </span>
           ))}
         </div>
 
         <input
           className={inputBase}
-          placeholder="Add language"
+          placeholder={t("Add language")}
           value={languageInput}
           onChange={(e) => {
             const val = e.target.value;
             setLanguageInput(val);
 
             setLanguageSuggestions(
-              allLanguages.filter(l =>
-                l.toLowerCase().includes(val.toLowerCase()) &&
-                !languages.includes(l)
+              allLanguages.filter(
+                (l) =>
+                  l.toLowerCase().includes(val.toLowerCase()) &&
+                  !languages.includes(l)
               )
             );
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter" && languageInput.trim()) {
-              setLanguages(prev => [...prev, languageInput.trim()]);
+              setLanguages((prev) => [
+                ...prev,
+                languageInput.trim(),
+              ]);
               setLanguageInput("");
             }
           }}
         />
 
         {languageSuggestions.length > 0 && (
-          <div className="bg-slate-900 border rounded-xl">
+          <div className="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
             {languageSuggestions.map((lang) => (
               <div
                 key={lang}
                 className="px-4 py-2 hover:bg-slate-700 cursor-pointer"
                 onClick={() => {
-                  setLanguages(prev => [...prev, lang]);
+                  setLanguages((prev) => [...prev, lang]);
                   setLanguageInput("");
                   setLanguageSuggestions([]);
                 }}
@@ -182,7 +293,7 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 };
 

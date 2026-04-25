@@ -481,6 +481,7 @@ const filteredProfessions = onlineProfessions.filter((p) =>
   onChange={(e) =>
     handleChange("expectedPrice", e.target.value)
   }
+  onWheel={(e) => e.target.blur()}
 />
     )}
 
@@ -494,6 +495,7 @@ const filteredProfessions = onlineProfessions.filter((p) =>
   onChange={(e) =>
     handleChange("expectedPrice", e.target.value)
   }
+  onWheel={(e) => e.target.blur()}
 />
     )}
 
@@ -508,6 +510,7 @@ const filteredProfessions = onlineProfessions.filter((p) =>
           onChange={(e) =>
             handleChange("minPrice", e.target.value)
           }
+          onWheel={(e) => e.target.blur()}
         />
         <input
           type="number"
@@ -517,6 +520,7 @@ const filteredProfessions = onlineProfessions.filter((p) =>
           onChange={(e) =>
             handleChange("maxPrice", e.target.value)
           }
+          onWheel={(e) => e.target.blur()}
         />
       </div>
     )}

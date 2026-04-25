@@ -20,19 +20,28 @@ const getImageUrl = (img) => {
 export default function Chats() {
   const [chats, setChats] = useState([]);
   const navigate = useNavigate();
-
+  const [loading, setLoading] = useState(true);
   const { user } = useContext(AuthContext);
   const userId = user?._id;
   const { t } = useTranslation();
 
   useEffect(() => {
-    axios
-      .get(`${BASE_URL}/api/chat`, {
-        withCredentials: true,
-      })
-      .then((res) => setChats(res.data))
-      .catch((err) => console.error(err));
-  }, []);
+  axios
+    .get(`${BASE_URL}/api/chat`, {
+      withCredentials: true,
+    })
+    .then((res) => setChats(res.data))
+    .catch((err) => console.error(err))
+    .finally(() => setLoading(false)); // ✅ only stop loading
+}, []);
+
+if (loading) {
+  return (
+    <div className="min-h-screen flex justify-center items-center">
+      <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+}
 
   return (
     <div className="max-w-xl mx-auto p-6">

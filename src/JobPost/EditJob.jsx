@@ -5,6 +5,8 @@ import { BASE_URL } from "../config";
 import CreateOfflineWorkerPostPage from "../PROFILE/CreateOfflineWorkerPostPage";
 import L from "leaflet";
 import { useRef } from "react";
+import OnlineEditJob from "../PROFILE/OnlineEditJob";
+
 
 const emptyForm = {
   profession: "",
@@ -23,6 +25,7 @@ const emptyForm = {
     safetyConcerns: false,
   },
   location: { type: "Point", coordinates: [], address: "" },
+  languages: [],
 };
 
 export default function EditJob() {
@@ -35,6 +38,7 @@ export default function EditJob() {
   const mapRef = useRef(null);
   const markerRef = useRef(null);
   const [locationLoading, setLocationLoading] = useState(false);
+  const [jobType, setJobType] = useState("offline"); // default
 
   const inputBase =
     "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700";
@@ -48,6 +52,7 @@ export default function EditJob() {
         });
 
         const job = res.data.job;
+        setJobType(job.type || "offline");
 
         setForm({
           profession: job.profession || "",
@@ -195,52 +200,62 @@ export default function EditJob() {
 
         <h1 className="text-xl font-bold">✏️ Edit Job</h1>
 
-        <CreateOfflineWorkerPostPage
-          form={form}
-          handleChange={handleChange}
-          inputBase={inputBase}
-          mediaPreviews={[]}
-          activeMedia={null}
-          setActiveMedia={() => {}}
-          fileInputRef={{ current: null }}
-          getTodayDate={() => new Date().toISOString().split("T")[0]}
-          openNativePicker={() => {}}
-          standardPriceOptions={[
-            { label: "No Budget", value: null },
-            { label: "Fixed Price", value: "fixed" },
-            { label: "Hourly", value: "hourly" },
-            { label: "Negotiable", value: "negotiable" },
-            { label: "Inspect first", value: "inspect_quote" },
-          ]}
-        />
+        {jobType === "online" ? (
+  <OnlineEditJob
+    form={form}
+    setForm={setForm}
+    handleChange={handleChange}
+  />
+) : (
+  <>
+    <CreateOfflineWorkerPostPage
+      form={form}
+      handleChange={handleChange}
+      inputBase={inputBase}
+      mediaPreviews={[]}
+      activeMedia={null}
+      setActiveMedia={() => {}}
+      fileInputRef={{ current: null }}
+      getTodayDate={() => new Date().toISOString().split("T")[0]}
+      openNativePicker={() => {}}
+      standardPriceOptions={[
+        { label: "No Budget", value: null },
+        { label: "Fixed Price", value: "fixed" },
+        { label: "Hourly", value: "hourly" },
+        { label: "Negotiable", value: "negotiable" },
+        { label: "Inspect first", value: "inspect_quote" },
+      ]}
+    />
 
-        {/* ADDRESS */}
-        <textarea
-          className={inputBase}
-          placeholder="Address"
-          value={form.addressDetails}
-          onChange={(e) =>
-            handleChange("addressDetails", e.target.value)
-          }
-        />
+    {/* ADDRESS */}
+    <textarea
+      className={inputBase}
+      placeholder="Address"
+      value={form.addressDetails}
+      onChange={(e) =>
+        handleChange("addressDetails", e.target.value)
+      }
+    />
 
-        {/* LOCATION INPUT */}
-<input
-  className={inputBase}
-  readOnly
-  onClick={getLocation}
-  value={
-    form.location.address ||
-    (locationLoading
-      ? "Detecting location…"
-      : "Tap to auto-detect your current location")
-  }
-/>
+    {/* LOCATION INPUT */}
+    <input
+      className={inputBase}
+      readOnly
+      onClick={getLocation}
+      value={
+        form.location.address ||
+        (locationLoading
+          ? "Detecting location…"
+          : "Tap to auto-detect your current location")
+      }
+    />
 
-{/* MAP */}
-<div className="overflow-hidden rounded-xl border border-slate-700">
-  <div id="map" style={{ height: 280 }} />
-</div>
+    {/* MAP */}
+    <div className="overflow-hidden rounded-xl border border-slate-700">
+      <div id="map" style={{ height: 280 }} />
+    </div>
+  </>
+)}
 
         {/* SUBMIT */}
         <button

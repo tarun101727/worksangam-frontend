@@ -210,27 +210,6 @@ export default function JobDetails() {
       <div className="mt-6 flex gap-4 flex-wrap">
 
         <button
-          onClick={() => navigate(-1)}
-          className="px-5 py-2 rounded-lg bg-gray-700"
-        >
-          {t("Back")}
-        </button>
-
-        <button
-          onClick={async () => {
-            const res = await axios.post(
-              `${BASE_URL}/api/chat/create/${job.hirer._id}`,
-              {},
-              { withCredentials: true }
-            );
-            navigate(`/chat/${res.data._id}`);
-          }}
-          className="px-5 py-2 rounded-xl bg-green-500"
-        >
-          {t("chat_with_user", { name: job.hirer.firstName })}
-        </button>
-
-        <button
           onClick={() => navigate(`/edit-job/${job._id}`)}
           className="px-5 py-2 rounded-xl bg-blue-500"
         >

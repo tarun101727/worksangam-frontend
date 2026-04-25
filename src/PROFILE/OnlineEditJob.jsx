@@ -7,7 +7,6 @@ import { useTranslation } from "react-i18next";
 const OnlineEditJob = ({ form, setForm, handleChange }) => {
   const { t } = useTranslation();
 
-  const [languages, setLanguages] = useState(form.languages || []);
   const [languageInput, setLanguageInput] = useState("");
   const [allLanguages, setAllLanguages] = useState([]);
   const [languageSuggestions, setLanguageSuggestions] = useState([]);
@@ -21,41 +20,56 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
   const inputBase =
     "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700";
 
+  /* ================= CLICK OUTSIDE ================= */
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        languageContainerRef.current &&
+        !languageContainerRef.current.contains(e.target)
+      ) {
+        setLanguageSuggestions([]);
+      }
+    };
 
-    useEffect(() => {
-  const handleClickOutside = (e) => {
-    if (
-      languageContainerRef.current &&
-      !languageContainerRef.current.contains(e.target)
-    ) {
-      setLanguageSuggestions([]);
-    }
-  };
-
-  document.addEventListener("click", handleClickOutside);
-  return () => document.removeEventListener("click", handleClickOutside);
-}, []);
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
 
   /* ================= LOAD LANGUAGES ================= */
   useEffect(() => {
-    axios.get(`${BASE_URL}/api/languages`)
-      .then(res => {
-        const langs = res.data.map(l => `${l.nativeName} (${l.name})`);
+    axios
+      .get(`${BASE_URL}/api/languages`)
+      .then((res) => {
+        const langs = res.data.map(
+          (l) => `${l.nativeName} (${l.name})`
+        );
         setAllLanguages(langs);
       })
       .catch(() => setAllLanguages([]));
   }, []);
 
-  useEffect(() => {
-  if (form.languages) {
-    setLanguages(form.languages);
-  }
-}, [form.languages]);
+  /* ================= ADD LANGUAGE ================= */
+  const addLanguage = (lang) => {
+    if (!lang.trim()) return;
 
-  /* ================= SYNC FORM ================= */
-  useEffect(() => {
-    setForm(prev => ({ ...prev, languages }));
-  }, [languages]);
+    if (!form.languages.includes(lang)) {
+      setForm((prev) => ({
+        ...prev,
+        languages: [...prev.languages, lang],
+      }));
+    }
+
+    setLanguageInput("");
+    setLanguageSuggestions([]);
+  };
+
+  /* ================= REMOVE LANGUAGE ================= */
+  const removeLanguage = (lang) => {
+    setForm((prev) => ({
+      ...prev,
+      languages: prev.languages.filter((l) => l !== lang),
+    }));
+  };
 
   return (
     <>
@@ -64,7 +78,9 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
         className={inputBase}
         placeholder="Profession"
         value={form.profession}
-        onChange={(e) => handleChange("profession", e.target.value)}
+        onChange={(e) =>
+          handleChange("profession", e.target.value)
+        }
       />
 
       {/* DESCRIPTION */}
@@ -72,18 +88,21 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
         className={`${inputBase} h-28`}
         placeholder="Work description"
         value={form.description}
-        onChange={(e) => handleChange("description", e.target.value)}
+        onChange={(e) =>
+          handleChange("description", e.target.value)
+        }
       />
 
-      {/* ================= PRICE (UPDATED UI) ================= */}
+      {/* ================= PRICE ================= */}
       <div className="space-y-3">
-
         <div className="flex gap-3 flex-wrap">
           {urgentPriceOptions.map((opt) => (
             <button
               key={opt.value}
               type="button"
-              onClick={() => handleChange("priceType", opt.value)}
+              onClick={() =>
+                handleChange("priceType", opt.value)
+              }
               className={`flex-1 py-2 rounded-lg text-sm font-semibold ${
                 form.priceType === opt.value
                   ? "bg-indigo-600 text-white"
@@ -100,7 +119,9 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
             <select
               className={inputBase}
               value={form.currency}
-              onChange={(e) => handleChange("currency", e.target.value)}
+              onChange={(e) =>
+                handleChange("currency", e.target.value)
+              }
             >
               {currencies.map((c) => (
                 <option key={c.code} value={c.code}>
@@ -116,7 +137,10 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
                 placeholder="Fixed price"
                 value={form.expectedPrice}
                 onChange={(e) =>
-                  handleChange("expectedPrice", e.target.value)
+                  handleChange(
+                    "expectedPrice",
+                    e.target.value
+                  )
                 }
               />
             )}
@@ -148,83 +172,87 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
       </div>
 
       {/* ================= LANGUAGES ================= */}
-      <div className="space-y-2 relative" ref={languageContainerRef}>
-      
- 
+      <div
+        className="space-y-2 relative"
+        ref={languageContainerRef}
+      >
+        {/* SELECTED LANGUAGES */}
         <div className="flex flex-wrap gap-2">
-          {languages.map((lang, i) => (
-            <span key={i} className="bg-indigo-600 px-3 py-1 rounded-full flex items-center gap-2">
+          {form.languages.map((lang, i) => (
+            <span
+              key={i}
+              className="bg-indigo-600 px-3 py-1 rounded-full flex items-center gap-2"
+            >
               {lang}
-              <button onClick={() => setLanguages(l => l.filter(x => x !== lang))}>✕</button>
+              <button onClick={() => removeLanguage(lang)}>
+                ✕
+              </button>
             </span>
           ))}
         </div>
 
+        {/* INPUT */}
         <input
-  className={inputBase}
-  placeholder={t("Add a language (English, Hindi...)")}
-  value={languageInput}
+          className={inputBase}
+          placeholder={t("Add a language (English, Hindi...)")}
+          value={languageInput}
 
-  onFocus={() =>
-    setLanguageSuggestions(
-      allLanguages.filter(l => !languages.includes(l))
-    )
-  }
-
-  onChange={(e) => {
-    const val = e.target.value;
-    setLanguageInput(val);
-
-    if (val.trim()) {
-      setLanguageSuggestions(
-        allLanguages.filter(
-          l =>
-            l.toLowerCase().includes(val.toLowerCase()) &&
-            !languages.includes(l)
-        )
-      );
-    } else {
-      setLanguageSuggestions(
-        allLanguages.filter(l => !languages.includes(l))
-      );
-    }
-  }}
-
-  onKeyDown={(e) => {
-    if (
-      (e.key === "Enter" || e.key === " ") &&
-      languageInput.trim() &&
-      !languages.includes(languageInput.trim())
-    ) {
-      e.preventDefault();
-      setLanguages(prev => [...prev, languageInput.trim()]);
-      setLanguageInput("");
-      setLanguageSuggestions(
-        allLanguages.filter(l => !languages.includes(l))
-      );
-    }
-  }}
-/>
-
-        {languageSuggestions.length > 0 && (
-  <div className="absolute z-50 mt-1 w-full max-h-64 overflow-auto rounded-xl bg-[#0F172A] border border-white/10 shadow-xl">
-    {languageSuggestions.map((lang) => (
-      <div
-        key={lang}
-        className="px-4 py-2 text-white hover:bg-[#374151] cursor-pointer"
-        onClick={() => {
-          if (!languages.includes(lang)) {
-            setLanguages(prev => [...prev, lang]);
+          onFocus={() =>
+            setLanguageSuggestions(
+              allLanguages.filter(
+                (l) => !form.languages.includes(l)
+              )
+            )
           }
-          setLanguageInput("");
-          setLanguageSuggestions([]);
-        }}
-      >
-        {lang}
-      </div>
-    ))}
-  </div>
-)}
+
+          onChange={(e) => {
+            const val = e.target.value;
+            setLanguageInput(val);
+
+            if (val.trim()) {
+              setLanguageSuggestions(
+                allLanguages.filter(
+                  (l) =>
+                    l
+                      .toLowerCase()
+                      .includes(val.toLowerCase()) &&
+                    !form.languages.includes(l)
+                )
+              );
+            } else {
+              setLanguageSuggestions(
+                allLanguages.filter(
+                  (l) => !form.languages.includes(l)
+                )
+              );
+            }
+          }}
+
+          onKeyDown={(e) => {
+            if (
+              (e.key === "Enter" || e.key === " ") &&
+              languageInput.trim()
+            ) {
+              e.preventDefault();
+              addLanguage(languageInput.trim());
+            }
+          }}
+        />
+
+        {/* SUGGESTIONS */}
+        {languageSuggestions.length > 0 && (
+          <div className="absolute z-50 mt-1 w-full max-h-64 overflow-auto rounded-xl bg-[#0F172A] border border-white/10 shadow-xl">
+            {languageSuggestions.map((lang) => (
+              <div
+                key={lang}
+                className="px-4 py-2 text-white hover:bg-[#374151] cursor-pointer"
+                onClick={() => addLanguage(lang)}
+              >
+                {lang}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </>
   );

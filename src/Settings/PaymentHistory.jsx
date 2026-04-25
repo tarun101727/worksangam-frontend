@@ -115,7 +115,7 @@ const PaymentHistory = () => {
         />
 
         <div className="flex gap-2 flex-wrap">
-  {["ALL", "SUCCESS", "FAILED", "PENDING"].map((type) => (
+  {[t("ALL"), t("SUCCESS"), t("FAILED"), t("PENDING")].map((type) => (
     <button
       key={type}
       onClick={() => setFilter(type)}
@@ -162,7 +162,7 @@ const PaymentHistory = () => {
                 <div>
                   {/* 💰 */}
                   <p className="text-lg font-semibold">
-                    ₹{p.amount} → {p.credits} Credits
+                    ₹{p.amount} → {p.credits} {t("Credits")}
                   </p>
 
                   {/* 🕒 */}

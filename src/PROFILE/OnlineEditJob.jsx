@@ -148,20 +148,23 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
     🗣 {t("Languages Required")}
   </p>
 
-  <div className="relative mt-2" ref={languageContainerRef}>
-    
+  <div
+    id="languages-container"
+    className="relative mt-2"
+    ref={languageContainerRef}
+  >
     {/* Selected languages */}
     <div className="flex flex-wrap gap-2 mb-2">
-      {languages.map((lang, i) => (
+      {languages.map((lang, idx) => (
         <span
-          key={i}
+          key={idx}
           className="bg-indigo-600 text-white px-3 py-1 rounded-full flex items-center gap-2"
         >
           {lang}
           <button
             type="button"
             onClick={() =>
-              setLanguages((l) => l.filter((x) => x !== lang))
+              setLanguages(prev => prev.filter(l => l !== lang))
             }
             className="text-white/70 hover:text-white"
           >
@@ -173,13 +176,14 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
 
     {/* Input */}
     <input
+      type="text"
       className={inputBase}
       placeholder={t("Add a language (English, Hindi...)")}
       value={languageInput}
 
       onFocus={() =>
         setLanguageSuggestions(
-          allLanguages.filter((l) => !languages.includes(l))
+          allLanguages.filter(l => !languages.includes(l))
         )
       }
 
@@ -190,14 +194,14 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
         if (val.trim()) {
           setLanguageSuggestions(
             allLanguages.filter(
-              (l) =>
+              l =>
                 l.toLowerCase().includes(val.toLowerCase()) &&
                 !languages.includes(l)
             )
           );
         } else {
           setLanguageSuggestions(
-            allLanguages.filter((l) => !languages.includes(l))
+            allLanguages.filter(l => !languages.includes(l))
           );
         }
       }}
@@ -205,17 +209,18 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
       onKeyDown={(e) => {
         if (
           (e.key === "Enter" || e.key === " ") &&
-          languageInput.trim() &&
-          !languages.includes(languageInput.trim())
+          languageInput.trim()
         ) {
           e.preventDefault();
-          setLanguages((prev) => [
-            ...prev,
-            languageInput.trim(),
-          ]);
+
+          setLanguages(prev => {
+            if (prev.includes(languageInput.trim())) return prev;
+            return [...prev, languageInput.trim()];
+          });
+
           setLanguageInput("");
           setLanguageSuggestions(
-            allLanguages.filter((l) => !languages.includes(l))
+            allLanguages.filter(l => !languages.includes(l))
           );
         }
       }}
@@ -229,9 +234,11 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
             key={lang}
             className="px-4 py-2 text-white hover:bg-[#374151] cursor-pointer"
             onClick={() => {
-              if (!languages.includes(lang)) {
-                setLanguages((prev) => [...prev, lang]);
-              }
+              setLanguages(prev => {
+                if (prev.includes(lang)) return prev;
+                return [...prev, lang];
+              });
+
               setLanguageInput("");
               setLanguageSuggestions([]);
             }}

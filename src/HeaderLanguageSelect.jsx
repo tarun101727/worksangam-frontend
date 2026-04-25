@@ -38,43 +38,46 @@ export default function HeaderLanguageSelect() {
   const currentLanguageLabel =
     languages.find((lang) => lang.code === i18n.language)?.label || "English";
 
- const changeLanguage = async (code) => {
-  if (loadingLang) return;
-  setLoadingLang(true);
-
-  try {
-    if (code !== "en" && !i18n.hasResourceBundle(code, "translation")) {
-      const res = await fetch(`${BASE_URL}/api/languages/${code}`);
-      if (res.ok) {
-        const data = await res.json();
-        i18n.addResourceBundle(code, "translation", data, true, true);
-      }
-    }
-
-    await i18n.changeLanguage(code);
-
-    localStorage.setItem("lang", code);
+  const changeLanguage = async (code) => {
+    if (loadingLang) return; // prevent multiple clicks
+    setLoadingLang(true);
 
     try {
-      await axios.put(
-        `${BASE_URL}/api/auth/update-language`,
-        { language: code },
-        { withCredentials: true }
-      );
+      // Load language dynamically if not already loaded
+      if (code !== "en" && !i18n.hasResourceBundle(code, "translation")) {
+        const res = await fetch(`${BASE_URL}/api/languages/${code}`);
+        if (res.ok) {
+          const data = await res.json();
+          i18n.addResourceBundle(code, "translation", data, true, true);
+        }
+      }
+
+      // Switch language
+      await i18n.changeLanguage(code);
+
+      // Save to localStorage
+      localStorage.setItem("lang", code);
+
+      try {
+  await axios.put(
+    `${BASE_URL}/api/auth/update-language`,
+    { language: code },
+    { withCredentials: true }
+  );
+} catch (err) {
+  console.error("Failed to update language on backend:", err);
+  // fallback: just save locally
+  localStorage.setItem("lang", code);
+}
+
+
     } catch (err) {
-      console.error("Backend update failed:", err);
+      console.error("Failed to change language:", err);
+    } finally {
+      setOpen(false);
+      setLoadingLang(false);
     }
-
-    // ✅ FORCE FULL PAGE REFRESH
-    window.location.reload();
-
-  } catch (err) {
-    console.error("Failed to change language:", err);
-  } finally {
-    setOpen(false);
-    setLoadingLang(false);
-  }
-};
+  };
 
   return (
     <div className="relative">

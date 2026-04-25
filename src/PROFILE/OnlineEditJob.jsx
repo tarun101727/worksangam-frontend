@@ -143,84 +143,106 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
       </div>
 
       {/* ================= LANGUAGES ================= */}
-      <div className="space-y-2 relative" ref={languageContainerRef}>
-     
+<div className="space-y-2 relative">
+  <p className="text-sm font-medium text-red-400">
+    🗣 {t("Languages Required")}
+  </p>
 
-        <div className="flex flex-wrap gap-2">
-          {languages.map((lang, i) => (
-            <span key={i} className="bg-indigo-600 px-3 py-1 rounded-full flex items-center gap-2">
-              {lang}
-              <button onClick={() => setLanguages(l => l.filter(x => x !== lang))}>✕</button>
-            </span>
-          ))}
-        </div>
+  <div className="relative mt-2" ref={languageContainerRef}>
+    
+    {/* Selected languages */}
+    <div className="flex flex-wrap gap-2 mb-2">
+      {languages.map((lang, i) => (
+        <span
+          key={i}
+          className="bg-indigo-600 text-white px-3 py-1 rounded-full flex items-center gap-2"
+        >
+          {lang}
+          <button
+            type="button"
+            onClick={() =>
+              setLanguages((l) => l.filter((x) => x !== lang))
+            }
+            className="text-white/70 hover:text-white"
+          >
+            ✕
+          </button>
+        </span>
+      ))}
+    </div>
 
-        <input
-  className={inputBase}
-  placeholder={t("Add a language (English, Hindi...)")}
-  value={languageInput}
+    {/* Input */}
+    <input
+      className={inputBase}
+      placeholder={t("Add a language (English, Hindi...)")}
+      value={languageInput}
 
-  onFocus={() =>
-    setLanguageSuggestions(
-      allLanguages.filter(l => !languages.includes(l))
-    )
-  }
-
-  onChange={(e) => {
-    const val = e.target.value;
-    setLanguageInput(val);
-
-    if (val.trim()) {
-      setLanguageSuggestions(
-        allLanguages.filter(
-          l =>
-            l.toLowerCase().includes(val.toLowerCase()) &&
-            !languages.includes(l)
+      onFocus={() =>
+        setLanguageSuggestions(
+          allLanguages.filter((l) => !languages.includes(l))
         )
-      );
-    } else {
-      setLanguageSuggestions(
-        allLanguages.filter(l => !languages.includes(l))
-      );
-    }
-  }}
+      }
 
-  onKeyDown={(e) => {
-    if (
-      (e.key === "Enter" || e.key === " ") &&
-      languageInput.trim() &&
-      !languages.includes(languageInput.trim())
-    ) {
-      e.preventDefault();
-      setLanguages(prev => [...prev, languageInput.trim()]);
-      setLanguageInput("");
-      setLanguageSuggestions(
-        allLanguages.filter(l => !languages.includes(l))
-      );
-    }
-  }}
-/>
+      onChange={(e) => {
+        const val = e.target.value;
+        setLanguageInput(val);
 
-        {languageSuggestions.length > 0 && (
-  <div className="absolute z-50 mt-1 w-full max-h-64 overflow-auto rounded-xl bg-[#0F172A] border border-white/10 shadow-xl">
-    {languageSuggestions.map((lang) => (
-      <div
-        key={lang}
-        className="px-4 py-2 text-white hover:bg-[#374151] cursor-pointer"
-        onClick={() => {
-          if (!languages.includes(lang)) {
-            setLanguages(prev => [...prev, lang]);
-          }
+        if (val.trim()) {
+          setLanguageSuggestions(
+            allLanguages.filter(
+              (l) =>
+                l.toLowerCase().includes(val.toLowerCase()) &&
+                !languages.includes(l)
+            )
+          );
+        } else {
+          setLanguageSuggestions(
+            allLanguages.filter((l) => !languages.includes(l))
+          );
+        }
+      }}
+
+      onKeyDown={(e) => {
+        if (
+          (e.key === "Enter" || e.key === " ") &&
+          languageInput.trim() &&
+          !languages.includes(languageInput.trim())
+        ) {
+          e.preventDefault();
+          setLanguages((prev) => [
+            ...prev,
+            languageInput.trim(),
+          ]);
           setLanguageInput("");
-          setLanguageSuggestions([]);
-        }}
-      >
-        {lang}
+          setLanguageSuggestions(
+            allLanguages.filter((l) => !languages.includes(l))
+          );
+        }
+      }}
+    />
+
+    {/* Dropdown */}
+    {languageSuggestions.length > 0 && (
+      <div className="absolute z-50 mt-1 w-full max-h-64 overflow-auto rounded-xl bg-[#0F172A] border border-white/10 shadow-xl">
+        {languageSuggestions.map((lang) => (
+          <div
+            key={lang}
+            className="px-4 py-2 text-white hover:bg-[#374151] cursor-pointer"
+            onClick={() => {
+              if (!languages.includes(lang)) {
+                setLanguages((prev) => [...prev, lang]);
+              }
+              setLanguageInput("");
+              setLanguageSuggestions([]);
+            }}
+          >
+            {lang}
+          </div>
+        ))}
       </div>
-    ))}
+    )}
   </div>
-)}
-      </div>
+</div>
     </>
   );
 };

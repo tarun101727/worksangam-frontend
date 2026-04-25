@@ -144,7 +144,7 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
 
       {/* ================= LANGUAGES ================= */}
       <div className="space-y-2 relative" ref={languageContainerRef}>
-        <p className="text-sm text-red-400">Languages Required</p>
+     
 
         <div className="flex flex-wrap gap-2">
           {languages.map((lang, i) => (

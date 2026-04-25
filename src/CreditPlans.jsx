@@ -1,52 +1,55 @@
 import axios from "axios";
 import { BASE_URL } from "./config";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
-const plans = [
+
+const CreditPlans = () => {
+  const [credits, setCredits] = useState(0);
+  const { t } = useTranslation();
+
+  const plans = [
   {
     amount: 99,
     credits: 50,
-    title: "Starter",
-    desc: "Perfect for small hirers who want to quickly find online or nearby workers for basic tasks.",
+    title: t("Starter"),
+    desc: t("Perfect for small hirers who want to quickly find online or nearby workers for basic tasks."),
     features: [
-      "Post 10+ online or offline jobs",
-      "Reach nearby workers within your area",
-      "Basic visibility in job listings",
-      "Suitable for one-time or small hiring needs",
-      "Simple and quick hiring process",
+      t("Post 10+ online or offline jobs"),
+      t("Reach nearby workers within your area"),
+      t("Basic visibility in job listings"),
+      t("Suitable for one-time or small hiring needs"),
+      t("Simple and quick hiring process"),
     ],
   },
   {
     amount: 199,
     credits: 120,
-    title: "Standard",
+    title: t("Standard"),
     popular: true,
-    desc: "Best for regular hirers who frequently hire employees and want faster responses and better reach.",
+    desc: t("Best for regular hirers who frequently hire employees and want faster responses and better reach."),
     features: [
-      "Post 25+ jobs (online & offline)",
-      "Higher visibility to relevant workers",
-      "Faster responses from employees",
-      "Priority listing in worker feeds",
-      "Ideal for daily or frequent hiring",
+      t("Post 25+ jobs (online & offline)"),
+t("Higher visibility to relevant workers"),
+t("Faster responses from employees"),
+t("Priority listing in worker feeds"),
+t("Ideal for daily or frequent hiring"),
     ],
   },
   {
     amount: 499,
     credits: 350,
-    title: "Premium",
-    desc: "Designed for businesses and heavy hirers who need maximum reach, urgent hiring, and top priority.",
+    title: t("Premium"),
+    desc: t("Designed for businesses and heavy hirers who need maximum reach, urgent hiring, and top priority."),
     features: [
-      "Post 70+ jobs with top priority",
-      "Maximum reach across all workers",
-      "Instant visibility to nearby & online employees",
-      "Top placement in job listings",
-      "Best for urgent and bulk hiring needs",
+      t("Post 70+ jobs with top priority"),
+t("Maximum reach across all workers"),
+t("Instant visibility to nearby & online employees"),
+t("Top placement in job listings"),
+t("Best for urgent and bulk hiring needs"),
     ],
   },
 ];
-
-const CreditPlans = () => {
-  const [credits, setCredits] = useState(0);
 
   const fetchCredits = async () => {
     try {
@@ -119,16 +122,16 @@ const CreditPlans = () => {
     <div className="min-h-screen overflow-y-auto flex flex-col items-center px-4 py-10 text-white">
       
       {/* Title */}
-      <h2 className="text-3xl font-bold mb-2">Buy Credits</h2>
+      <h2 className="text-3xl font-bold mb-2">{t("Buy Credits")}</h2>
       <p className="text-white/60 mb-6 text-center">
-        Use credits to post jobs and reach workers instantly 🚀
+        {t("Use credits to post jobs and reach workers instantly")} 🚀
       </p>
 
       {/* Credits Card */}
       <div className="mb-8 bg-white/5 border border-white/10 px-6 py-4 rounded-2xl shadow-md">
-        <p className="text-sm text-white/60">Your Balance</p>
+        <p className="text-sm text-white/60">{t("Your Balance")}</p>
         <h3 className="text-2xl font-semibold text-yellow-400">
-          {credits} Credits
+          {credits} {t("Credits")}
         </h3>
       </div>
 
@@ -150,7 +153,7 @@ const CreditPlans = () => {
               {/* Popular Badge */}
               {plan.popular && (
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-yellow-400 text-black text-xs px-3 py-1 rounded-full font-semibold">
-                  Most Popular
+                  {t("Most Popular")}
                 </span>
               )}
 
@@ -166,12 +169,12 @@ const CreditPlans = () => {
 
               {/* Credits */}
               <p className="text-yellow-400 font-semibold mb-2">
-                {plan.credits} Credits
+                {plan.credits} {t("Credits")}
               </p>
 
               {/* Per credit */}
               <p className="text-xs text-white/50 mb-3">
-                ₹{perCredit} per credit
+                ₹{perCredit} {t("per credit")}
               </p>
 
               {/* Description */}
@@ -196,7 +199,7 @@ const CreditPlans = () => {
                     : "bg-white/10 hover:bg-white/20"
                 }`}
               >
-                Buy Now
+                {t("Buy Now")}
               </button>
             </div>
           );

@@ -21,6 +21,7 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
   const inputBase =
     "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700";
 
+
     useEffect(() => {
   const handleClickOutside = (e) => {
     if (
@@ -44,6 +45,12 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
       })
       .catch(() => setAllLanguages([]));
   }, []);
+
+  useEffect(() => {
+  if (form.languages) {
+    setLanguages(form.languages);
+  }
+}, [form.languages]);
 
   /* ================= SYNC FORM ================= */
   useEffect(() => {
@@ -142,26 +149,7 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
 
       {/* ================= LANGUAGES ================= */}
       <div className="space-y-2 relative" ref={languageContainerRef}>
-        
-        {/* Languages */}
-{form.languages && form.languages.length > 0 && (
-  <div className="mt-4">
-    <p className="text-sm text-white/60 mb-1">
-      {t("Languages")}:
-    </p>
-
-    <div className="flex flex-wrap gap-2">
-      {form.languages.map((lang, i) => (
-        <span
-          key={i}
-          className="px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-full text-xs"
-        >
-          {lang}
-        </span>
-      ))}
-    </div>
-  </div>
-)}
+      
  
         <div className="flex flex-wrap gap-2">
           {languages.map((lang, i) => (

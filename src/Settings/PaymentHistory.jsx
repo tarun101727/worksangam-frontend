@@ -3,8 +3,6 @@ import { BASE_URL } from "../config";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-
-
 const PaymentHistory = () => {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -176,14 +174,14 @@ const PaymentHistory = () => {
                   </p>
 
                   {/* ❌ FAILED MESSAGE */}
-                  {p.status === "FAILED" && (
+                  {p.status === t("FAILED") && (
                     <p className="text-xs text-red-400 mt-1">
                       {t("Payment failed. No credits added.")}
                     </p>
                   )}
 
                   {/* ⏳ PENDING */}
-                  {p.status === "PENDING" && (
+                  {p.status === t("PENDING") && (
                     <p className="text-xs text-yellow-400 mt-1">
                       {t("Payment is pending confirmation...")}
                     </p>

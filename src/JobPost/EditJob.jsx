@@ -6,8 +6,6 @@ import CreateOfflineWorkerPostPage from "../PROFILE/CreateOfflineWorkerPostPage"
 import L from "leaflet";
 import { useRef } from "react";
 
-
-
 const emptyForm = {
   profession: "",
   description: "",
@@ -37,58 +35,42 @@ export default function EditJob() {
   const mapRef = useRef(null);
   const markerRef = useRef(null);
   const [locationLoading, setLocationLoading] = useState(false);
-  const [mediaPreviews, setMediaPreviews] = useState([]);
-const [activeMedia, setActiveMedia] = useState(null);
-const fileInputRef = useRef(null);
 
   const inputBase =
     "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700";
 
+  /* ================= FETCH JOB ================= */
   useEffect(() => {
-  const fetchJob = async () => {
-    try {
-      const res = await axios.get(`${BASE_URL}/api/jobs/${jobId}`, {
-        withCredentials: true,
-      });
-      const job = res.data.job;
+    const fetchJob = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/api/jobs/${jobId}`, {
+          withCredentials: true,
+        });
 
-      setForm({
-  profession: job.profession || "",
-  description: job.description || "",
-  priceType: job.price?.type || null,
-  expectedPrice: job.price?.value || "",
-  minPrice: job.price?.min || "",
-  maxPrice: job.price?.max || "",
-  currency: job.price?.currency || "INR",
-  preferredTime: job.preferredTime || { type: null }, // ✅ make sure it exists
-  addressDetails: job.addressDetails || "",
-  safetyWarnings: job.safetyWarnings || {
-    pets: false,
-    elderly: false,
-    children: false,
-    safetyConcerns: false,
-  },
-  location: job.location || { type: "Point", coordinates: [], address: "" },
-  media: job.media || [],
-});
+        const job = res.data.job;
 
-      // convert media to previews
-      const previews = (job.media || []).map((url) => ({
-        url: url.startsWith("http") ? url : `${BASE_URL}${url}`,
-        type: url.includes("mp4") ? "video" : "image",
-      }));
+        setForm({
+          profession: job.profession || "",
+          description: job.description || "",
+          priceType: job.price?.type || null,
+          expectedPrice: job.price?.value || "",
+          minPrice: job.price?.min || "",
+          maxPrice: job.price?.max || "",
+          currency: job.price?.currency || "INR",
+          preferredTime: job.preferredTime || null,
+          addressDetails: job.addressDetails || "",
+          safetyWarnings: job.safetyWarnings || emptyForm.safetyWarnings,
+          location: job.location || emptyForm.location,
+        });
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      setMediaPreviews(previews);
-
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchJob();
-}, [jobId]);
+    fetchJob();
+  }, [jobId]);
 
   useEffect(() => {
   if (!mapRef.current || !form.location?.coordinates?.length) return;
@@ -178,23 +160,34 @@ const fileInputRef = useRef(null);
   );
 };
 
+  /* ================= UPDATE ================= */
   const handleUpdate = async () => {
-  try {
-    setSaving(true);
-    await axios.put(`${BASE_URL}/api/jobs/update/${jobId}`, form, {
-      withCredentials: true,
-    });
-    alert("Job updated successfully");
-    navigate(`/job/${jobId}`);
-  } catch (err) {
-    console.error(err);
-    alert("Update failed");
-  } finally {
-    setSaving(false);
-  }
-};
+    try {
+      setSaving(true);
 
-  if (loading) return <p className="text-center mt-10">Loading...</p>;
+      await axios.put(
+        `${BASE_URL}/api/jobs/update/${jobId}`,
+        form,
+        { withCredentials: true }
+      );
+
+      alert("Job updated successfully");
+      navigate(`/job/${jobId}`);
+    } catch (err) {
+      console.error(err);
+      alert("Update failed");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+  return (
+    <div className="min-h-screen flex justify-center items-center">
+      <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+}
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
@@ -203,23 +196,23 @@ const fileInputRef = useRef(null);
         <h1 className="text-xl font-bold">✏️ Edit Job</h1>
 
         <CreateOfflineWorkerPostPage
-  form={form}
-  handleChange={handleChange}
-  inputBase={inputBase}
-  mediaPreviews={mediaPreviews}
-  activeMedia={activeMedia}
-  setActiveMedia={setActiveMedia}
-  fileInputRef={fileInputRef}
-  getTodayDate={() => new Date().toISOString().split("T")[0]}
-  openNativePicker={() => {}}
-  standardPriceOptions={[
-    { label: "No Budget", value: null },
-    { label: "Fixed Price", value: "fixed" },
-    { label: "Hourly", value: "hourly" },
-    { label: "Negotiable", value: "negotiable" },
-    { label: "Inspect first", value: "inspect_quote" },
-  ]}
-/>
+          form={form}
+          handleChange={handleChange}
+          inputBase={inputBase}
+          mediaPreviews={[]}
+          activeMedia={null}
+          setActiveMedia={() => {}}
+          fileInputRef={{ current: null }}
+          getTodayDate={() => new Date().toISOString().split("T")[0]}
+          openNativePicker={() => {}}
+          standardPriceOptions={[
+            { label: "No Budget", value: null },
+            { label: "Fixed Price", value: "fixed" },
+            { label: "Hourly", value: "hourly" },
+            { label: "Negotiable", value: "negotiable" },
+            { label: "Inspect first", value: "inspect_quote" },
+          ]}
+        />
 
         {/* ADDRESS */}
         <textarea

@@ -35,7 +35,6 @@ export default function EditJob() {
   const mapRef = useRef(null);
   const markerRef = useRef(null);
   const [locationLoading, setLocationLoading] = useState(false);
-  const [jobType, setJobType] = useState("offline"); // 🔥 ADD THIS
 
   const inputBase =
     "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700";
@@ -49,7 +48,6 @@ export default function EditJob() {
         });
 
         const job = res.data.job;
-        setJobType(job.professionType || "offline"); // 🔥 ADD THIS
 
         setForm({
           profession: job.profession || "",
@@ -63,7 +61,6 @@ export default function EditJob() {
           addressDetails: job.addressDetails || "",
           safetyWarnings: job.safetyWarnings || emptyForm.safetyWarnings,
           location: job.location || emptyForm.location,
-          languages: job.languages || [],
         });
       } catch (err) {
         console.error(err);
@@ -184,88 +181,13 @@ export default function EditJob() {
     }
   };
 
-  if (loading) {
+ if (loading) {
   return (
     <div className="min-h-screen flex justify-center items-center">
       <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
     </div>
   );
 }
-  
-
-const OnlineEditForm = ({ form, handleChange, inputBase }) => {
-  return (
-    <>
-      {/* PROFESSION */}
-      <input
-        className={inputBase}
-        placeholder="Profession"
-        value={form.profession}
-        onChange={(e) => handleChange("profession", e.target.value)}
-      />
-
-      {/* DESCRIPTION */}
-      <textarea
-        className={`${inputBase} h-28`}
-        placeholder="Work description"
-        value={form.description}
-        onChange={(e) => handleChange("description", e.target.value)}
-      />
-
-      {/* PRICE */}
-      <div className="space-y-2">
-        <button
-          onClick={() => handleChange("priceType", "fixed")}
-          className="px-3 py-2 bg-indigo-600 rounded"
-        >
-          Fixed
-        </button>
-
-        <button
-          onClick={() => handleChange("priceType", "negotiable")}
-          className="px-3 py-2 bg-gray-700 rounded"
-        >
-          Negotiable
-        </button>
-
-        {form.priceType === "fixed" && (
-          <input
-            className={inputBase}
-            type="number"
-            placeholder="Price"
-            value={form.expectedPrice}
-            onChange={(e) =>
-              handleChange("expectedPrice", e.target.value)
-            }
-          />
-        )}
-
-        {form.priceType === "negotiable" && (
-          <div className="flex gap-2">
-            <input
-              className={inputBase}
-              placeholder="Min"
-              value={form.minPrice}
-              onChange={(e) =>
-                handleChange("minPrice", e.target.value)
-              }
-            />
-            <input
-              className={inputBase}
-              placeholder="Max"
-              value={form.maxPrice}
-              onChange={(e) =>
-                handleChange("maxPrice", e.target.value)
-              }
-            />
-          </div>
-        )}
-      </div>
-    </>
-  );
-};
-
-
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
@@ -273,64 +195,52 @@ const OnlineEditForm = ({ form, handleChange, inputBase }) => {
 
         <h1 className="text-xl font-bold">✏️ Edit Job</h1>
 
-        {jobType === "online" ? (
-  <OnlineEditForm
-    form={form}
-    handleChange={handleChange}
-    inputBase={inputBase}
-  />
-) : (
-  <CreateOfflineWorkerPostPage
-    form={form}
-    handleChange={handleChange}
-    inputBase={inputBase}
-    mediaPreviews={[]}
-    activeMedia={null}
-    setActiveMedia={() => {}}
-    fileInputRef={{ current: null }}
-    getTodayDate={() => new Date().toISOString().split("T")[0]}
-    openNativePicker={() => {}}
-    standardPriceOptions={[
-      { label: "No Budget", value: null },
-      { label: "Fixed Price", value: "fixed" },
-      { label: "Hourly", value: "hourly" },
-      { label: "Negotiable", value: "negotiable" },
-      { label: "Inspect first", value: "inspect_quote" },
-    ]}
-  />
-)}
+        <CreateOfflineWorkerPostPage
+          form={form}
+          handleChange={handleChange}
+          inputBase={inputBase}
+          mediaPreviews={[]}
+          activeMedia={null}
+          setActiveMedia={() => {}}
+          fileInputRef={{ current: null }}
+          getTodayDate={() => new Date().toISOString().split("T")[0]}
+          openNativePicker={() => {}}
+          standardPriceOptions={[
+            { label: "No Budget", value: null },
+            { label: "Fixed Price", value: "fixed" },
+            { label: "Hourly", value: "hourly" },
+            { label: "Negotiable", value: "negotiable" },
+            { label: "Inspect first", value: "inspect_quote" },
+          ]}
+        />
 
-        {jobType !== "online" && (
-  <>
-    {/* ADDRESS */}
-    <textarea
-      className={inputBase}
-      placeholder="Address"
-      value={form.addressDetails}
-      onChange={(e) =>
-        handleChange("addressDetails", e.target.value)
-      }
-    />
+        {/* ADDRESS */}
+        <textarea
+          className={inputBase}
+          placeholder="Address"
+          value={form.addressDetails}
+          onChange={(e) =>
+            handleChange("addressDetails", e.target.value)
+          }
+        />
 
-    {/* LOCATION INPUT */}
-    <input
-      className={inputBase}
-      readOnly
-      onClick={getLocation}
-      value={
-        form.location.address ||
-        (locationLoading
-          ? "Detecting location…"
-          : "Tap to auto-detect your current location")
-      }
-    />
+        {/* LOCATION INPUT */}
+<input
+  className={inputBase}
+  readOnly
+  onClick={getLocation}
+  value={
+    form.location.address ||
+    (locationLoading
+      ? "Detecting location…"
+      : "Tap to auto-detect your current location")
+  }
+/>
 
-    {/* MAP */}
-    <div className="overflow-hidden rounded-xl border border-slate-700">
-      <div id="map" style={{ height: 280 }} />
-    </div>
-  </>
-)}
+{/* MAP */}
+<div className="overflow-hidden rounded-xl border border-slate-700">
+  <div id="map" style={{ height: 280 }} />
+</div>
 
         {/* SUBMIT */}
         <button

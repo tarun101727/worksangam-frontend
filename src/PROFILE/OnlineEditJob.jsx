@@ -4,10 +4,10 @@ import { BASE_URL } from "../config";
 import { currencies } from "../constants/currencies";
 import { useTranslation } from "react-i18next";
 
-const OnlineEditJob = ({ form, setForm, handleChange }) => {
+const OnlineEditJob = ({ form, handleChange }) => {
   const { t } = useTranslation();
 
-  const [languages, setLanguages] = useState(form.languages || []);
+  const languages = form.languages || [];
   const [languageInput, setLanguageInput] = useState("");
   const [allLanguages, setAllLanguages] = useState([]);
   const [languageSuggestions, setLanguageSuggestions] = useState([]);
@@ -45,11 +45,6 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
       })
       .catch(() => setAllLanguages([]));
   }, []);
-
-  /* ================= SYNC FORM ================= */
-  useEffect(() => {
-    setForm(prev => ({ ...prev, languages }));
-  }, [languages]);
 
   return (
     <>
@@ -150,7 +145,7 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
 
   {/* Selected Languages */}
   <div className="flex flex-wrap gap-2 mb-2">
-    {languages.map((lang, i) => (
+    {(form.languages || []).map((lang, i) => (
       <span
         key={i}
         className="bg-indigo-600 text-white px-3 py-1 rounded-full flex items-center gap-2"
@@ -158,9 +153,7 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
         {lang}
         <button
           type="button"
-          onClick={() =>
-            setLanguages((prev) => prev.filter((l) => l !== lang))
-          }
+        
           className="text-white/70 hover:text-white"
         >
           ✕
@@ -208,7 +201,7 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
       ) {
         e.preventDefault();
 
-        setLanguages((prev) => [...prev, languageInput.trim()]);
+        
         setLanguageInput("");
 
         setLanguageSuggestions(
@@ -226,9 +219,7 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
           key={lang}
           className="px-4 py-2 text-white hover:bg-[#374151] cursor-pointer"
           onClick={() => {
-            if (!languages.includes(lang)) {
-              setLanguages((prev) => [...prev, lang]);
-            }
+            
             setLanguageInput("");
             setLanguageSuggestions([]);
           }}

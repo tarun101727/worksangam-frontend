@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 const OnlineEditJob = ({ form, setForm, handleChange }) => {
   const { t } = useTranslation();
 
-  const [languages, setLanguages] = useState(form.languages || []);
+  const [languages, setLanguages] = useState([]);
   const [languageInput, setLanguageInput] = useState("");
   const [allLanguages, setAllLanguages] = useState([]);
   const [languageSuggestions, setLanguageSuggestions] = useState([]);
@@ -51,12 +51,12 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
     setForm(prev => ({ ...prev, languages }));
   }, [languages]);
 
-  /* ================= LOAD EXISTING LANGUAGES ================= */
-useEffect(() => {
-  if (form.languages && form.languages.length > 0) {
+
+  useEffect(() => {
+  if (form.languages && Array.isArray(form.languages)) {
     setLanguages(form.languages);
   }
-}, [form.languages]);
+}, []); // ✅ ONLY RUN ONCE
 
   return (
     <>
@@ -149,84 +149,101 @@ useEffect(() => {
       </div>
 
       {/* ================= LANGUAGES ================= */}
-      <div className="space-y-2 relative" ref={languageContainerRef}>
-     
+<div className="space-y-2 relative" ref={languageContainerRef}>
 
-        <div className="flex flex-wrap gap-2">
-          {languages.map((lang, i) => (
-            <span key={i} className="bg-indigo-600 px-3 py-1 rounded-full flex items-center gap-2">
-              {lang}
-              <button onClick={() => setLanguages(l => l.filter(x => x !== lang))}>✕</button>
-            </span>
-          ))}
-        </div>
+  <p className="text-sm font-medium text-red-400">
+    🗣 {t("Languages Required")}
+  </p>
 
-        <input
-  className={inputBase}
-  placeholder={t("Add a language (English, Hindi...)")}
-  value={languageInput}
-
-  onFocus={() =>
-    setLanguageSuggestions(
-      allLanguages.filter(l => !languages.includes(l))
-    )
-  }
-
-  onChange={(e) => {
-    const val = e.target.value;
-    setLanguageInput(val);
-
-    if (val.trim()) {
-      setLanguageSuggestions(
-        allLanguages.filter(
-          l =>
-            l.toLowerCase().includes(val.toLowerCase()) &&
-            !languages.includes(l)
-        )
-      );
-    } else {
-      setLanguageSuggestions(
-        allLanguages.filter(l => !languages.includes(l))
-      );
-    }
-  }}
-
-  onKeyDown={(e) => {
-    if (
-      (e.key === "Enter" || e.key === " ") &&
-      languageInput.trim() &&
-      !languages.includes(languageInput.trim())
-    ) {
-      e.preventDefault();
-      setLanguages(prev => [...prev, languageInput.trim()]);
-      setLanguageInput("");
-      setLanguageSuggestions(
-        allLanguages.filter(l => !languages.includes(l))
-      );
-    }
-  }}
-/>
-
-        {languageSuggestions.length > 0 && (
-  <div className="absolute z-50 mt-1 w-full max-h-64 overflow-auto rounded-xl bg-[#0F172A] border border-white/10 shadow-xl">
-    {languageSuggestions.map((lang) => (
-      <div
-        key={lang}
-        className="px-4 py-2 text-white hover:bg-[#374151] cursor-pointer"
-        onClick={() => {
-          if (!languages.includes(lang)) {
-            setLanguages(prev => [...prev, lang]);
-          }
-          setLanguageInput("");
-          setLanguageSuggestions([]);
-        }}
+  {/* ✅ SHOW SELECTED LANGUAGES (FROM DB) */}
+  <div className="flex flex-wrap gap-2 mb-2">
+    {languages.map((lang, i) => (
+      <span
+        key={i}
+        className="bg-indigo-600 text-white px-3 py-1 rounded-full flex items-center gap-2"
       >
         {lang}
-      </div>
+        <button
+          type="button"
+          onClick={() =>
+            setLanguages((prev) => prev.filter((l) => l !== lang))
+          }
+          className="text-white/70 hover:text-white"
+        >
+          ✕
+        </button>
+      </span>
     ))}
   </div>
-)}
-      </div>
+
+  {/* ✅ SEARCH INPUT */}
+  <input
+    className={inputBase}
+    placeholder={t("Add a language (English, Hindi...)")}
+    value={languageInput}
+
+    onFocus={() =>
+      setLanguageSuggestions(
+        allLanguages.filter((l) => !languages.includes(l))
+      )
+    }
+
+    onChange={(e) => {
+      const val = e.target.value;
+      setLanguageInput(val);
+
+      if (val.trim()) {
+        setLanguageSuggestions(
+          allLanguages.filter(
+            (l) =>
+              l.toLowerCase().includes(val.toLowerCase()) &&
+              !languages.includes(l)
+          )
+        );
+      } else {
+        setLanguageSuggestions(
+          allLanguages.filter((l) => !languages.includes(l))
+        );
+      }
+    }}
+
+    onKeyDown={(e) => {
+      if (
+        (e.key === "Enter" || e.key === " ") &&
+        languageInput.trim() &&
+        !languages.includes(languageInput.trim())
+      ) {
+        e.preventDefault();
+        setLanguages((prev) => [...prev, languageInput.trim()]);
+        setLanguageInput("");
+        setLanguageSuggestions(
+          allLanguages.filter((l) => !languages.includes(l))
+        );
+      }
+    }}
+  />
+
+  {/* ✅ DROPDOWN */}
+  {languageSuggestions.length > 0 && (
+    <div className="absolute z-50 mt-1 w-full max-h-64 overflow-auto rounded-xl bg-[#0F172A] border border-white/10 shadow-xl">
+      {languageSuggestions.map((lang) => (
+        <div
+          key={lang}
+          className="px-4 py-2 text-white hover:bg-[#374151] cursor-pointer"
+          onClick={() => {
+            if (!languages.includes(lang)) {
+              setLanguages((prev) => [...prev, lang]);
+            }
+            setLanguageInput("");
+            setLanguageSuggestions([]);
+          }}
+        >
+          {lang}
+        </div>
+      ))}
+    </div>
+  )}
+</div>
     </>
   );
 };

@@ -61,7 +61,7 @@ export default function JobDetails() {
   );
 }
   if (!job) return <p className="text-center mt-10">Job not found</p>;
-
+  
   return (
     <div className="max-w-3xl mx-auto mt-10 p-5 bg-[#0F172A] rounded-2xl border border-white/10">
       
@@ -81,90 +81,134 @@ export default function JobDetails() {
       </div>
 
       {/* Job Card */}
-      <div className="bg-white/5 rounded-2xl p-6 space-y-6">
-        {/* Profession */}
-        <h1 className="text-2xl font-bold">
-          Profession: <span className="text-indigo-300 capitalize">{job.profession}</span>
-        </h1>
+      {/* Job Card */}
+<div className="bg-white/5 rounded-2xl p-6 space-y-6">
 
-        {/* Description */}
-        <p className="text-white/70">{job.description}</p>
+  {/* ================= ONLINE JOB ================= */}
+  {job.type === "online" && (
+    <>
+      {/* Profession */}
+      <h1 className="text-2xl font-bold">
+        Profession: <span className="text-indigo-300 capitalize">{job.profession}</span>
+      </h1>
 
-        {/* Preferred Time & Date */}
-        {job.preferredTime && (
-          <p className="text-white/60">
-            <span className="font-semibold">Preferred Time: </span>
-            {job.preferredTime.type === "asap" && "As soon as possible"}
-            {job.preferredTime.type === "today" && "Today"}
-            {job.preferredTime.type === "custom" && (
-              <>
-                {new Date(job.preferredTime.from).toLocaleString()} — {new Date(job.preferredTime.to).toLocaleString()}
-              </>
+      {/* Description */}
+      <p className="text-white/70">{job.description}</p>
+
+      {/* Languages */}
+      {job.languages?.length > 0 && (
+        <p className="text-white/60">
+          <span className="font-semibold">Languages: </span>
+          {job.languages.join(", ")}
+        </p>
+      )}
+
+      {/* Price */}
+      {job.price && (
+        <p className="text-xl font-bold text-yellow-400">
+          {job.price.type === "fixed" && `${job.price.currency} ${job.price.value}`}
+          {job.price.type === "hourly" && `${job.price.currency} ${job.price.value}/hr`}
+          {job.price.type === "negotiable" && `${job.price.currency} ${job.price.min} – ${job.price.max}`}
+        </p>
+      )}
+    </>
+  )}
+
+  {/* ================= OFFLINE JOB ================= */}
+  {job.type === "offline" && (
+    <>
+      {/* Profession */}
+      <h1 className="text-2xl font-bold">
+        {job.profession}
+      </h1>
+
+      {/* Description */}
+      <p className="text-white/70">{job.description}</p>
+
+      {/* Preferred Time */}
+      {job.preferredTime && (
+        <p className="text-white/60">
+          <span className="font-semibold">Preferred Time: </span>
+          {job.preferredTime.type === "asap" && "As soon as possible"}
+          {job.preferredTime.type === "today" && "Today"}
+          {job.preferredTime.type === "custom" && (
+            <>
+              {new Date(job.preferredTime.from).toLocaleString()} —{" "}
+              {new Date(job.preferredTime.to).toLocaleString()}
+            </>
+          )}
+        </p>
+      )}
+
+      {/* Media */}
+      {job.media?.length > 0 && (
+        <div>
+          <p className="text-sm font-semibold text-white/80 mb-3">Media</p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {job.media.map((m, i) =>
+              m.type === "image" ? (
+                <img
+                  key={i}
+                  src={getImageUrl(m.url)}
+                  alt="job"
+                  onClick={() => setSelectedMedia(m)}
+                  className="h-28 w-full object-cover rounded-xl cursor-pointer"
+                />
+              ) : (
+                <video
+                  key={i}
+                  onClick={() => setSelectedMedia(m)}
+                  className="h-28 w-full object-cover rounded-xl cursor-pointer"
+                >
+                  <source src={getImageUrl(m.url)} />
+                </video>
+              )
             )}
-          </p>
-        )}
-
-        {/* Media */}
-        {job.media?.length > 0 && (
-          <div>
-            <p className="text-sm font-semibold text-white/80 mb-3">Media</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {job.media.map((m, i) =>
-                m.type === "image" ? (
-                  <img
-                    key={i}
-                    src={getImageUrl(m.url)}
-                    alt="job"
-                    onClick={() => setSelectedMedia(m)}
-                    className="h-28 w-full object-cover rounded-xl cursor-pointer hover:opacity-80"
-                  />
-                ) : (
-                  <video
-                    key={i}
-                    onClick={() => setSelectedMedia(m)}
-                    className="h-28 w-full object-cover rounded-xl cursor-pointer"
-                  >
-                    <source src={getImageUrl(m.url)} />
-                  </video>
-                )
-              )}
-            </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Safety Warnings */}
-        {job.safetyWarnings && (
-          <div className="bg-red-500/10 rounded-xl p-4">
-            <p className="font-semibold text-red-400 mb-2">Warnings</p>
-            <div className="text-sm text-red-300 space-y-1">
-              {job.safetyWarnings.children && <p>• Children present</p>}
-              {job.safetyWarnings.elderly && <p>• Elderly present</p>}
-              {job.safetyWarnings.pets && <p>• Pets present</p>}
-              {job.safetyWarnings.safetyConcerns && <p>• Safety concerns</p>}
-            </div>
+      {/* Safety Warnings */}
+      {job.safetyWarnings && (
+        <div className="bg-red-500/10 rounded-xl p-4">
+          <p className="font-semibold text-red-400 mb-2">Warnings</p>
+          <div className="text-sm text-red-300 space-y-1">
+            {job.safetyWarnings.children && <p>• Children present</p>}
+            {job.safetyWarnings.elderly && <p>• Elderly present</p>}
+            {job.safetyWarnings.pets && <p>• Pets present</p>}
+            {job.safetyWarnings.safetyConcerns && <p>• Safety concerns</p>}
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Price */}
-        {job.price && (
-          <p className="text-xl font-bold text-yellow-400">
-            {job.price.type === "fixed" && `${job.price.currency} ${job.price.value}`}
-            {job.price.type === "hourly" && `${job.price.currency} ${job.price.value}/hr`}
-            {job.price.type === "negotiable" && `${job.price.currency} ${job.price.min} – ${job.price.max}`}
-            {job.price.type === "inspect_quote" && "Inspect & Quote"}
-          </p>
-        )}
+      {/* Price */}
+      {job.price && (
+        <p className="text-xl font-bold text-yellow-400">
+          {job.price.type === "fixed" && `${job.price.currency} ${job.price.value}`}
+          {job.price.type === "hourly" && `${job.price.currency} ${job.price.value}/hr`}
+          {job.price.type === "negotiable" && `${job.price.currency} ${job.price.min} – ${job.price.max}`}
+          {job.price.type === "inspect_quote" && "Inspect & Quote"}
+        </p>
+      )}
 
-        {/* Address */}
-        {job.addressDetails && (
-          <p className="text-white/60"><span className="font-semibold">Address / Landmark: </span>{job.addressDetails}</p>
-        )}
+      {/* Address */}
+      {job.addressDetails && (
+        <p className="text-white/60">
+          <span className="font-semibold">Address: </span>
+          {job.addressDetails}
+        </p>
+      )}
 
-        {/* Current Location */}
-        {job.location?.address && (
-          <p className="text-white/60"><span className="font-semibold">Current Location: </span>{job.location.address}</p>
-        )}
-      </div>
+      {/* Location */}
+      {job.location?.address && (
+        <p className="text-white/60">
+          <span className="font-semibold">Location: </span>
+          {job.location.address}
+        </p>
+      )}
+    </>
+  )}
+</div>
 
       {/* 🔥 ACTION BUTTONS */}
       <div className="flex gap-3 mt-6">

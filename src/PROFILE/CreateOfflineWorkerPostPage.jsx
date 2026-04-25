@@ -126,11 +126,14 @@ const filteredProfessions = onlineProfessions.filter((p) =>
     type="text"
     className={inputBase}
     placeholder={t("Search online profession")}
-    value={search}
+    value={search || form.profession}
     onChange={(e) => {
-      setSearch(e.target.value);
-      setShowSuggestions(true);
-    }}
+  const value = e.target.value;
+
+  setSearch(value);
+  handleChange("profession", value); // 🔥 keep form in sync
+  setShowSuggestions(true);
+}}
     onFocus={() => setShowSuggestions(true)}
   />
 
@@ -142,10 +145,10 @@ const filteredProfessions = onlineProfessions.filter((p) =>
             key={profession._id}
             className="px-4 py-2 text-sm text-slate-200 hover:bg-indigo-500/20 cursor-pointer"
             onClick={() => {
-              handleChange("profession", profession.name);
-              setSearch(profession.name);
-              setShowSuggestions(false);
-            }}
+  handleChange("profession", profession.name);
+  setSearch(""); // 🔥 clear search so form value shows
+  setShowSuggestions(false);
+}}
           >
             {profession.name}
           </div>

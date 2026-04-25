@@ -1,12 +1,18 @@
 import axios from "axios";
 import { BASE_URL } from "../config";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+
+
 
 const PaymentHistory = () => {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("ALL");
+  const { t } = useTranslation();
+
+
 
   const fetchPayments = async () => {
     try {
@@ -64,26 +70,26 @@ const PaymentHistory = () => {
 
       {/* 🔥 HEADER */}
       <h2 className="text-3xl font-bold mb-6 text-center">
-        Payment History
+        {t("Payment History")}
       </h2>
 
       {/* 📊 SUMMARY CARDS */}
       <div className="grid md:grid-cols-4 gap-4 max-w-5xl mx-auto mb-6">
         {/* TOTAL SPENT */}
         <div className="bg-white/5 p-4 rounded-xl border border-white/10">
-          <p className="text-white/60 text-sm">Total Spent</p>
+          <p className="text-white/60 text-sm">{t("Total Spent")}</p>
           <h3 className="text-xl font-bold">₹{totalSpent}</h3>
         </div>
 
         {/* CREDITS */}
         <div className="bg-white/5 p-4 rounded-xl border border-white/10">
-          <p className="text-white/60 text-sm">Credits Bought</p>
+          <p className="text-white/60 text-sm">{t("Credits Bought")}</p>
           <h3 className="text-xl font-bold">{totalCredits}</h3>
         </div>
 
         {/* SUCCESS */}
         <div className="bg-white/5 p-4 rounded-xl border border-white/10">
-          <p className="text-white/60 text-sm">Successful Payments</p>
+          <p className="text-white/60 text-sm">{t("Successful Payments")}</p>
           <h3 className="text-xl font-bold text-green-400">
             {successCount}
           </h3>
@@ -91,7 +97,7 @@ const PaymentHistory = () => {
 
         {/* ❌ FAILED */}
         <div className="bg-white/5 p-4 rounded-xl border border-white/10">
-          <p className="text-white/60 text-sm">Failed Payments</p>
+          <p className="text-white/60 text-sm">{t("Failed Payments")}</p>
           <h3 className="text-xl font-bold text-red-400">
             {failedCount}
           </h3>
@@ -139,9 +145,9 @@ const PaymentHistory = () => {
       ) : filteredPayments.length === 0 ? (
         // 📭 EMPTY
         <div className="text-center text-white/60 mt-20">
-          <p className="text-lg font-semibold">No Payments Found</p>
+          <p className="text-lg font-semibold">{t("No Payments Found")}</p>
           <p className="text-sm">
-            Your transactions will appear here
+            {t("Your transactions will appear here")}
           </p>
         </div>
       ) : (
@@ -166,20 +172,20 @@ const PaymentHistory = () => {
 
                   {/* 🔑 */}
                   <p className="text-xs text-white/40 mt-1">
-                    Order ID: {p.orderId}
+                    {t("Order ID")}: {p.orderId}
                   </p>
 
                   {/* ❌ FAILED MESSAGE */}
                   {p.status === "FAILED" && (
                     <p className="text-xs text-red-400 mt-1">
-                      Payment failed. No credits added.
+                      {t("Payment failed. No credits added.")}
                     </p>
                   )}
 
                   {/* ⏳ PENDING */}
                   {p.status === "PENDING" && (
                     <p className="text-xs text-yellow-400 mt-1">
-                      Payment is pending confirmation...
+                      {t("Payment is pending confirmation...")}
                     </p>
                   )}
                 </div>
@@ -198,7 +204,7 @@ const PaymentHistory = () => {
 
       {/* 🔐 TRUST */}
       <p className="text-xs text-white/40 text-center mt-10">
-        🔒 Secure payments powered by Cashfree
+        🔒 {t("Secure payments powered by Cashfree")}
       </p>
     </div>
   );

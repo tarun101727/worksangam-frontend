@@ -23,6 +23,20 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
   const inputBase =
     "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700";
 
+    useEffect(() => {
+  const handleClickOutside = (e) => {
+    if (
+      languageContainerRef.current &&
+      !languageContainerRef.current.contains(e.target)
+    ) {
+      setLanguageSuggestions([]);
+    }
+  };
+
+  document.addEventListener("click", handleClickOutside);
+  return () => document.removeEventListener("click", handleClickOutside);
+}, []);
+
   /* ================= LOAD LANGUAGES ================= */
   useEffect(() => {
     axios.get(`${BASE_URL}/api/languages`)
@@ -129,7 +143,7 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
       </div>
 
       {/* ================= LANGUAGES ================= */}
-      <div ref={languageContainerRef} className="space-y-2">
+      <div className="space-y-2 relative" ref={languageContainerRef}>
         <p className="text-sm text-red-400">Languages Required</p>
 
         <div className="flex flex-wrap gap-2">
@@ -142,45 +156,70 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
         </div>
 
         <input
-          className={inputBase}
-          placeholder="Add language"
-          value={languageInput}
-          onChange={(e) => {
-            const val = e.target.value;
-            setLanguageInput(val);
+  className={inputBase}
+  placeholder={t("Add a language (English, Hindi...)")}
+  value={languageInput}
 
-            setLanguageSuggestions(
-              allLanguages.filter(l =>
-                l.toLowerCase().includes(val.toLowerCase()) &&
-                !languages.includes(l)
-              )
-            );
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && languageInput.trim()) {
-              setLanguages(prev => [...prev, languageInput.trim()]);
-              setLanguageInput("");
-            }
-          }}
-        />
+  onFocus={() =>
+    setLanguageSuggestions(
+      allLanguages.filter(l => !languages.includes(l))
+    )
+  }
+
+  onChange={(e) => {
+    const val = e.target.value;
+    setLanguageInput(val);
+
+    if (val.trim()) {
+      setLanguageSuggestions(
+        allLanguages.filter(
+          l =>
+            l.toLowerCase().includes(val.toLowerCase()) &&
+            !languages.includes(l)
+        )
+      );
+    } else {
+      setLanguageSuggestions(
+        allLanguages.filter(l => !languages.includes(l))
+      );
+    }
+  }}
+
+  onKeyDown={(e) => {
+    if (
+      (e.key === "Enter" || e.key === " ") &&
+      languageInput.trim() &&
+      !languages.includes(languageInput.trim())
+    ) {
+      e.preventDefault();
+      setLanguages(prev => [...prev, languageInput.trim()]);
+      setLanguageInput("");
+      setLanguageSuggestions(
+        allLanguages.filter(l => !languages.includes(l))
+      );
+    }
+  }}
+/>
 
         {languageSuggestions.length > 0 && (
-          <div className="bg-slate-900 border rounded-xl">
-            {languageSuggestions.map((lang) => (
-              <div
-                key={lang}
-                className="px-4 py-2 hover:bg-slate-700 cursor-pointer"
-                onClick={() => {
-                  setLanguages(prev => [...prev, lang]);
-                  setLanguageInput("");
-                  setLanguageSuggestions([]);
-                }}
-              >
-                {lang}
-              </div>
-            ))}
-          </div>
-        )}
+  <div className="absolute z-50 mt-1 w-full max-h-64 overflow-auto rounded-xl bg-[#0F172A] border border-white/10 shadow-xl">
+    {languageSuggestions.map((lang) => (
+      <div
+        key={lang}
+        className="px-4 py-2 text-white hover:bg-[#374151] cursor-pointer"
+        onClick={() => {
+          if (!languages.includes(lang)) {
+            setLanguages(prev => [...prev, lang]);
+          }
+          setLanguageInput("");
+          setLanguageSuggestions([]);
+        }}
+      >
+        {lang}
+      </div>
+    ))}
+  </div>
+)}
       </div>
     </>
   );

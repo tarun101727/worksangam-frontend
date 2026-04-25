@@ -61,7 +61,10 @@ export default function JobDetails() {
   );
 }
   if (!job) return <p className="text-center mt-10">Job not found</p>;
-  
+
+
+  const isOnline = job.professionType === "online";
+
   return (
     <div className="max-w-3xl mx-auto mt-10 p-5 bg-[#0F172A] rounded-2xl border border-white/10">
       
@@ -81,45 +84,44 @@ export default function JobDetails() {
       </div>
 
       {/* Job Card */}
-      {/* Job Card */}
 <div className="bg-white/5 rounded-2xl p-6 space-y-6">
 
-  {/* ================= ONLINE JOB ================= */}
-  {job.type === "online" && (
+  {/* 🔵 ONLINE JOB UI (like HirerOnlinePost.jsx) */}
+  {isOnline ? (
     <>
       {/* Profession */}
       <h1 className="text-2xl font-bold">
-        Profession: <span className="text-indigo-300 capitalize">{job.profession}</span>
+        💻 {job.profession}
       </h1>
 
       {/* Description */}
-      <p className="text-white/70">{job.description}</p>
+      <p className="text-white/70">
+        {job.description || "No description provided"}
+      </p>
 
       {/* Languages */}
       {job.languages?.length > 0 && (
         <p className="text-white/60">
-          <span className="font-semibold">Languages: </span>
-          {job.languages.join(", ")}
+          🗣 Languages: {job.languages.join(", ")}
         </p>
       )}
 
       {/* Price */}
       {job.price && (
         <p className="text-xl font-bold text-yellow-400">
-          {job.price.type === "fixed" && `${job.price.currency} ${job.price.value}`}
-          {job.price.type === "hourly" && `${job.price.currency} ${job.price.value}/hr`}
-          {job.price.type === "negotiable" && `${job.price.currency} ${job.price.min} – ${job.price.max}`}
+          {job.price.type === "fixed" &&
+            `${job.price.currency} ${job.price.value}`}
+          {job.price.type === "negotiable" &&
+            `${job.price.currency} ${job.price.min} – ${job.price.max}`}
         </p>
       )}
     </>
-  )}
-
-  {/* ================= OFFLINE JOB ================= */}
-  {job.type === "offline" && (
+  ) : (
+    /* 🟢 OFFLINE JOB UI (like HirerOfflinePost.jsx) */
     <>
       {/* Profession */}
       <h1 className="text-2xl font-bold">
-        {job.profession}
+        🧰 {job.profession}
       </h1>
 
       {/* Description */}
@@ -168,25 +170,26 @@ export default function JobDetails() {
         </div>
       )}
 
-      {/* Safety Warnings */}
+      {/* Safety */}
       {job.safetyWarnings && (
         <div className="bg-red-500/10 rounded-xl p-4">
           <p className="font-semibold text-red-400 mb-2">Warnings</p>
-          <div className="text-sm text-red-300 space-y-1">
-            {job.safetyWarnings.children && <p>• Children present</p>}
-            {job.safetyWarnings.elderly && <p>• Elderly present</p>}
-            {job.safetyWarnings.pets && <p>• Pets present</p>}
-            {job.safetyWarnings.safetyConcerns && <p>• Safety concerns</p>}
-          </div>
+          {job.safetyWarnings.children && <p>• Children present</p>}
+          {job.safetyWarnings.elderly && <p>• Elderly present</p>}
+          {job.safetyWarnings.pets && <p>• Pets present</p>}
+          {job.safetyWarnings.safetyConcerns && <p>• Safety concerns</p>}
         </div>
       )}
 
       {/* Price */}
       {job.price && (
         <p className="text-xl font-bold text-yellow-400">
-          {job.price.type === "fixed" && `${job.price.currency} ${job.price.value}`}
-          {job.price.type === "hourly" && `${job.price.currency} ${job.price.value}/hr`}
-          {job.price.type === "negotiable" && `${job.price.currency} ${job.price.min} – ${job.price.max}`}
+          {job.price.type === "fixed" &&
+            `${job.price.currency} ${job.price.value}`}
+          {job.price.type === "hourly" &&
+            `${job.price.currency} ${job.price.value}/hr`}
+          {job.price.type === "negotiable" &&
+            `${job.price.currency} ${job.price.min} – ${job.price.max}`}
           {job.price.type === "inspect_quote" && "Inspect & Quote"}
         </p>
       )}

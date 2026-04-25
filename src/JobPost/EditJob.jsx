@@ -5,7 +5,7 @@ import { BASE_URL } from "../config";
 import CreateOfflineWorkerPostPage from "../PROFILE/CreateOfflineWorkerPostPage";
 import L from "leaflet";
 import { useRef } from "react";
-import OnlineEditJob from "../PROFILE/OnlineEditJob";
+import OnlineEditJob from "../PROFILE/OnlineEditJob"
 
 
 const emptyForm = {
@@ -38,7 +38,7 @@ export default function EditJob() {
   const mapRef = useRef(null);
   const markerRef = useRef(null);
   const [locationLoading, setLocationLoading] = useState(false);
-  const [jobType, setJobType] = useState("offline"); // default
+  const [jobType, setJobType] = useState("offline");
 
   const inputBase =
     "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700";
@@ -52,7 +52,7 @@ export default function EditJob() {
         });
 
         const job = res.data.job;
-        setJobType(job.type || "offline");
+        setJobType(job.professionType || "offline");
 
         setForm({
           profession: job.profession || "",

@@ -177,9 +177,23 @@ export default function OfflineJobDetails() {
   </button>
 
   {user?.isGuest ? (
-    <div className="text-gray-400 text-sm italic">
-      Login to see chat and apply
-    </div>
+    <div className="flex items-center gap-2 text-sm italic text-gray-400 bg-gray-800/50 p-3 rounded-lg border border-gray-700">
+    <svg
+      className="w-5 h-5 text-gray-400"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M12 11c0 1.104-.896 2-2 2s-2-.896-2-2 .896-2 2-2 2 .896 2 2zm0 0v2m0-2h2m-2 0H8"
+      />
+    </svg>
+    Login to see chat and apply
+  </div>
   ) : (
     <>
       <button

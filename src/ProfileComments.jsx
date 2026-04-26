@@ -98,7 +98,6 @@ const CommentItem = React.memo(function CommentItem({
   visibleReplies,
   setVisibleReplies,
   loggedInUserId,
-  isGuest
 }) {
   const [expanded, setExpanded] = useState(false);
   const [showButton, setShowButton] = useState(false);
@@ -179,19 +178,19 @@ const CommentItem = React.memo(function CommentItem({
             )}
 
             <div className="flex gap-4 mt-1 items-center">
-              {!isGuest && depth < 3 && (
-  <button
-    onClick={() =>
-      setShowReply((prev) => ({
-        ...prev,
-        [comment._id]: !prev[comment._id],
-      }))
-    }
-    className="text-xs text-indigo-400"
-  >
-    Reply
-  </button>
-)}
+              {depth < 3 && (
+                <button
+                  onClick={() =>
+                    setShowReply((prev) => ({
+                      ...prev,
+                      [comment._id]: !prev[comment._id],
+                    }))
+                  }
+                  className="text-xs text-indigo-400"
+                >
+                  Reply
+                </button>
+              )}
 
               {hasReplies && (
                 <button
@@ -319,7 +318,7 @@ const CommentItem = React.memo(function CommentItem({
   );
 });
 
-export default function ProfileComments({ profileId, loggedInUserId , loggedInUser }) {
+export default function ProfileComments({ profileId, loggedInUserId }) {
   const [comments, setComments] = useState([]);
   const [text, setText] = useState("");
   const [replyText, setReplyText] = useState({});
@@ -372,34 +371,17 @@ export default function ProfileComments({ profileId, loggedInUserId , loggedInUs
   }, [comments]);
 
   const sendComment = async () => {
-  if (isGuest) {
-    alert("Guests cannot post comments or replies");
-    return;
-  }
-
-  if (!text.trim()) return;
-
-  try {
+    if (!text.trim()) return;
     await axios.post(
       `${BASE_URL}/api/profile-comments/add`,
       { profileId, text },
       { withCredentials: true }
     );
     setText("");
-  } catch (err) {
-    console.error(err);
-  }
-};
+  };
 
   const sendReply = async (parentId) => {
-  if (isGuest) {
-    alert("Guests cannot post comments or replies");
-    return;
-  }
-
-  if (!replyText[parentId]?.trim()) return;
-
-  try {
+    if (!replyText[parentId]?.trim()) return;
     await axios.post(
       `${BASE_URL}/api/profile-comments/add`,
       { profileId, text: replyText[parentId], parentComment: parentId },
@@ -407,10 +389,7 @@ export default function ProfileComments({ profileId, loggedInUserId , loggedInUs
     );
     setReplyText((prev) => ({ ...prev, [parentId]: "" }));
     setShowReply((prev) => ({ ...prev, [parentId]: false }));
-  } catch (err) {
-    console.error(err);
-  }
-};
+  };
 
   const toggleLike = async (commentId) => {
     await axios.post(`${BASE_URL}/api/profile-comments/like/${commentId}`, {}, { withCredentials: true });
@@ -435,8 +414,6 @@ export default function ProfileComments({ profileId, loggedInUserId , loggedInUs
     }, 1000);
   };
 
-  const isGuest = loggedInUser?.isGuest;
-
   return (
     <div className="mt-10 text-white">
       <h2 className="text-xl font-bold mb-4">Comments ({totalCommentCount})</h2>
@@ -446,14 +423,9 @@ export default function ProfileComments({ profileId, loggedInUserId , loggedInUs
           value={text}
           onChange={(e) => handleCommentChange(e.target.value)}
           className="flex-1 bg-gray-800 p-2 rounded"
-          placeholder={isGuest ? "Guests cannot comment" : "Write a comment..."}
-          disabled={isGuest}
+          placeholder="Write a comment..."
         />
-        <button
-          onClick={sendComment}
-          className="bg-indigo-500 px-4 rounded"
-          disabled={isGuest}
-        >
+        <button onClick={sendComment} className="bg-indigo-500 px-4 rounded">
           Post
         </button>
       </div>
@@ -476,7 +448,6 @@ export default function ProfileComments({ profileId, loggedInUserId , loggedInUs
             visibleReplies={visibleReplies}
             setVisibleReplies={setVisibleReplies}
             loggedInUserId={loggedInUserId}
-            isGuest={isGuest}
           />
           <div style={{ height: "1px", background: "#444", margin: "20px 0" }} />
         </div>

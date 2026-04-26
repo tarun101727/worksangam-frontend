@@ -235,7 +235,9 @@ useEffect(() => {
 
   /* 🔔 SOCKET LISTENERS */
   useEffect(() => {
-    socket.on("new-notification", (notification) => {
+   socket.on("new-notification", (notification) => {
+  if (user?.isGuest) return; // ❌ skip for guests
+
   setNotifications((prev) => [notification, ...prev]);
 
   if (Notification.permission === "granted") {
@@ -264,25 +266,24 @@ useEffect(() => {
 
   useEffect(() => {
   socket.on("new-job-notification", (job) => {
-    console.log("🔥 New Job:", job);
+  if (user?.isGuest) return; // ❌ skip for guests
 
-    setNotifications(prev => [
-      {
-        ...job,
-        type: "new_job",
-        isRead: false,
-        createdAt: new Date()
-      },
-      ...prev
-    ]);
+  setNotifications(prev => [
+    {
+      ...job,
+      type: "new_job",
+      isRead: false,
+      createdAt: new Date()
+    },
+    ...prev
+  ]);
 
-    // 🔔 Browser notification
-    if (Notification.permission === "granted") {
-      new Notification("New Job Available 🚀", {
-        body: `${job.profession} job posted`,
-      });
-    }
-  });
+  if (Notification.permission === "granted") {
+    new Notification("New Job Available 🚀", {
+      body: `${job.profession} job posted`,
+    });
+  }
+});
 
   return () => {
     socket.off("new-job-notification");
@@ -292,6 +293,8 @@ useEffect(() => {
   // Socket listener
 useEffect(() => {
   socket.on("new-chat-notification", (notif) => {
+  if (user?.isGuest) return; // ❌ skip for guests
+
   const normalized = { ...notif, type: "chat", message: notif.message || "" };
   setChatNotifications(prev => [normalized, ...prev]);
 
@@ -490,54 +493,61 @@ d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03
 
 {showNotifications && (
   <div className="absolute right-0 top-12 w-80 bg-[#0F172A] border border-white/10 rounded-xl shadow-xl max-h-96 overflow-y-auto scrollbar-dark z-50">
-    {[...notifications, ...chatNotifications]
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // newest first
-      .map((n) => (
-        <div
-          key={n._id}
-          onClick={() => {
-            if (n.type === "chat") {
-              navigate(`/chat/${n.chat}`);
-            } else {
-              navigate(`/job-application/${n._id}`);
-            }
-            setShowNotifications(false);
-          }}
-          className="flex items-center gap-3 p-3 hover:bg-white/5 cursor-pointer"
-        >
-          {n.sender?.profileImage ? (
-            <img
-              src={getImageUrl(n.sender.profileImage)}
-              className="w-10 h-10 rounded-full object-cover"
-            />
-          ) : (
-            <div
-              className="w-10 h-10 rounded-full flex items-center justify-center"
-              style={{ background: n.sender?.avatarColor }}
-            >
-              {n.sender?.avatarInitial}
-            </div>
-          )}
+    
+    {user?.isGuest ? (
+      <div className="p-4 text-center text-white/60">
+        {t("In guest mode, notifications will not appear")}
+      </div>
+    ) : (
+      [...notifications, ...chatNotifications]
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // newest first
+        .map((n) => (
+          <div
+            key={n._id}
+            onClick={() => {
+              if (n.type === "chat") {
+                navigate(`/chat/${n.chat}`);
+              } else {
+                navigate(`/job-application/${n._id}`);
+              }
+              setShowNotifications(false);
+            }}
+            className="flex items-center gap-3 p-3 hover:bg-white/5 cursor-pointer"
+          >
+            {n.sender?.profileImage ? (
+              <img
+                src={getImageUrl(n.sender.profileImage)}
+                className="w-10 h-10 rounded-full object-cover"
+              />
+            ) : (
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center"
+                style={{ background: n.sender?.avatarColor }}
+              >
+                {n.sender?.avatarInitial}
+              </div>
+            )}
 
-          <p className="text-sm text-white">
-            {n.type === "chat" && (
-              <><b>{n.sender?.firstName} {n.sender?.lastName}</b>: {n.message?.slice(0, 30)}...</>
-            )}
-            {n.type === "job_application" && (
-              <><b>{n.sender?.firstName} {n.sender?.lastName}</b> applied for your job</>
-            )}
-            {n.type === "application_accepted" && (
-              <>Your application was <span className="text-green-400">accepted</span> by <b>{n.sender?.firstName} {n.sender?.lastName}</b></>
-            )}
-            {n.type === "application_rejected" && (
-              <>Your application was <span className="text-red-400">rejected</span> by <b>{n.sender?.firstName} {n.sender?.lastName}</b></>
-            )}
-          </p>
-        </div>
-      ))}
+            <p className="text-sm text-white">
+              {n.type === "chat" && (
+                <><b>{n.sender?.firstName} {n.sender?.lastName}</b>: {n.message?.slice(0, 30)}...</>
+              )}
+              {n.type === "job_application" && (
+                <><b>{n.sender?.firstName} {n.sender?.lastName}</b> applied for your job</>
+              )}
+              {n.type === "application_accepted" && (
+                <>Your application was <span className="text-green-400">accepted</span> by <b>{n.sender?.firstName} {n.sender?.lastName}</b></>
+              )}
+              {n.type === "application_rejected" && (
+                <>Your application was <span className="text-red-400">rejected</span> by <b>{n.sender?.firstName} {n.sender?.lastName}</b></>
+              )}
+            </p>
+          </div>
+        ))
+    )}
 
-          {/* Fallback if no notifications */}
-    {[...notifications, ...chatNotifications].length === 0 && (
+    {/* Fallback if no notifications for non-guest users */}
+    {!user?.isGuest && [...notifications, ...chatNotifications].length === 0 && (
       <div className="p-4 text-center text-white/60">
         {t("No notifications")}
       </div>

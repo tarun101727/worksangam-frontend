@@ -98,7 +98,7 @@ const CommentItem = React.memo(function CommentItem({
   visibleReplies,
   setVisibleReplies,
   loggedInUserId,
-  loggedInUser
+  loggedInUser,
 }) {
   const [expanded, setExpanded] = useState(false);
   const [showButton, setShowButton] = useState(false);
@@ -179,18 +179,14 @@ const CommentItem = React.memo(function CommentItem({
             )}
 
             <div className="flex gap-4 mt-1 items-center">
-              {depth < 3 && (
+              {depth < 3 && !loggedInUser?.isGuest && ( // ✅ hide for guests
   <button
-    onClick={() => {
-      if (loggedInUser?.isGuest) {
-        alert("Guests cannot reply. Please login to reply."); // 🚨 message for guests
-        return;
-      }
+    onClick={() =>
       setShowReply((prev) => ({
         ...prev,
         [comment._id]: !prev[comment._id],
-      }));
-    }}
+      }))
+    }
     className="text-xs text-indigo-400"
   >
     Reply
@@ -231,12 +227,11 @@ const CommentItem = React.memo(function CommentItem({
               </button>
             </div>
 
-           {showReply[comment._id] && (
-  <div className="flex gap-2 mt-2">
-    <input
-      value={replyText[comment._id] || ""}
-      onChange={(e) => {
-        if (loggedInUser?.isGuest) return;
+            {showReply[comment._id] && !loggedInUser?.isGuest && (
+              <div className="flex gap-2 mt-2">
+                <input
+                  value={replyText[comment._id] || ""}
+                  onChange={(e) => {
         const val = e.target.value;
         setReplyText((prev) => ({ ...prev, [comment._id]: val }));
 
@@ -256,19 +251,17 @@ const CommentItem = React.memo(function CommentItem({
           );
         }, 1000);
       }}
-      className="bg-gray-800 p-1 rounded text-sm flex-1"
-      placeholder={loggedInUser?.isGuest ? "Guests cannot reply" : "Write reply..."}
-      disabled={loggedInUser?.isGuest} // disable input for guests
-    />
-    <button
-      onClick={() => sendReply(comment._id)}
-      className="bg-indigo-500 px-3 rounded text-sm"
-      disabled={loggedInUser?.isGuest} // disable post button for guests
-    >
-      Post
-    </button>
-  </div>
-)}
+                  className="bg-gray-800 p-1 rounded text-sm flex-1"
+                  placeholder="Write reply..."
+                />
+                <button
+                  onClick={() => sendReply(comment._id)}
+                  className="bg-indigo-500 px-3 rounded text-sm"
+                >
+                  Post
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -313,7 +306,6 @@ const CommentItem = React.memo(function CommentItem({
             visibleReplies={visibleReplies}
             setVisibleReplies={setVisibleReplies}
             loggedInUserId={loggedInUserId}
-            loggedInUser={loggedInUser}
           />
         ))}
 
@@ -479,6 +471,7 @@ export default function ProfileComments({ profileId, loggedInUserId ,loggedInUse
             visibleReplies={visibleReplies}
             setVisibleReplies={setVisibleReplies}
             loggedInUserId={loggedInUserId}
+            loggedInUser={loggedInUser}
           />
           <div style={{ height: "1px", background: "#444", margin: "20px 0" }} />
         </div>

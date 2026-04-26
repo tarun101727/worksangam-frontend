@@ -351,16 +351,24 @@ export default function ProfileComments({ profileId, loggedInUserId ,loggedInUse
     socket.off("profile-comment-deleted");
 
     socket.on("profile-comment-added", (newComment) => {
-  if (newComment.profileId !== profileId) return;
+  if (newComment.profileId === profileId) {
+    setComments((prev) => {
+      // Find if a temp comment with the same text exists
+      const tempIndex = prev.findIndex(
+        (c) => c._id.startsWith("temp-") && c.text === newComment.text
+      );
 
-  setComments((prev) => {
-    // Check if the comment already exists (by _id)
-    const exists = prev.some(c => c._id === newComment._id);
-    if (exists) return prev; // skip duplicates
-    // Remove temp comment if text matches
-    const filtered = prev.filter(c => c._id !== "temp-" + newComment.createdAt);
-    return [...filtered, newComment];
-  });
+      if (tempIndex > -1) {
+        // Replace the temp comment with the real one
+        const updated = [...prev];
+        updated[tempIndex] = newComment;
+        return updated;
+      }
+
+      // Otherwise just append
+      return [...prev, newComment];
+    });
+  }
 });
     socket.on("profile-comment-liked", ({ commentId, likes }) => {
       setComments((prev) =>
@@ -390,16 +398,15 @@ export default function ProfileComments({ profileId, loggedInUserId ,loggedInUse
   const sendComment = async () => {
   if (!text.trim()) return;
 
-  // Optimistic comment
   const tempComment = {
-    _id: "temp-" + Date.now(),
-    text,
-    user: loggedInUser,
-    profileId,
-    likes: [],
-    replies: [],
-    createdAt: new Date().toISOString(),
-  };
+  _id: "temp-" + Date.now(),
+  text,
+  user: loggedInUser,
+  profileId,
+  likes: [],
+  replies: [],
+  createdAt: new Date().toISOString(),
+};
 
   setComments((prev) => [...prev, tempComment]); // update UI immediately
   setText("");
@@ -421,17 +428,16 @@ export default function ProfileComments({ profileId, loggedInUserId ,loggedInUse
   const reply = replyText[parentId]?.trim();
   if (!reply) return;
 
-  // Optimistic reply
   const tempReply = {
-    _id: "temp-" + Date.now(),
-    text: reply,
-    user: loggedInUser,
-    profileId,
-    parentComment: parentId,
-    likes: [],
-    replies: [],
-    createdAt: new Date().toISOString(),
-  };
+  _id: "temp-" + Date.now(),
+  text: reply,
+  user: loggedInUser,
+  profileId,
+  parentComment: parentId,
+  likes: [],
+  replies: [],
+  createdAt: new Date().toISOString(),
+};
 
   setComments((prev) => [...prev, tempReply]);
   setReplyText((prev) => ({ ...prev, [parentId]: "" }));

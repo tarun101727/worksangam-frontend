@@ -267,8 +267,11 @@ const CommentItem = React.memo(function CommentItem({
 
         <div className="flex items-start">
           <button
-            onClick={() => toggleLike(comment._id)}
-            className="flex items-center gap-1 text-xs hover:text-red-400"
+            onClick={() => !loggedInUser?.isGuest && toggleLike(comment._id)}
+  className={`flex items-center gap-1 text-xs ${
+    loggedInUser?.isGuest ? "cursor-not-allowed opacity-50" : "hover:text-red-400"
+  }`}
+  disabled={loggedInUser?.isGuest}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

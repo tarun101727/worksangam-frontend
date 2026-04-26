@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { AuthContext } from "../AuthContext"; // ✅ Add this
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BASE_URL } from "../config";
@@ -18,6 +19,7 @@ export default function OfflineJobDetails() {
   const [applying, setApplying] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { user } = useContext(AuthContext); // ✅ Add this inside the component
 
   useEffect(() => {
   if (!jobId) return;
@@ -166,27 +168,44 @@ export default function OfflineJobDetails() {
       </div>
 
       {/* Back & Chat */}
-      <div className="mt-6 flex gap-4">
-        <button onClick={() => navigate(-1)} className="px-6 py-2 rounded-lg bg-gray-700 hover:bg-gray-600">Back</button>
+<div className="mt-6 flex gap-4">
+  <button 
+    onClick={() => navigate(-1)} 
+    className="px-6 py-2 rounded-lg bg-gray-700 hover:bg-gray-600"
+  >
+    Back
+  </button>
 
-        <button
-          onClick={async () => {
-            const res = await axios.post(`${BASE_URL}/api/chat/create/${job.hirer._id}`, {}, { withCredentials: true });
-            navigate(`/chat/${res.data._id}`);
-          }}
-          className="px-5 py-2 rounded-xl bg-green-500"
-        >
-          Chat with {job.hirer.firstName}
-        </button>
+  {user?.isGuest ? (
+    <div className="text-gray-400 text-sm italic">
+      Login to see chat and apply
+    </div>
+  ) : (
+    <>
+      <button
+        onClick={async () => {
+          const res = await axios.post(
+            `${BASE_URL}/api/chat/create/${job.hirer._id}`,
+            {},
+            { withCredentials: true }
+          );
+          navigate(`/chat/${res.data._id}`);
+        }}
+        className="px-5 py-2 rounded-xl bg-green-500"
+      >
+        Chat with {job.hirer.firstName}
+      </button>
 
-        <button
-          onClick={applyJob}
-          disabled={applying}
-          className="px-5 py-2 rounded-xl bg-indigo-500 disabled:opacity-50"
-        >
-          {applying ? "Applied" : "Apply"}
-        </button>
-      </div>
+      <button
+        onClick={applyJob}
+        disabled={applying}
+        className="px-5 py-2 rounded-xl bg-indigo-500 disabled:opacity-50"
+      >
+        {applying ? "Applied" : "Apply"}
+      </button>
+    </>
+  )}
+</div>
 
       {/* Fullscreen Media */}
       {selectedMedia && (

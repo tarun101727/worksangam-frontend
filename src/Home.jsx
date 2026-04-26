@@ -658,22 +658,22 @@ const filtered = professions.filter((p) =>
 
               {/* Job Details */}
               <p className="text-white/50 text-sm font-semibold">
-                Profession: {job.profession}
+                {t("Profession")}: {job.profession}
               </p>
               <p className="text-white/70 text-sm line-clamp-2 overflow-hidden break-words">
-                Description: {job.description || "No description provided"}
+                {t("Description")}: {job.description || "No description provided"}
               </p>
               {selectedTab === "online-jobs" && job.languages?.length > 0 && (
                 <p className="text-white/50 text-sm font-semibold">
-                  Language Required: {job.languages.join(" , ")}
+                  {t("Language Required")}: {job.languages.join(" , ")}
                 </p>
               )}
               <p className="text-yellow-400 font-semibold">
-                Price: {formatPrice(job.price)}
+                {t("Price")}: {formatPrice(job.price)}
               </p>
               {selectedTab === "offline-jobs" && job.location?.address && (
                 <p className="text-white/50 text-sm mt-1">
-                  Address: {job.location.address}
+                  {t("Address")}: {job.location.address}
                 </p>
               )}
             </div>

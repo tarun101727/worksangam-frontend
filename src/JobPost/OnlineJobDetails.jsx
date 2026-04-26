@@ -27,6 +27,22 @@ export default function OnlineJobDetails() {
 
   const currentLang = localStorage.getItem("lang") || "en";
 
+  const [currentUser, setCurrentUser] = useState(null);
+
+useEffect(() => {
+  const fetchCurrentUser = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/auth/get-current-user`, { withCredentials: true });
+      setCurrentUser(res.data.user);
+    } catch (err) {
+      console.error("Failed to fetch current user", err);
+      setCurrentUser(null); // treat as guest
+    }
+  };
+
+  fetchCurrentUser();
+}, []);
+
   const handleTranslate = async (field, text) => {
     if (!text) return;
     try {
@@ -163,30 +179,39 @@ export default function OnlineJobDetails() {
   </div>
 )}
 
-      {/* Back & Chat */}
       <div className="mt-6 flex gap-4">
-        <button onClick={() => navigate(-1)} className="px-6 py-2 rounded-lg bg-gray-700 hover:bg-gray-600">
-          {t("Back")}
-        </button>
+  <button 
+    onClick={() => navigate(-1)} 
+    className="px-6 py-2 rounded-lg bg-gray-700 hover:bg-gray-600">
+    {t("Back")}
+  </button>
 
-     <button
-          onClick={async () => {
-            const res = await axios.post(`${BASE_URL}/api/chat/create/${job.hirer._id}`, {}, { withCredentials: true });
-            navigate(`/chat/${res.data._id}`);
-          }}
-          className="px-5 py-2 rounded-xl bg-green-500"
-        >
-           {t("chat_with_user", { name: job.hirer.firstName })}
-        </button>
+  {currentUser && currentUser.isGuest ? (
+    <p className="text-yellow-400 italic">
+      {t("Login to see chat and apply")}
+    </p>
+  ) : (
+    <>
+      <button
+        onClick={async () => {
+          const res = await axios.post(`${BASE_URL}/api/chat/create/${job.hirer._id}`, {}, { withCredentials: true });
+          navigate(`/chat/${res.data._id}`);
+        }}
+        className="px-5 py-2 rounded-xl bg-green-500"
+      >
+        {t("chat_with_user", { name: job.hirer.firstName })}
+      </button>
 
-        <button
-          onClick={applyJob}
-          disabled={applying}
-          className="px-5 py-2 rounded-xl bg-indigo-500 disabled:opacity-50"
-        >
-          {applying ? t("Applied") : t("Apply")}
-        </button>
-      </div>
+      <button
+        onClick={applyJob}
+        disabled={applying}
+        className="px-5 py-2 rounded-xl bg-indigo-500 disabled:opacity-50"
+      >
+        {applying ? t("Applied") : t("Apply")}
+      </button>
+    </>
+  )}
+</div>
     </div>
   );
 }

@@ -23,7 +23,12 @@ export default function OfflineJobDetails() {
   const { user } = useContext(AuthContext);
 
   // Translation states
-  const [translated, setTranslated] = useState({ profession: null, description: null });
+const [translated, setTranslated] = useState({
+  profession: null,
+  description: null,
+  addressDetails: null,    // ✅ add this
+  locationAddress: null,   // ✅ add this
+});
   const [loadingTranslate, setLoadingTranslate] = useState(null);
   const currentLang = localStorage.getItem("lang") || "en";
 

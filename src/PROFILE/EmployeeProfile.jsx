@@ -466,6 +466,7 @@ const handleTranslate = async (field, text) => {
   <ProfileComments 
   profileId={user?._id} 
   loggedInUserId={loggedUser?._id} 
+  loggedInUser={loggedUser}
 />
 </div>
      

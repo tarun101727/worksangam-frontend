@@ -168,43 +168,49 @@ export default function OfflineJobDetails() {
       </div>
 
       {/* Back & Chat */}
-<div className="mt-6 flex gap-4">
+{/* Back & Chat / Apply */}
+<div className="mt-6 flex flex-col gap-2">
   <button 
     onClick={() => navigate(-1)} 
-    className="px-6 py-2 rounded-lg bg-gray-700 hover:bg-gray-600"
+    className="px-6 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 w-fit"
   >
     Back
   </button>
 
-  {user?.isGuest ? (
-    <div className="text-gray-400 text-sm italic">
+  {/* Guest message above buttons */}
+  {user?.isGuest && (
+    <div className="text-gray-400 text-sm italic mb-2">
       Login to see chat and apply
     </div>
-  ) : (
-    <>
-      <button
-        onClick={async () => {
-          const res = await axios.post(
-            `${BASE_URL}/api/chat/create/${job.hirer._id}`,
-            {},
-            { withCredentials: true }
-          );
-          navigate(`/chat/${res.data._id}`);
-        }}
-        className="px-5 py-2 rounded-xl bg-green-500"
-      >
-        Chat with {job.hirer.firstName}
-      </button>
-
-      <button
-        onClick={applyJob}
-        disabled={applying}
-        className="px-5 py-2 rounded-xl bg-indigo-500 disabled:opacity-50"
-      >
-        {applying ? "Applied" : "Apply"}
-      </button>
-    </>
   )}
+
+  <div className="flex gap-4">
+    {!user?.isGuest && (
+      <>
+        <button
+          onClick={async () => {
+            const res = await axios.post(
+              `${BASE_URL}/api/chat/create/${job.hirer._id}`,
+              {},
+              { withCredentials: true }
+            );
+            navigate(`/chat/${res.data._id}`);
+          }}
+          className="px-5 py-2 rounded-xl bg-green-500"
+        >
+          Chat with {job.hirer.firstName}
+        </button>
+
+        <button
+          onClick={applyJob}
+          disabled={applying}
+          className="px-5 py-2 rounded-xl bg-indigo-500 disabled:opacity-50"
+        >
+          {applying ? "Applied" : "Apply"}
+        </button>
+      </>
+    )}
+  </div>
 </div>
 
       {/* Fullscreen Media */}

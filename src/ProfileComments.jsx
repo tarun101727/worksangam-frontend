@@ -309,6 +309,7 @@ const CommentItem = React.memo(function CommentItem({
             visibleReplies={visibleReplies}
             setVisibleReplies={setVisibleReplies}
             loggedInUserId={loggedInUserId}
+            loggedInUser={loggedInUser}
           />
         ))}
 

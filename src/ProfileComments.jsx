@@ -227,7 +227,13 @@ const CommentItem = React.memo(function CommentItem({
             </div>
 
             {showReply[comment._id] && (
-              <div className="flex gap-2 mt-2">
+  <div className="flex gap-2 mt-2">
+    {loggedInUserId?.role === "guest" ? (
+      <div className="flex-1 p-2 rounded bg-gray-800 text-gray-400 flex items-center justify-center">
+        Comment / reply can't be posted in guest mode
+      </div>
+    ) : (
+      <>
                 <input
                   value={replyText[comment._id] || ""}
                   onChange={(e) => {
@@ -252,8 +258,10 @@ const CommentItem = React.memo(function CommentItem({
                 >
                   Post
                 </button>
-              </div>
-            )}
+               </>
+    )}
+  </div>
+)}
           </div>
         </div>
 
@@ -419,16 +427,24 @@ export default function ProfileComments({ profileId, loggedInUserId }) {
       <h2 className="text-xl font-bold mb-4">Comments ({totalCommentCount})</h2>
 
       <div className="flex gap-2 mb-5">
-        <input
-          value={text}
-          onChange={(e) => handleCommentChange(e.target.value)}
-          className="flex-1 bg-gray-800 p-2 rounded"
-          placeholder="Write a comment..."
-        />
-        <button onClick={sendComment} className="bg-indigo-500 px-4 rounded">
-          Post
-        </button>
-      </div>
+  {loggedInUserId?.role === "guest" ? (
+    <div className="flex-1 p-2 rounded bg-gray-800 text-gray-400 flex items-center justify-center">
+      Comment / reply can't be posted in guest mode
+    </div>
+  ) : (
+    <>
+      <input
+        value={text}
+        onChange={(e) => handleCommentChange(e.target.value)}
+        className="flex-1 bg-gray-800 p-2 rounded"
+        placeholder="Write a comment..."
+      />
+      <button onClick={sendComment} className="bg-indigo-500 px-4 rounded">
+        Post
+      </button>
+    </>
+  )}
+</div>
 
       {commentTree.slice(0, visibleComments).map((c) => (
         <div key={c._id}>

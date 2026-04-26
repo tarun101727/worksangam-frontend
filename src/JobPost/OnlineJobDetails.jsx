@@ -4,6 +4,7 @@ import axios from "axios";
 import { BASE_URL } from "../config";
 import { useTranslation } from "react-i18next";
 
+
 const getImageUrl = (img) => {
   if (!img) return "";
   if (img.startsWith("http")) return img;
@@ -14,51 +15,18 @@ export default function OnlineJobDetails() {
   const { t } = useTranslation();
   const { jobId } = useParams();
   const navigate = useNavigate();
-
   const [job, setJob] = useState(null);
   const [error, setError] = useState("");
   const [applying, setApplying] = useState(false);
+
+  // Translation states
   const [translated, setTranslated] = useState({ profession: null, description: null });
   const [loadingTranslate, setLoadingTranslate] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState(null);
+
 
   const currentLang = localStorage.getItem("lang") || "en";
 
-  // Fetch current user
-  const getCurrentUser = async () => {
-    try {
-      const res = await axios.get(`${BASE_URL}/auth/get-current-user`, { withCredentials: true });
-      setCurrentUser(res.data.user);
-    } catch {
-      setCurrentUser(null); // guest or not logged in
-    }
-  };
-
-  useEffect(() => {
-    getCurrentUser();
-  }, []);
-
-  // Fetch job details
-  useEffect(() => {
-    if (!jobId) return;
-
-    const fetchJob = async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(`${BASE_URL}/api/jobs/${jobId}`, { withCredentials: true });
-        setJob(res.data.job);
-      } catch {
-        setError("Failed to load job details");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchJob();
-  }, [jobId]);
-
-  // Translate field
   const handleTranslate = async (field, text) => {
     if (!text) return;
     try {
@@ -76,11 +44,25 @@ export default function OnlineJobDetails() {
     }
   };
 
-  const applyJob = async () => {
-    if (!currentUser || currentUser.isGuest) {
-      alert("Please login to apply for this job");
-      return;
+  useEffect(() => {
+  if (!jobId) return;
+
+  const fetchJob = async () => {
+    try {
+      setLoading(true); // ✅ START spinner
+      const res = await axios.get(`${BASE_URL}/api/jobs/${jobId}`, { withCredentials: true });
+      setJob(res.data.job);
+    } catch {
+      setError("Failed to load job details");
+    } finally {
+      setLoading(false); // ✅ STOP spinner
     }
+  };
+
+  fetchJob();
+}, [jobId]);
+
+  const applyJob = async () => {
     if (applying) return;
     try {
       setApplying(true);
@@ -94,16 +76,15 @@ export default function OnlineJobDetails() {
 
   if (error) return <p className="text-red-400 text-center">{error}</p>;
   if (loading) {
-    return (
-      <div className="min-h-screen flex justify-center items-center">
-        <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
+  return (
+    <div className="min-h-screen flex justify-center items-center">
+      <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+}
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 text-white">
-      {/* Hirer Info */}
       <div className="flex items-center gap-5 pb-6 border-b border-white/10 mb-8">
         {job.hirer?.profileImage ? (
           <img
@@ -130,93 +111,81 @@ export default function OnlineJobDetails() {
       </div>
 
       {/* Profession */}
-      <div className="flex items-center gap-3">
-        <h1 className="text-2xl font-bold">
-          {t("Profession")}:{" "}
-          <span className="text-indigo-300 capitalize">
-            {translated.profession || job.profession}
-          </span>
-        </h1>
-        {job.profession && (
-          <button
-            onClick={() => handleTranslate("profession", job.profession)}
-            className="text-sm text-indigo-400 underline hover:text-indigo-300"
-          >
-            {loadingTranslate === "profession" ? "..." : t("Translate")}
-          </button>
-        )}
-      </div>
+<div className="flex items-center gap-3">
+  <h1 className="text-2xl font-bold">
+    {t("Profession")}:{" "}
+    <span className="text-indigo-300 capitalize">
+      {translated.profession || job.profession}
+    </span>
+  </h1>
+  {job.profession && (
+    <button
+      onClick={() => handleTranslate("profession", job.profession)}
+      className="text-sm text-indigo-400 underline hover:text-indigo-300"
+    >
+      {loadingTranslate === "profession" ? "..." : t("Translate")}
+    </button>
+  )}
+</div>
 
-      {/* Description */}
-      <div className="flex items-center gap-3 mt-2">
-        <p className="text-white/70">
-          {translated.description || job.description}
-        </p>
-        {job.description && (
-          <button
-            onClick={() => handleTranslate("description", job.description)}
-            className="text-sm text-indigo-400 underline hover:text-indigo-300"
-          >
-            {loadingTranslate === "description" ? "..." : t("Translate")}
-          </button>
-        )}
-      </div>
+{/* Description */}
+<div className="flex items-center gap-3 mt-2">
+  <p className="text-white/70">
+    {translated.description || job.description}
+  </p>
+  {job.description && (
+    <button
+      onClick={() => handleTranslate("description", job.description)}
+      className="text-sm text-indigo-400 underline hover:text-indigo-300"
+    >
+      {loadingTranslate === "description" ? "..." : t("Translate")}
+    </button>
+  )}
+</div>
 
-      {/* Languages */}
-      {job.languages && job.languages.length > 0 && (
-        <div className="mt-4">
-          <p className="text-sm text-white/60 mb-1">{t("Languages")}:</p>
-          <div className="flex flex-wrap gap-2">
-            {job.languages.map((lang, i) => (
-              <span
-                key={i}
-                className="px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-full text-xs"
-              >
-                {lang}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
+{/* Languages */}
+{job.languages && job.languages.length > 0 && (
+  <div className="mt-4">
+    <p className="text-sm text-white/60 mb-1">
+      {t("Languages")}:
+    </p>
 
-      {/* Back & Chat & Apply */}
-      <div className="mt-6 flex gap-4">
-        <button
-          onClick={() => navigate(-1)}
-          className="px-6 py-2 rounded-lg bg-gray-700 hover:bg-gray-600"
+    <div className="flex flex-wrap gap-2">
+      {job.languages.map((lang, i) => (
+        <span
+          key={i}
+          className="px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-full text-xs"
         >
+          {lang}
+        </span>
+      ))}
+    </div>
+  </div>
+)}
+
+      {/* Back & Chat */}
+      <div className="mt-6 flex gap-4">
+        <button onClick={() => navigate(-1)} className="px-6 py-2 rounded-lg bg-gray-700 hover:bg-gray-600">
           {t("Back")}
         </button>
 
-        {currentUser && !currentUser.isGuest ? (
-          <>
-            <button
-              onClick={async () => {
-                const res = await axios.post(
-                  `${BASE_URL}/api/chat/create/${job.hirer._id}`,
-                  {},
-                  { withCredentials: true }
-                );
-                navigate(`/chat/${res.data._id}`);
-              }}
-              className="px-5 py-2 rounded-xl bg-green-500"
-            >
-              {t("chat_with_user", { name: job.hirer.firstName })}
-            </button>
+     <button
+          onClick={async () => {
+            const res = await axios.post(`${BASE_URL}/api/chat/create/${job.hirer._id}`, {}, { withCredentials: true });
+            navigate(`/chat/${res.data._id}`);
+          }}
+          className="px-5 py-2 rounded-xl bg-green-500"
+        >
+           {t("chat_with_user", { name: job.hirer.firstName })}
+        </button>
 
-            <button
-              onClick={applyJob}
-              disabled={applying}
-              className="px-5 py-2 rounded-xl bg-indigo-500 disabled:opacity-50"
-            >
-              {applying ? t("Applied") : t("Apply")}
-            </button>
-          </>
-        ) : (
-          <p className="text-red-400 text-sm">
-            {t("login_to_see_chat_apply", "Login to see chat and apply")}
-          </p>
-        )}
+        <button
+          onClick={applyJob}
+          disabled={applying}
+          className="px-5 py-2 rounded-xl bg-indigo-500 disabled:opacity-50"
+        >
+          {applying ? t("Applied") : t("Apply")}
+        </button>
       </div>
     </div>
   );

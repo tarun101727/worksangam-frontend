@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState , useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BASE_URL } from "../config";
 import { useTranslation } from "react-i18next";
-
+import { AuthContext } from "../AuthContext"; // ✅ import
 
 const getImageUrl = (img) => {
   if (!img) return "";
@@ -23,25 +23,9 @@ export default function OnlineJobDetails() {
   const [translated, setTranslated] = useState({ profession: null, description: null });
   const [loadingTranslate, setLoadingTranslate] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const { user } = useContext(AuthContext);
 
   const currentLang = localStorage.getItem("lang") || "en";
-
-  const [currentUser, setCurrentUser] = useState(null);
-
-useEffect(() => {
-  const fetchCurrentUser = async () => {
-    try {
-      const res = await axios.get(`${BASE_URL}/auth/get-current-user`, { withCredentials: true });
-      setCurrentUser(res.data.user);
-    } catch (err) {
-      console.error("Failed to fetch current user", err);
-      setCurrentUser(null); // treat as guest
-    }
-  };
-
-  fetchCurrentUser();
-}, []);
 
   const handleTranslate = async (field, text) => {
     if (!text) return;
@@ -179,22 +163,28 @@ useEffect(() => {
   </div>
 )}
 
-      <div className="mt-6 flex gap-4">
+      {/* Back & Chat / Apply */}
+<div className="mt-6 flex gap-4">
   <button 
     onClick={() => navigate(-1)} 
-    className="px-6 py-2 rounded-lg bg-gray-700 hover:bg-gray-600">
+    className="px-6 py-2 rounded-lg bg-gray-700 hover:bg-gray-600"
+  >
     {t("Back")}
   </button>
 
-  {currentUser && currentUser.isGuest ? (
-    <p className="text-yellow-400 italic">
+  {user?.isGuest ? (
+    <div className="text-gray-400 text-sm italic">
       {t("Login to see chat and apply")}
-    </p>
+    </div>
   ) : (
     <>
       <button
         onClick={async () => {
-          const res = await axios.post(`${BASE_URL}/api/chat/create/${job.hirer._id}`, {}, { withCredentials: true });
+          const res = await axios.post(
+            `${BASE_URL}/api/chat/create/${job.hirer._id}`,
+            {},
+            { withCredentials: true }
+          );
           navigate(`/chat/${res.data._id}`);
         }}
         className="px-5 py-2 rounded-xl bg-green-500"

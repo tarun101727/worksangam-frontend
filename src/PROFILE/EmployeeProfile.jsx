@@ -322,7 +322,7 @@ const handleTranslate = async (field, text) => {
       </div>
 
       {/* USER RATING */}
-      {readOnly && (
+      {readOnly && loggedUser?.role !== 'guest' && (
         <div className="mt-8 text-white">
 
           <p className="text-white/60 mb-2">{t("Your Rating")}</p>

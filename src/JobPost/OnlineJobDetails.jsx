@@ -23,9 +23,22 @@ export default function OnlineJobDetails() {
   const [translated, setTranslated] = useState({ profession: null, description: null });
   const [loadingTranslate, setLoadingTranslate] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [currentUser, setCurrentUser] = useState(null);
 
   const currentLang = localStorage.getItem("lang") || "en";
+  
+  useEffect(() => {
+  const fetchUser = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/auth/get-current-user`, { withCredentials: true });
+      setCurrentUser(res.data.user);
+    } catch (err) {
+      setCurrentUser(null , err );
+    }
+  };
+  fetchUser();
+}, []);
+
 
   const handleTranslate = async (field, text) => {
     if (!text) return;
@@ -164,29 +177,47 @@ export default function OnlineJobDetails() {
 )}
 
       {/* Back & Chat */}
-      <div className="mt-6 flex gap-4">
-        <button onClick={() => navigate(-1)} className="px-6 py-2 rounded-lg bg-gray-700 hover:bg-gray-600">
-          {t("Back")}
-        </button>
+<div className="mt-6 flex gap-4">
+  <button
+    onClick={() => navigate(-1)}
+    className="px-6 py-2 rounded-lg bg-gray-700 hover:bg-gray-600"
+  >
+    {t("Back")}
+  </button>
 
-     <button
-          onClick={async () => {
-            const res = await axios.post(`${BASE_URL}/api/chat/create/${job.hirer._id}`, {}, { withCredentials: true });
-            navigate(`/chat/${res.data._id}`);
-          }}
-          className="px-5 py-2 rounded-xl bg-green-500"
-        >
-           {t("chat_with_user", { name: job.hirer.firstName })}
-        </button>
+  {currentUser && !currentUser.isGuest ? (
+    <>
+      <button
+        onClick={async () => {
+          const res = await axios.post(
+            `${BASE_URL}/api/chat/create/${job.hirer._id}`,
+            {},
+            { withCredentials: true }
+          );
+          navigate(`/chat/${res.data._id}`);
+        }}
+        className="px-5 py-2 rounded-xl bg-green-500"
+      >
+        {t("chat_with_user", { name: job.hirer.firstName })}
+      </button>
 
-        <button
-          onClick={applyJob}
-          disabled={applying}
-          className="px-5 py-2 rounded-xl bg-indigo-500 disabled:opacity-50"
-        >
-          {applying ? t("Applied") : t("Apply")}
-        </button>
-      </div>
+      <button
+        onClick={applyJob}
+        disabled={applying}
+        className="px-5 py-2 rounded-xl bg-indigo-500 disabled:opacity-50"
+      >
+        {applying ? t("Applied") : t("Apply")}
+      </button>
+    </>
+  ) : (
+    <button
+      onClick={() => navigate("/signup")}
+      className="px-5 py-2 rounded-xl bg-indigo-500"
+    >
+      {t("Sign up to Apply / Chat")}
+    </button>
+  )}
+</div>
     </div>
   );
 }

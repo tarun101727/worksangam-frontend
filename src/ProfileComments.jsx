@@ -351,8 +351,17 @@ export default function ProfileComments({ profileId, loggedInUserId ,loggedInUse
     socket.off("profile-comment-deleted");
 
     socket.on("profile-comment-added", (newComment) => {
-      if (newComment.profileId === profileId) setComments((prev) => [...prev, newComment]);
-    });
+  if (newComment.profileId !== profileId) return;
+
+  setComments((prev) => {
+    // Check if the comment already exists (by _id)
+    const exists = prev.some(c => c._id === newComment._id);
+    if (exists) return prev; // skip duplicates
+    // Remove temp comment if text matches
+    const filtered = prev.filter(c => c._id !== "temp-" + newComment.createdAt);
+    return [...filtered, newComment];
+  });
+});
     socket.on("profile-comment-liked", ({ commentId, likes }) => {
       setComments((prev) =>
         prev.map((c) => (String(c._id) === String(commentId) ? { ...c, likes } : c))

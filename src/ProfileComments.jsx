@@ -379,33 +379,101 @@ export default function ProfileComments({ profileId, loggedInUserId ,loggedInUse
   }, [comments]);
 
   const sendComment = async () => {
-    if (!text.trim()) return;
+  if (!text.trim()) return;
+
+  // Optimistic comment
+  const tempComment = {
+    _id: "temp-" + Date.now(),
+    text,
+    user: loggedInUser,
+    profileId,
+    likes: [],
+    replies: [],
+    createdAt: new Date().toISOString(),
+  };
+
+  setComments((prev) => [...prev, tempComment]); // update UI immediately
+  setText("");
+
+  try {
     await axios.post(
       `${BASE_URL}/api/profile-comments/add`,
       { profileId, text },
       { withCredentials: true }
     );
-    setText("");
-  };
+    // actual comment will arrive via socket
+  } catch (err) {
+    console.error(err);
+    // Optionally remove temp comment if request fails
+  }
+};
 
   const sendReply = async (parentId) => {
-    if (!replyText[parentId]?.trim()) return;
+  const reply = replyText[parentId]?.trim();
+  if (!reply) return;
+
+  // Optimistic reply
+  const tempReply = {
+    _id: "temp-" + Date.now(),
+    text: reply,
+    user: loggedInUser,
+    profileId,
+    parentComment: parentId,
+    likes: [],
+    replies: [],
+    createdAt: new Date().toISOString(),
+  };
+
+  setComments((prev) => [...prev, tempReply]);
+  setReplyText((prev) => ({ ...prev, [parentId]: "" }));
+  setShowReply((prev) => ({ ...prev, [parentId]: false }));
+
+  try {
     await axios.post(
       `${BASE_URL}/api/profile-comments/add`,
-      { profileId, text: replyText[parentId], parentComment: parentId },
+      { profileId, text: reply, parentComment: parentId },
       { withCredentials: true }
     );
-    setReplyText((prev) => ({ ...prev, [parentId]: "" }));
-    setShowReply((prev) => ({ ...prev, [parentId]: false }));
-  };
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   const toggleLike = async (commentId) => {
+  setComments((prev) =>
+    prev.map((c) => {
+      if (String(c._id) !== String(commentId)) return c;
+      const alreadyLiked = c.likes.includes(loggedInUserId);
+      return {
+        ...c,
+        likes: alreadyLiked
+          ? c.likes.filter((id) => id !== loggedInUserId)
+          : [...c.likes, loggedInUserId],
+      };
+    })
+  );
+
+  try {
     await axios.post(`${BASE_URL}/api/profile-comments/like/${commentId}`, {}, { withCredentials: true });
-  };
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   const deleteComment = async (commentId) => {
+  // Optimistic removal
+  setComments((prev) =>
+    prev.filter(
+      (c) => String(c._id) !== String(commentId) && String(c.parentComment) !== String(commentId)
+    )
+  );
+
+  try {
     await axios.delete(`${BASE_URL}/api/profile-comments/delete/${commentId}`, { withCredentials: true });
-  };
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   const totalCommentCount = useMemo(() => countComments(commentTree), [commentTree]);
 

@@ -98,7 +98,7 @@ const CommentItem = React.memo(function CommentItem({
   visibleReplies,
   setVisibleReplies,
   loggedInUserId,
-  loggedInUser,
+  loggedInUser
 }) {
   const [expanded, setExpanded] = useState(false);
   const [showButton, setShowButton] = useState(false);
@@ -180,18 +180,22 @@ const CommentItem = React.memo(function CommentItem({
 
             <div className="flex gap-4 mt-1 items-center">
               {depth < 3 && (
-                <button
-                  onClick={() =>
-                    setShowReply((prev) => ({
-                      ...prev,
-                      [comment._id]: !prev[comment._id],
-                    }))
-                  }
-                  className="text-xs text-indigo-400"
-                >
-                  Reply
-                </button>
-              )}
+  <button
+    onClick={() => {
+      if (loggedInUser?.isGuest) {
+        alert("Guests cannot reply. Please login to reply."); // 🚨 message for guests
+        return;
+      }
+      setShowReply((prev) => ({
+        ...prev,
+        [comment._id]: !prev[comment._id],
+      }));
+    }}
+    className="text-xs text-indigo-400"
+  >
+    Reply
+  </button>
+)}
 
               {hasReplies && (
                 <button
@@ -227,42 +231,42 @@ const CommentItem = React.memo(function CommentItem({
               </button>
             </div>
 
-            {showReply[comment._id] && (
-  <div className="flex flex-col gap-2 mt-2">
-    {loggedInUser?.isGuest && (
-      <p className="text-red-400 text-xs">
-        Guests cannot reply. Please <span className="underline cursor-pointer" onClick={() => window.location.href="/login"}>login</span> to reply.
-      </p>
-    )}
-    <div className="flex gap-2">
-      <input
-        value={replyText[comment._id] || ""}
-        onChange={(e) => {
-          if (loggedInUser?.isGuest) return; // prevent typing
-          const val = e.target.value;
-          setReplyText((prev) => ({ ...prev, [comment._id]: val }));
-          const currentLang = i18n.language || "en";
-          if (!["te", "hi", "ta", "kn"].includes(currentLang)) return;
+           {showReply[comment._id] && (
+  <div className="flex gap-2 mt-2">
+    <input
+      value={replyText[comment._id] || ""}
+      onChange={(e) => {
+        if (loggedInUser?.isGuest) return;
+        const val = e.target.value;
+        setReplyText((prev) => ({ ...prev, [comment._id]: val }));
 
-          clearTimeout(translitTimer);
-          translitTimer = setTimeout(() => {
-            transliterate(val, comment._id, (newVal) =>
-              setReplyText((prev) => ({ ...prev, [comment._id]: newVal }))
-            );
-          }, 1000);
-        }}
-        className="bg-gray-800 p-1 rounded text-sm flex-1"
-        placeholder="Write reply..."
-        disabled={loggedInUser?.isGuest} // disable input for guests
-      />
-      <button
-        onClick={() => sendReply(comment._id)}
-        className="bg-indigo-500 px-3 rounded text-sm"
-        disabled={loggedInUser?.isGuest} // disable button for guests
-      >
-        Post
-      </button>
-    </div>
+        // All supported transliteration languages
+        const translitLangs = [
+          "en", "te", "hi", "as", "bn", "brx", "doi", "gu",
+          "kn", "ks", "kok", "mai", "ml", "mni", "mr", "ne",
+          "or", "pa", "sa", "sat", "sd", "ta", "ur"
+        ];
+        const currentLang = i18n.language || "en";
+        if (!translitLangs.includes(currentLang)) return;
+
+        clearTimeout(translitTimer);
+        translitTimer = setTimeout(() => {
+          transliterate(val, comment._id, (newVal) =>
+            setReplyText((prev) => ({ ...prev, [comment._id]: newVal }))
+          );
+        }, 1000);
+      }}
+      className="bg-gray-800 p-1 rounded text-sm flex-1"
+      placeholder={loggedInUser?.isGuest ? "Guests cannot reply" : "Write reply..."}
+      disabled={loggedInUser?.isGuest} // disable input for guests
+    />
+    <button
+      onClick={() => sendReply(comment._id)}
+      className="bg-indigo-500 px-3 rounded text-sm"
+      disabled={loggedInUser?.isGuest} // disable post button for guests
+    >
+      Post
+    </button>
   </div>
 )}
           </div>
@@ -415,16 +419,20 @@ export default function ProfileComments({ profileId, loggedInUserId ,loggedInUse
 
   const currentLang = i18n.language || "en";
 
-  // Transliterate input text as user types
   const handleCommentChange = (val) => {
-    setText(val);
-    if (!["te", "hi", "ta", "kn"].includes(currentLang)) return;
+  setText(val);
+  const translitLangs = [
+    "en", "te", "hi", "as", "bn", "brx", "doi", "gu",
+    "kn", "ks", "kok", "mai", "ml", "mni", "mr", "ne",
+    "or", "pa", "sa", "sat", "sd", "ta", "ur"
+  ];
+  if (!translitLangs.includes(currentLang)) return;
 
-    clearTimeout(translitTimer);
-    translitTimer = setTimeout(() => {
-      transliterate(val, "comment", setText);
-    }, 1000);
-  };
+  clearTimeout(translitTimer);
+  translitTimer = setTimeout(() => {
+    transliterate(val, "comment", setText);
+  }, 1000);
+};
 
   return (
     <div className="mt-10 text-white">

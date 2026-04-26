@@ -178,14 +178,34 @@ export default function OfflineJobDetails() {
         )}
 
         {/* Address */}
-        {job.addressDetails && (
-          <p className="text-white/60"><span className="font-semibold">{t("Address / Landmark")}:</span> {job.addressDetails}</p>
-        )}
+{job.addressDetails && (
+  <div className="flex items-center gap-3">
+    <p className="text-white/60">
+      <span className="font-semibold">{t("Address / Landmark")}:</span> {translated.addressDetails || job.addressDetails}
+    </p>
+    <button
+      onClick={() => handleTranslate("addressDetails", job.addressDetails)}
+      className="text-sm text-indigo-400 underline hover:text-indigo-300"
+    >
+      {loadingTranslate === "addressDetails" ? "..." : t("Translate")}
+    </button>
+  </div>
+)}
 
-        {/* Current Location */}
-        {job.location?.address && (
-          <p className="text-white/60"><span className="font-semibold">{t("Current Location")}:</span> {job.location.address}</p>
-        )}
+{/* Current Location */}
+{job.location?.address && (
+  <div className="flex items-center gap-3 mt-2">
+    <p className="text-white/60">
+      <span className="font-semibold">{t("Current Location")}:</span> {translated.locationAddress || job.location.address}
+    </p>
+    <button
+      onClick={() => handleTranslate("locationAddress", job.location.address)}
+      className="text-sm text-indigo-400 underline hover:text-indigo-300"
+    >
+      {loadingTranslate === "locationAddress" ? "..." : t("Translate")}
+    </button>
+  </div>
+)}
       </div>
 
       {/* Back & Chat / Apply */}

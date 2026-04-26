@@ -98,6 +98,7 @@ const CommentItem = React.memo(function CommentItem({
   visibleReplies,
   setVisibleReplies,
   loggedInUserId,
+  loggedInUser,
 }) {
   const [expanded, setExpanded] = useState(false);
   const [showButton, setShowButton] = useState(false);
@@ -227,39 +228,41 @@ const CommentItem = React.memo(function CommentItem({
             </div>
 
             {showReply[comment._id] && (
-  <div className="flex gap-2 mt-2">
-    {loggedInUserId?.role === "guest" ? (
-      <div className="flex-1 p-2 rounded bg-gray-800 text-gray-400 flex items-center justify-center">
-        Comment / reply can't be posted in guest mode
-      </div>
-    ) : (
-      <>
-                <input
-                  value={replyText[comment._id] || ""}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setReplyText((prev) => ({ ...prev, [comment._id]: val }));
-                    const currentLang = i18n.language || "en";
-                    if (!["te", "hi", "ta", "kn"].includes(currentLang)) return;
-
-                    clearTimeout(translitTimer);
-                    translitTimer = setTimeout(() => {
-                      transliterate(val, comment._id, (newVal) =>
-                        setReplyText((prev) => ({ ...prev, [comment._id]: newVal }))
-                      );
-                    }, 1000);
-                  }}
-                  className="bg-gray-800 p-1 rounded text-sm flex-1"
-                  placeholder="Write reply..."
-                />
-                <button
-                  onClick={() => sendReply(comment._id)}
-                  className="bg-indigo-500 px-3 rounded text-sm"
-                >
-                  Post
-                </button>
-               </>
+  <div className="flex flex-col gap-2 mt-2">
+    {loggedInUser?.isGuest && (
+      <p className="text-red-400 text-xs">
+        Guests cannot reply. Please <span className="underline cursor-pointer" onClick={() => window.location.href="/login"}>login</span> to reply.
+      </p>
     )}
+    <div className="flex gap-2">
+      <input
+        value={replyText[comment._id] || ""}
+        onChange={(e) => {
+          if (loggedInUser?.isGuest) return; // prevent typing
+          const val = e.target.value;
+          setReplyText((prev) => ({ ...prev, [comment._id]: val }));
+          const currentLang = i18n.language || "en";
+          if (!["te", "hi", "ta", "kn"].includes(currentLang)) return;
+
+          clearTimeout(translitTimer);
+          translitTimer = setTimeout(() => {
+            transliterate(val, comment._id, (newVal) =>
+              setReplyText((prev) => ({ ...prev, [comment._id]: newVal }))
+            );
+          }, 1000);
+        }}
+        className="bg-gray-800 p-1 rounded text-sm flex-1"
+        placeholder="Write reply..."
+        disabled={loggedInUser?.isGuest} // disable input for guests
+      />
+      <button
+        onClick={() => sendReply(comment._id)}
+        className="bg-indigo-500 px-3 rounded text-sm"
+        disabled={loggedInUser?.isGuest} // disable button for guests
+      >
+        Post
+      </button>
+    </div>
   </div>
 )}
           </div>
@@ -326,7 +329,7 @@ const CommentItem = React.memo(function CommentItem({
   );
 });
 
-export default function ProfileComments({ profileId, loggedInUserId }) {
+export default function ProfileComments({ profileId, loggedInUserId ,loggedInUser  }) {
   const [comments, setComments] = useState([]);
   const [text, setText] = useState("");
   const [replyText, setReplyText] = useState({});
@@ -426,25 +429,28 @@ export default function ProfileComments({ profileId, loggedInUserId }) {
     <div className="mt-10 text-white">
       <h2 className="text-xl font-bold mb-4">Comments ({totalCommentCount})</h2>
 
-      <div className="flex gap-2 mb-5">
-  {loggedInUserId?.role === "guest" ? (
-    <div className="flex-1 p-2 rounded bg-gray-800 text-gray-400 flex items-center justify-center">
-      Comment / reply can't be posted in guest mode
-    </div>
-  ) : (
-    <>
-      <input
-        value={text}
-        onChange={(e) => handleCommentChange(e.target.value)}
-        className="flex-1 bg-gray-800 p-2 rounded"
-        placeholder="Write a comment..."
-      />
-      <button onClick={sendComment} className="bg-indigo-500 px-4 rounded">
-        Post
-      </button>
-    </>
+      {loggedInUser?.isGuest && (
+    <p className="text-red-400 mb-2 text-sm">
+      Guests cannot comment. Please <span className="underline cursor-pointer" onClick={() => window.location.href="/login"}>login</span> to comment.
+    </p>
   )}
-</div>
+
+      <div className="flex gap-2 mb-5">
+    <input
+      value={text}
+      onChange={(e) => handleCommentChange(e.target.value)}
+      className="flex-1 bg-gray-800 p-2 rounded"
+      placeholder="Write a comment..."
+      disabled={loggedInUser?.isGuest} // disable input for guests
+    />
+    <button
+      onClick={sendComment}
+      className="bg-indigo-500 px-4 rounded"
+      disabled={loggedInUser?.isGuest} // disable button for guests
+    >
+      Post
+    </button>
+  </div>
 
       {commentTree.slice(0, visibleComments).map((c) => (
         <div key={c._id}>

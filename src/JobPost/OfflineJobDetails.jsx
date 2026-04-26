@@ -23,7 +23,7 @@ export default function OfflineJobDetails() {
   const { user } = useContext(AuthContext);
 
   // Translation states
-  const [translated, setTranslated] = useState({ profession: null, description: null, preferredTime: null, warnings: null, addressDetails: null });
+  const [translated, setTranslated] = useState({ profession: null, description: null });
   const [loadingTranslate, setLoadingTranslate] = useState(null);
   const currentLang = localStorage.getItem("lang") || "en";
 
@@ -126,21 +126,14 @@ export default function OfflineJobDetails() {
 
         {/* Preferred Time & Date */}
         {job.preferredTime && (
-          <div className="flex items-center gap-3">
-            <p className="text-white/60">
-              <span className="font-semibold">{t("Preferred Time")}:</span> 
-              {translated.preferredTime || (
-                job.preferredTime.type === "asap" ? t("As soon as possible") :
-                job.preferredTime.type === "today" ? t("Today") :
-                job.preferredTime.type === "custom" ? `${new Date(job.preferredTime.from).toLocaleString()} — ${new Date(job.preferredTime.to).toLocaleString()}` : ""
-              )}
-            </p>
+          <p className="text-white/60">
+            <span className="font-semibold">{t("Preferred Time")}:</span> 
+            {job.preferredTime.type === "asap" && t("As soon as possible")}
+            {job.preferredTime.type === "today" && t("Today")}
             {job.preferredTime.type === "custom" && (
-              <button onClick={() => handleTranslate("preferredTime", `${new Date(job.preferredTime.from).toLocaleString()} — ${new Date(job.preferredTime.to).toLocaleString()}`)} className="text-sm text-indigo-400 underline hover:text-indigo-300">
-                {loadingTranslate === "preferredTime" ? "..." : t("Translate")}
-              </button>
+              <>{new Date(job.preferredTime.from).toLocaleString()} — {new Date(job.preferredTime.to).toLocaleString()}</>
             )}
-          </div>
+          </p>
         )}
 
         {/* Media */}
@@ -166,14 +159,11 @@ export default function OfflineJobDetails() {
           <div className="bg-red-500/10 rounded-xl p-4">
             <p className="font-semibold text-red-400 mb-2">{t("Warnings")}</p>
             <div className="text-sm text-red-300 space-y-1">
-              {job.safetyWarnings.children && <p>• {translated.warnings?.children || t("Children present")}</p>}
-              {job.safetyWarnings.elderly && <p>• {translated.warnings?.elderly || t("Elderly present")}</p>}
-              {job.safetyWarnings.pets && <p>• {translated.warnings?.pets || t("Pets present")}</p>}
-              {job.safetyWarnings.safetyConcerns && <p>• {translated.warnings?.safetyConcerns || t("Safety concerns")}</p>}
+              {job.safetyWarnings.children && <p>• {t("Children present")}</p>}
+              {job.safetyWarnings.elderly && <p>• {t("Elderly present")}</p>}
+              {job.safetyWarnings.pets && <p>• {t("Pets present")}</p>}
+              {job.safetyWarnings.safetyConcerns && <p>• {t("Safety concerns")}</p>}
             </div>
-            <button onClick={() => handleTranslate("warnings", JSON.stringify(job.safetyWarnings))} className="text-sm text-indigo-400 underline hover:text-indigo-300">
-              {loadingTranslate === "warnings" ? "..." : t("Translate")}
-            </button>
           </div>
         )}
 
@@ -189,12 +179,7 @@ export default function OfflineJobDetails() {
 
         {/* Address */}
         {job.addressDetails && (
-          <div className="flex items-center gap-3">
-            <p className="text-white/60"><span className="font-semibold">{t("Address / Landmark")}:</span> {translated.addressDetails || job.addressDetails}</p>
-            <button onClick={() => handleTranslate("addressDetails", job.addressDetails)} className="text-sm text-indigo-400 underline hover:text-indigo-300">
-              {loadingTranslate === "addressDetails" ? "..." : t("Translate")}
-            </button>
-          </div>
+          <p className="text-white/60"><span className="font-semibold">{t("Address / Landmark")}:</span> {job.addressDetails}</p>
         )}
 
         {/* Current Location */}

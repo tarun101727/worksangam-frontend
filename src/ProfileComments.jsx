@@ -372,17 +372,34 @@ export default function ProfileComments({ profileId, loggedInUserId , loggedInUs
   }, [comments]);
 
   const sendComment = async () => {
-    if (!text.trim()) return;
+  if (isGuest) {
+    alert("Guests cannot post comments or replies");
+    return;
+  }
+
+  if (!text.trim()) return;
+
+  try {
     await axios.post(
       `${BASE_URL}/api/profile-comments/add`,
       { profileId, text },
       { withCredentials: true }
     );
     setText("");
-  };
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   const sendReply = async (parentId) => {
-    if (!replyText[parentId]?.trim()) return;
+  if (isGuest) {
+    alert("Guests cannot post comments or replies");
+    return;
+  }
+
+  if (!replyText[parentId]?.trim()) return;
+
+  try {
     await axios.post(
       `${BASE_URL}/api/profile-comments/add`,
       { profileId, text: replyText[parentId], parentComment: parentId },
@@ -390,7 +407,10 @@ export default function ProfileComments({ profileId, loggedInUserId , loggedInUs
     );
     setReplyText((prev) => ({ ...prev, [parentId]: "" }));
     setShowReply((prev) => ({ ...prev, [parentId]: false }));
-  };
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   const toggleLike = async (commentId) => {
     await axios.post(`${BASE_URL}/api/profile-comments/like/${commentId}`, {}, { withCredentials: true });

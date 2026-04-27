@@ -362,9 +362,9 @@ className="w-8 h-8 rounded-full object-cover"
 
     {/* CAPTION */}
     {m.message && (
-      <div className={`px-3 py-2 rounded-xl max-w-xs break-words ${isSender ? "bg-indigo-500 text-white" : "bg-gray-700 text-white"}`}>
-  {m.message}
-</div>
+      <div className="px-3 py-2 text-white break-words">
+        {m.message}
+      </div>
     )}
   </div>
 ) : (
@@ -431,9 +431,9 @@ className="w-8 h-8 rounded-full object-cover"
 
     {/* CAPTION */}
     {m.message && (
-      <div className={`px-3 py-2 rounded-xl max-w-xs break-words ${isSender ? "bg-indigo-500 text-white" : "bg-gray-700 text-white"}`}>
-  {m.message}
-</div>
+      <div className="px-3 py-2 text-white break-words">
+        {m.message}
+      </div>
     )}
   </div>
 ) : (

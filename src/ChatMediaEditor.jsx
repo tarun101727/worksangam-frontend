@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
@@ -38,6 +39,7 @@ const [editMode,setEditMode] = useState(false);
 const [text,setText] = useState("");
 const [isEditingText,setIsEditingText] = useState(false);
 
+const [color,setColor] = useState("#ffffff");
 const [fontSize,setFontSize] = useState(16);
 const [fontStyle,setFontStyle] = useState("normal");
 
@@ -90,9 +92,6 @@ const [currentBoxId, setCurrentBoxId] = useState(null); // current editing box
 const [toolbarVisible, setToolbarVisible] = useState(false);
 const [undoStack, setUndoStack] = useState([]);
 const [redoStack, setRedoStack] = useState([]);
-const [textColor, setTextColor] = useState("#000000"); // text color
-const [penColor, setPenColor] = useState("#ff0000");   // pen color
-const [isSending, setIsSending] = useState(false);
 
 
 const closeToolbar = () => {
@@ -390,6 +389,7 @@ if (resizeRef.current && currentBoxId !== null) {
 
 };
 
+// UPDATE BOX DURING TYPING
 const handleTextChange = (e) => {
   saveState();
   const el = e.target;
@@ -399,16 +399,19 @@ const handleTextChange = (e) => {
 
   setText(el.value);
 
-  // Calculate wrapped lines
-  const activeBox = textBoxes.find(b => b.id === currentBoxId);
+  // Existing expansion logic (do not change)
+  el.style.height = "auto";
+  const imgRect = img.getBoundingClientRect();
+  const maxWidth = imgRect.width - 10;
+  const maxHeight = imgRect.height - 10;
+
   const ctx = document.createElement("canvas").getContext("2d");
-  ctx.font = `${activeBox.fontStyle === "italic" ? "italic " : ""}${activeBox.fontStyle === "bold" ? "bold " : ""}${activeBox.fontSize}px sans-serif`;
+  ctx.font = `${fontStyle === "italic" ? "italic" : ""} ${fontStyle === "bold" ? "bold" : ""} ${fontSize}px sans-serif`;
 
   const words = el.value.split(" ");
   let lines = [];
   let currentLine = "";
 
-  const maxWidth = img.width - 10; // max width for wrapping
   words.forEach(word => {
     const testLine = currentLine ? currentLine + " " + word : word;
     if (ctx.measureText(testLine).width > maxWidth) {
@@ -427,25 +430,31 @@ const handleTextChange = (e) => {
     if (w > widest) widest = w;
   });
   const newWidth = Math.min(Math.max(originalBox.current.width, widest), maxWidth);
-  const lineHeight = activeBox.fontSize * 1.2;
+  const lineHeight = fontSize * 1.2;
   let contentHeight = lineHeight * lines.length + 2 * buffer;
-  let newHeight = Math.min(Math.max(originalBox.current.height, contentHeight, el.scrollHeight), img.height - 10);
+  let newHeight = Math.min(Math.max(originalBox.current.height, contentHeight, el.scrollHeight), maxHeight);
 
+  setBox(prev => ({
+    ...prev,
+    width: newWidth,
+    height: newHeight,
+  }));
   el.style.height = `${newHeight}px`;
 
   setTextBoxes(prev =>
-    prev.map(b => {
-      if (b.id !== currentBoxId) return b;
-      return {
-        ...b,
-        text: lines.join("\n"), // ✅ store wrapped lines as explicit line breaks
-        width: newWidth,
-        height: newHeight,
-        x: b.x,
-        y: b.y
-      };
-    })
-  );
+  prev.map(b => {
+    if (b.id !== currentBoxId) return b;
+
+    return {
+      ...b,
+      text: el.value,
+      width: newWidth,
+      height: newHeight,
+      x: b.x, // keep same position
+      y: b.y
+    };
+  })
+);
 };
 
 
@@ -463,26 +472,30 @@ const drawPaths = () => {
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
 
-  paths.forEach((p) => {
-    ctx.beginPath();
-    p.points.forEach((pt, i) => {
-      if (i === 0) ctx.moveTo(pt.x, pt.y);
-      else ctx.lineTo(pt.x, pt.y);
+  // Draw saved paths
+  paths
+    .filter(p => p.points.length > 0)
+    .forEach((p, idx) => {
+      ctx.beginPath();
+      p.points.forEach((pt, i) => {
+        if (i === 0) ctx.moveTo(pt.x, pt.y);
+        else ctx.lineTo(pt.x, pt.y);
+      });
+      ctx.strokeStyle = p.type === "eraser" ? "rgba(0,0,0,1)" : "#ff0000";
+      ctx.lineWidth = p.type === "eraser" ? 15 : 3;
+      ctx.globalCompositeOperation = p.type === "eraser" ? "destination-out" : "source-over";
+      ctx.stroke();
+      ctx.globalCompositeOperation = "source-over";
     });
-    ctx.strokeStyle = p.type === "eraser" ? "rgba(0,0,0,1)" : (p.color || penColor); // ✅ dynamic pen color
-    ctx.lineWidth = p.type === "eraser" ? 15 : 3;
-    ctx.globalCompositeOperation = p.type === "eraser" ? "destination-out" : "source-over";
-    ctx.stroke();
-    ctx.globalCompositeOperation = "source-over";
-  });
 
+  // Draw current path while drawing
   if (currentPath.current.length > 0) {
     ctx.beginPath();
     currentPath.current.forEach((pt, i) => {
       if (i === 0) ctx.moveTo(pt.x, pt.y);
       else ctx.lineTo(pt.x, pt.y);
     });
-    ctx.strokeStyle = currentPathType.current === "eraser" ? "rgba(0,0,0,1)" : penColor;
+    ctx.strokeStyle = currentPathType.current === "eraser" ? "rgba(0,0,0,1)" : "#ff0000";
     ctx.lineWidth = currentPathType.current === "eraser" ? 15 : 3;
     ctx.globalCompositeOperation = currentPathType.current === "eraser" ? "destination-out" : "source-over";
     ctx.stroke();
@@ -625,52 +638,50 @@ const sendMedia = async () => {
 const previewHeight = "70vh"; // keep constant
 
 const handleButtonClick = async () => {
-  try {
-    setIsSending(true); // start loading
-    if(buttonLabel === "Save" && cropMode){
-      // --- Save the cropped image ---
-      const image = imgRef.current;
-      if(image && crop.width && crop.height){
-        const scaleX = image.naturalWidth / image.width;
-        const scaleY = image.naturalHeight / image.height;
+  if(buttonLabel === "Save" && cropMode){
+    // --- Save the cropped image ---
+    const image = imgRef.current;
+    if(image && crop.width && crop.height){
+      const scaleX = image.naturalWidth / image.width;
+      const scaleY = image.naturalHeight / image.height;
 
-        const croppedBlob = await getCroppedImg(image, {
-          x: crop.x * scaleX,
-          y: crop.y * scaleY,
-          width: crop.width * scaleX,
-          height: crop.height * scaleY
-        });
+      const croppedBlob = await getCroppedImg(image, {
+        x: crop.x * scaleX,
+        y: crop.y * scaleY,
+        width: crop.width * scaleX,
+        height: crop.height * scaleY
+      });
 
-        const croppedFile = new File([croppedBlob], "cropped.jpg", { type: "image/jpeg" });
-        const newUrl = URL.createObjectURL(croppedFile);
-        imgRef.current.src = newUrl;
+      // Replace original image with cropped one
+      const croppedFile = new File([croppedBlob], "cropped.jpg", { type: "image/jpeg" });
+      const newUrl = URL.createObjectURL(croppedFile);
+      imgRef.current.src = newUrl; // update preview
 
-        setCropMode(false);
-        setButtonLabel("Send");
-        setCurrentFile(croppedFile);
-        setCurrentImageUrl(newUrl);
-      }
-    } else {
-      await sendMedia();
+      // Reset crop mode and button
+      setCropMode(false);
+      setButtonLabel("Send");
+
+      setCurrentFile(croppedFile);
+setCurrentImageUrl(newUrl);
     }
-  } catch (err) {
-    console.error("Failed to send media:", err);
-  } finally {
-    setIsSending(false); // stop loading
+  } else {
+    // Normal send
+    await sendMedia();
   }
 };
 
 const endDrawing = () => {
   if (currentPath.current.length === 0) return;
   saveState();
-
   const newPath = {
     points: currentPath.current.map(p => ({ ...p })),
-    type: currentPathType.current,
-    color: penColor, // ✅ save current pen color
+    type: currentPathType.current
   };
 
-  setPaths(prev => [...prev, newPath]);
+  setPaths(prev => {
+    const updated = [...prev, newPath];
+    return updated;
+  });
 
   currentPath.current = [];
   setDrawing(false);
@@ -844,18 +855,9 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
 
 <button
   onClick={handleButtonClick}
-  className="bg-indigo-500 hover:bg-indigo-600 px-4 py-2 rounded-lg flex items-center justify-center gap-2"
-  disabled={isSending} // disable while sending
+  className="bg-indigo-500 hover:bg-indigo-600 px-4 py-2 rounded-lg"
 >
-  {isSending ? (
-    <>
-      <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-      </svg>
-      {t("Sending...")}
-    </>
-  ) : t(buttonLabel)}
+  {t(buttonLabel)}
 </button>
 
 </div>
@@ -886,13 +888,37 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
       {t("Text")}
     </button>
 
-{/* Pen Color Picker */}
-<input
-  type="color"
-  value={penColor}
-  onChange={(e) => setPenColor(e.target.value)}
-  className="w-8 h-8 border-none rounded-lg cursor-pointer"
-/>
+    {/* Font size */}
+    <select
+      value={fontSize}
+      onChange={(e) => setFontSize(Number(e.target.value))}
+      className="bg-[#020617]/90 border border-white/20 rounded-lg px-2 py-1 text-sm hover:border-white/40 transition"
+    >
+      <option value={16}>16</option>
+      <option value={24}>24</option>
+      <option value={32}>32</option>
+      <option value={48}>48</option>
+      <option value={64}>64</option>
+    </select>
+
+    {/* Color */}
+    <input
+      type="color"
+      value={color}
+      onChange={(e) => setColor(e.target.value)}
+      className="w-10 h-8 p-0 border-none rounded-lg cursor-pointer"
+    />
+
+    {/* Font style */}
+    <select
+      value={fontStyle}
+      onChange={(e) => setFontStyle(e.target.value)}
+      className="bg-[#020617]/90 border border-white/20 rounded-lg px-2 py-1 text-sm hover:border-white/40 transition"
+    >
+      <option value="normal">{t("Normal")}</option>
+      <option value="bold">{t("Bold")}</option>
+      <option value="italic">{t("Italic")}</option>
+    </select>
 
     {/* Pen */}
     <button
@@ -1030,25 +1056,25 @@ objectFit:"contain"
         onChange={handleTextChange}
         onMouseDown={(e) => e.stopPropagation()}
 onClick={(e) => e.stopPropagation()}
-          style={{
-    width: "100%",
-    height: "100%",
-    background: "transparent",
-    border: "none",
-    outline: "none",
-    color: textBoxes.find(b => b.id === currentBoxId)?.color || "#000000", // ✅ dynamic color
-    fontSize: boxItem.fontSize,
-    fontWeight: boxItem.fontStyle === "bold" ? "bold" : "normal",
-    fontStyle: boxItem.fontStyle === "italic" ? "italic" : "normal",
-    resize: "none",
-    overflow: "hidden",
-    textAlign: "left",
-    whiteSpace: "pre-wrap",
-    verticalAlign: "top",
-    padding: "5px",
-    pointerEvents: "auto",
-    boxSizing: "border-box"
-  }}
+        style={{
+          width: "100%",
+          height: "100%",
+          background: "transparent",
+          border: "none",
+          outline: "none",
+          color: "#000000",
+          fontSize: boxItem.fontSize,
+          fontWeight: boxItem.fontStyle === "bold" ? "bold" : "normal",
+          fontStyle: boxItem.fontStyle === "italic" ? "italic" : "normal",
+          resize: "none",
+          overflow: "hidden",
+          textAlign: "left",
+          whiteSpace: "pre-wrap",
+          verticalAlign: "top",
+          padding: "5px",
+          pointerEvents: "auto",
+          boxSizing: "border-box"
+        }}
       />
     ) : (
       <div
@@ -1221,96 +1247,6 @@ onClick={(e) => e.stopPropagation()}
 )}
 </div>
 
-{/* Text formatting controls above active text box */}
-{currentBoxId !== null && isEditingText && (
-  <div
-    style={{
-      position: "absolute",
-      top: textBoxes.find(b => b.id === currentBoxId).y - textBoxes.find(b => b.id === currentBoxId).height / 2 - 50,
-      left: textBoxes.find(b => b.id === currentBoxId).x - 150, // adjust width
-      display: "flex",
-      gap: "8px",
-      background: "rgba(0,0,0,0.7)",
-      padding: "6px 10px",
-      borderRadius: "8px",
-      zIndex: 100,
-    }}
-    onMouseDown={(e) => e.stopPropagation()}
-  >
-    {/* Text Color Picker */}
-    <input
-      type="color"
-      value={textColor}
-      onChange={(e) => {
-        const newColor = e.target.value;
-        setTextColor(newColor);
-        setTextBoxes(prev =>
-          prev.map(b =>
-            b.id === currentBoxId ? { ...b, color: newColor } : b
-          )
-        );
-      }}
-      className="w-8 h-8 border-none rounded-lg cursor-pointer"
-    />
-
-    {/* Text Color Input (user can type names) */}
-    <input
-      type="text"
-      placeholder="black, red, blue..."
-      value={textColor}
-      onChange={(e) => {
-        const newColor = e.target.value;
-        setTextColor(newColor);
-        setTextBoxes(prev =>
-          prev.map(b =>
-            b.id === currentBoxId ? { ...b, color: newColor } : b
-          )
-        );
-      }}
-      className="w-24 p-1 rounded-lg text-black"
-    />
-
-    {/* Font Size */}
-    <select
-      value={fontSize}
-      onChange={(e) => {
-        const newSize = Number(e.target.value);
-        setFontSize(newSize);
-        setTextBoxes(prev =>
-          prev.map(b =>
-            b.id === currentBoxId ? { ...b, fontSize: newSize } : b
-          )
-        );
-      }}
-      className="bg-[#020617]/90 border border-white/20 rounded-lg px-2 py-1 text-sm hover:border-white/40 transition"
-    >
-      <option value={16}>16</option>
-      <option value={24}>24</option>
-      <option value={32}>32</option>
-      <option value={48}>48</option>
-      <option value={64}>64</option>
-    </select>
-
-    {/* Font Style */}
-    <select
-      value={fontStyle}
-      onChange={(e) => {
-        const newStyle = e.target.value;
-        setFontStyle(newStyle);
-        setTextBoxes(prev =>
-          prev.map(b =>
-            b.id === currentBoxId ? { ...b, fontStyle: newStyle } : b
-          )
-        );
-      }}
-      className="bg-[#020617]/90 border border-white/20 rounded-lg px-2 py-1 text-sm hover:border-white/40 transition"
-    >
-      <option value="normal">Normal</option>
-      <option value="bold">Bold</option>
-      <option value="italic">Italic</option>
-    </select>
-  </div>
-)}
 
 {/* CAPTION */}
 

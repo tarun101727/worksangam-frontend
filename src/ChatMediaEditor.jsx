@@ -638,26 +638,7 @@ const previewHeight = "70vh"; // keep constant
 
 const handleButtonClick = async () => {
   try {
-    // If a text box is currently being edited, close it first
-    if (isEditingText && currentBoxId !== null) {
-      const currentBox = textBoxes.find(b => b.id === currentBoxId);
-
-      // Delete if empty
-      if (!currentBox?.text || currentBox.text.trim() === "") {
-        setTextBoxes(prev => prev.filter(b => b.id !== currentBoxId));
-      }
-
-      // Stop editing
-      setIsEditingText(false);
-      setCurrentBoxId(null);
-      setTextActive(false);
-
-      // Wait a tick to ensure UI updates before sending
-      await new Promise(resolve => setTimeout(resolve, 50));
-    }
-
     setIsSending(true); // start loading
-
     if(buttonLabel === "Save" && cropMode){
       // --- Save the cropped image ---
       const image = imgRef.current;
@@ -876,7 +857,7 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
 <button
   onClick={handleButtonClick}
   className="bg-indigo-500 hover:bg-indigo-600 px-4 py-2 rounded-lg flex items-center justify-center gap-2"
-  disabled={isSending || isEditingText} // ✅ disable while sending or editing text
+  disabled={isSending} // disable while sending
 >
   {isSending ? (
     <>

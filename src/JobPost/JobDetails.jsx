@@ -132,7 +132,7 @@ export default function JobDetails() {
       </div>
 
       {/* JOB CARD */}
-      <div className="rounded-2xl p-6">
+      <div className="flex items-center gap-3">
 
         {/* 🔵 PROFESSION */}
         <div className="flex items-center gap-3">

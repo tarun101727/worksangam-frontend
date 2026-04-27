@@ -6,6 +6,7 @@ import { BASE_URL } from "./config";
 import ReactCrop from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 import getCroppedImg from "./utils/cropImage";
+import { flushSync } from "react-dom";
 
 // Paint brush style cursor
 const BRUSH_CURSOR = `url('data:image/svg+xml;base64,${btoa(`
@@ -639,31 +640,35 @@ const previewHeight = "70vh"; // keep constant
 
 const closeAllActiveTools = async () => {
   // Close toolbar
-  setToolbarVisible(false);
+  flushSync(() => setToolbarVisible(false));
 
   // Finish text editing
   if (currentBoxId !== null) {
     const activeBox = textBoxes.find(b => b.id === currentBoxId);
 
-    // Remove empty text boxes
-    if (activeBox && (!activeBox.text || activeBox.text.trim() === "")) {
-      setTextBoxes(prev => prev.filter(b => b.id !== currentBoxId));
-    }
+    flushSync(() => {
+      // Remove empty text boxes
+      if (activeBox && (!activeBox.text || activeBox.text.trim() === "")) {
+        setTextBoxes(prev => prev.filter(b => b.id !== currentBoxId));
+      }
 
-    setIsEditingText(false);
-    setCurrentBoxId(null);
-    setTextActive(false);
+      setIsEditingText(false);
+      setCurrentBoxId(null);
+      setTextActive(false);
+    });
   }
 
   // Disable pen/eraser
-  setPenMode(false);
-  setEraserMode(false);
+  flushSync(() => {
+    setPenMode(false);
+    setEraserMode(false);
+  });
 
   // Stop any ongoing drawing
   endDrawing();
 
-  // Allow small delay for UI to update
-  await new Promise(resolve => setTimeout(resolve, 50));
+  // Give a tiny delay to ensure DOM updates before sending
+  await new Promise(resolve => setTimeout(resolve, 10));
 };
 
 
@@ -674,8 +679,8 @@ const handleButtonClick = async () => {
     // ❗ Close all active inputs/tools first
     await closeAllActiveTools();
 
+    // Now the text box is definitely closed
     if (buttonLabel === "Save" && cropMode) {
-      // Save cropped image
       const image = imgRef.current;
       if (image && crop.width && crop.height) {
         const scaleX = image.naturalWidth / image.width;

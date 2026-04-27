@@ -1,5 +1,4 @@
 import { useTranslation } from "react-i18next";
-
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
@@ -508,63 +507,137 @@ useEffect(() => {
 }, [paths, penMode, currentImageUrl]);
 
 const sendMedia = async () => {
-  setButtonLabel("Sending..."); // feedback
+  try {
+    setButtonLabel("Sending..."); // Feedback to user
+    let finalFile = currentFile; // fallback if no edits
 
-  let finalFile = currentFile;
+    const img = imgRef.current;
+    const container = containerRef.current;
+    if (!img || !container) return;
 
-  if (textBoxes.length > 0 || paths.length > 0) {
-    finalFile = await new Promise((resolve) => {
-      setTimeout(async () => {
-        const canvas = document.createElement("canvas");
-        const img = imgRef.current;
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-        const ctx = canvas.getContext("2d");
+    const displayedWidth = img.width;
+    const displayedHeight = img.height;
+    const offsetX = (container.clientWidth - displayedWidth) / 2;
+    const offsetY = (container.clientHeight - displayedHeight) / 2;
+    const scaleX = img.naturalWidth / displayedWidth;
+    const scaleY = img.naturalHeight / displayedHeight;
 
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    // Only process if there are drawings or text boxes
+    if (textBoxes.length > 0 || paths.length > 0) {
+      finalFile = await new Promise((resolve) => {
+        setTimeout(() => {
+          const canvas = document.createElement("canvas");
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          const ctx = canvas.getContext("2d");
 
-        const drawCanvas = document.createElement("canvas");
-        drawCanvas.width = canvas.width;
-        drawCanvas.height = canvas.height;
-        const drawCtx = drawCanvas.getContext("2d");
+          // Draw original image
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        // draw paths & text boxes here (same as before)
-        paths.forEach(...);
-        textBoxes.forEach(...);
+          // Draw paths and text on a separate canvas
+          const drawCanvas = document.createElement("canvas");
+          drawCanvas.width = canvas.width;
+          drawCanvas.height = canvas.height;
+          const drawCtx = drawCanvas.getContext("2d");
 
-        ctx.drawImage(drawCanvas, 0, 0, canvas.width, canvas.height);
+          // DRAW PEN / ERASER PATHS
+          paths.forEach((path) => {
+            if (!path.points || path.points.length === 0) return;
 
-        canvas.toBlob((blob) => {
-          resolve(new File([blob], "edited.jpg", { type: "image/jpeg" }));
-        }, "image/jpeg", 0.95);
-      }, 50);
+            drawCtx.beginPath();
+            path.points.forEach((p, i) => {
+              const x = (p.x - offsetX) * scaleX;
+              const y = (p.y - offsetY) * scaleY;
+              if (i === 0) drawCtx.moveTo(x, y);
+              else drawCtx.lineTo(x, y);
+            });
+
+            drawCtx.lineWidth = path.type === "eraser" ? 15 * scaleX : 3 * scaleX;
+            drawCtx.strokeStyle = path.type === "eraser" ? "rgba(0,0,0,1)" : penColor;
+            drawCtx.globalCompositeOperation =
+              path.type === "eraser" ? "destination-out" : "source-over";
+            drawCtx.stroke();
+            drawCtx.globalCompositeOperation = "source-over";
+          });
+
+          // DRAW TEXT BOXES
+          textBoxes.forEach((box) => {
+            if (!box.text) return;
+
+            const relX = (box.x - offsetX - box.width / 2) / displayedWidth;
+            const relY = (box.y - offsetY - box.height / 2) / displayedHeight;
+            const relWidth = box.width / displayedWidth;
+
+            const realX = relX * canvas.width;
+            const realY = relY * canvas.height;
+            const realWidth = relWidth * canvas.width;
+
+            drawCtx.fillStyle = box.color || "#000";
+            drawCtx.font = `${box.fontStyle === "italic" ? "italic " : ""}${
+              box.fontStyle === "bold" ? "bold " : ""
+            }${box.fontSize * scaleX}px sans-serif`;
+            drawCtx.textAlign = "left";
+            drawCtx.textBaseline = "top";
+
+            const inputLines = box.text.split("\n");
+            const lines = [];
+            inputLines.forEach((rawLine) => {
+              let currentLine = "";
+              rawLine.split(" ").forEach((word) => {
+                const testLine = currentLine ? currentLine + " " + word : word;
+                if (drawCtx.measureText(testLine).width > realWidth && currentLine !== "") {
+                  lines.push(currentLine);
+                  currentLine = word;
+                } else currentLine = testLine;
+              });
+              lines.push(currentLine);
+            });
+
+            const lineHeight = box.fontSize * 1.2 * scaleY;
+            const padding = 5 * scaleX;
+            const startY = realY + padding;
+
+            lines.forEach((line, i) => {
+              drawCtx.fillText(line.trim(), realX + padding, startY + i * lineHeight);
+            });
+          });
+
+          // Merge drawCanvas onto base canvas
+          ctx.drawImage(drawCanvas, 0, 0, canvas.width, canvas.height);
+
+          // Export to blob
+          canvas.toBlob((blob) => {
+            resolve(new File([blob], "edited.jpg", { type: "image/jpeg" }));
+          }, "image/jpeg", 0.95);
+        }, 50); // async delay to prevent freeze
+      });
+    }
+
+    // Apply crop if active
+    if (cropMode && crop.width && crop.height) {
+      const croppedBlob = await getCroppedImg(imgRef.current, {
+        x: crop.x * scaleX,
+        y: crop.y * scaleY,
+        width: crop.width * scaleX,
+        height: crop.height * scaleY,
+      });
+      finalFile = new File([croppedBlob], "cropped.jpg", { type: "image/jpeg" });
+    }
+
+    // Send final file to backend
+    const formData = new FormData();
+    formData.append("image", finalFile);
+    formData.append("caption", caption);
+
+    await axios.post(`${BASE_URL}/api/chat/send-media/${chatId}`, formData, {
+      withCredentials: true,
     });
+
+    navigate(-1);
+  } catch (err) {
+    console.error("Failed to send media:", err);
+    setButtonLabel("Send");
   }
-
-  // If crop mode active
-  if (cropMode && crop.width && crop.height) {
-    const scaleX = imgRef.current.naturalWidth / imgRef.current.width;
-    const scaleY = imgRef.current.naturalHeight / imgRef.current.height;
-    const croppedBlob = await getCroppedImg(imgRef.current, {
-      x: crop.x * scaleX,
-      y: crop.y * scaleY,
-      width: crop.width * scaleX,
-      height: crop.height * scaleY
-    });
-    finalFile = new File([croppedBlob], "cropped.jpg", { type: "image/jpeg" });
-  }
-
-  const formData = new FormData();
-  formData.append("image", finalFile);
-  formData.append("caption", caption);
-
-  await axios.post(
-    `${BASE_URL}/api/chat/send-media/${chatId}`,
-    formData,
-    { withCredentials: true }
-  );
-
-  navigate(-1);
 };
 
 const previewHeight = "70vh"; // keep constant

@@ -121,6 +121,7 @@ const [translated, setTranslated] = useState({
 
         {/* Description */}
         <div className="flex items-center gap-3 mt-2">
+          <span className="font-semibold">{t("Description")} : </span> 
           <p className="text-white/70">{translated.description || job.description}</p>
           {job.description && (
             <button onClick={() => handleTranslate("description", job.description)} className="text-sm text-indigo-400 underline hover:text-indigo-300">
@@ -132,7 +133,7 @@ const [translated, setTranslated] = useState({
         {/* Preferred Time & Date */}
         {job.preferredTime && (
           <p className="text-white/60">
-            <span className="font-semibold">{t("Preferred Time")}:</span> 
+            <span className="font-semibold">{t("Preferred Time")} : </span> 
             {job.preferredTime.type === "asap" && t("As soon as possible")}
             {job.preferredTime.type === "today" && t("Today")}
             {job.preferredTime.type === "custom" && (

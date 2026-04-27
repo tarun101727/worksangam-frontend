@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BASE_URL } from "../config";
@@ -15,13 +15,11 @@ export default function JobDetails() {
   const { t } = useTranslation();
   const { jobId } = useParams();
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
 
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedMedia, setSelectedMedia] = useState(null);
-  const [applying, setApplying] = useState(false);
 
   // Translation state
   const [translated, setTranslated] = useState({
@@ -68,16 +66,15 @@ export default function JobDetails() {
     fetchJob();
   }, [jobId]);
 
-  // Apply job
-  const applyJob = async () => {
-    if (applying || !job) return;
+   const handleDelete = async () => {
+    if (!window.confirm(t("delete_confirm"))) return;
     try {
-      setApplying(true);
-      await axios.post(`${BASE_URL}/api/jobs/apply/${job._id}`, {}, { withCredentials: true });
+      await axios.delete(`${BASE_URL}/api/jobs/delete/${jobId}`, { withCredentials: true });
+      alert(t("job_deleted"));
+      navigate("/");
     } catch (err) {
       console.error(err);
-    } finally {
-      setApplying(false);
+      alert(t("delete_failed"));
     }
   };
 
@@ -220,31 +217,14 @@ export default function JobDetails() {
 
       </div>
 
-      {/* ACTION BUTTONS */}
+      {/* ACTION BUTTONS (EDIT/DELETE) */}
       <div className="mt-6 flex gap-4 flex-wrap">
-        {user?.isGuest ? (
-          <div className="flex items-center gap-2 text-sm italic text-gray-400 bg-gray-800/50 p-3 rounded-lg border border-gray-700">
-            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c0 1.104-.896 2-2 2s-2-.896-2-2 .896-2 2-2 2 .896 2 2zm0 0v2m0-2h2m-2 0H8" />
-            </svg>
-            {t("Login to see chat and apply")}
-          </div>
-        ) : (
-          <>
-            <button
-              onClick={async () => {
-                const res = await axios.post(`${BASE_URL}/api/chat/create/${job.hirer._id}`, {}, { withCredentials: true });
-                navigate(`/chat/${res.data._id}`);
-              }}
-              className="px-5 py-2 rounded-xl bg-green-500"
-            >
-              {t("chat_with_user", { name: job.hirer.firstName })}
-            </button>
-            <button onClick={applyJob} disabled={applying} className="px-5 py-2 rounded-xl bg-indigo-500 disabled:opacity-50">
-              {applying ? t("Applied") : t("Apply")}
-            </button>
-          </>
-        )}
+        <button onClick={() => navigate(`/edit-job/${job._id}`)} className="px-5 py-2 rounded-xl bg-blue-500">
+          {t("Edit")}
+        </button>
+        <button onClick={handleDelete} className="px-5 py-2 rounded-xl bg-red-500">
+          {t("Delete")}
+        </button>
       </div>
 
       {/* FULLSCREEN MEDIA */}

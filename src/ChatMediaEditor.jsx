@@ -412,37 +412,20 @@ const handleTextChange = (e) => {
 
   ctx.font = `${activeBox.fontStyle === "italic" ? "italic" : ""} ${activeBox.fontStyle === "bold" ? "bold" : ""} ${activeBox.fontSize}px sans-serif`;
 
-  const words = el.value.split(/\s+/); // split on spaces/newlines
-let lines = [];
-let currentLine = "";
+  const words = el.value.match(/(\S{1,20}|\s+)/g) || [];
+  let lines = [];
+  let currentLine = "";
 
-words.forEach(word => {
-  let testLine = currentLine ? currentLine + " " + word : word;
-
-  // If the word is too long to fit on a single line
-  if (ctx.measureText(testLine).width > maxWidth && currentLine === "") {
-    // Break the word into characters
-    let subWord = "";
-    for (let char of word) {
-      const testSub = subWord + char;
-      if (ctx.measureText(testSub).width > maxWidth) {
-        lines.push(subWord);
-        subWord = char;
-      } else {
-        subWord = testSub;
-      }
+  words.forEach(word => {
+    const testLine = currentLine ? currentLine + " " + word : word;
+    if (ctx.measureText(testLine).width > maxWidth) {
+      if (currentLine) lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
     }
-    if (subWord) lines.push(subWord);
-    currentLine = "";
-  } else if (ctx.measureText(testLine).width > maxWidth) {
-    if (currentLine) lines.push(currentLine);
-    currentLine = word;
-  } else {
-    currentLine = testLine;
-  }
-});
-
-if (currentLine) lines.push(currentLine);
+  });
+  if (currentLine) lines.push(currentLine);
 
   const buffer = 10;
   let widest = 0;
@@ -595,14 +578,17 @@ const sendMedia = async () => {
       const lines = [];
       inputLines.forEach(rawLine => {
         let currentLine = "";
-        rawLine.split(" ").forEach(word => {
-          const testLine = currentLine ? currentLine + " " + word : word;
-          if (drawCtx.measureText(testLine).width > realWidth && currentLine !== "") {
-            lines.push(currentLine);
-            currentLine = word;
-          } else currentLine = testLine;
-        });
-        lines.push(currentLine);
+        rawLine.split(/(.{1,20})/g).forEach(word => {
+  if (!word) return;
+  const testLine = currentLine ? currentLine + word : word;
+  if (drawCtx.measureText(testLine).width > realWidth && currentLine !== "") {
+    lines.push(currentLine);
+    currentLine = word;
+  } else {
+    currentLine = testLine;
+  }
+});
+if (currentLine) lines.push(currentLine);
       });
 
       const lineHeight = box.fontSize * 1.2 * scaleY;

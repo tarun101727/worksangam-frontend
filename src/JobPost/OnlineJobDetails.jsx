@@ -163,6 +163,7 @@ export default function OnlineJobDetails() {
 {/* 🔵 PRICE */}
 {job.price && (
   <p className="text-xl font-bold text-yellow-400 mt-4">
+    <span className="text-sm text-white/60">{t("Price")}:</span>
     {job.price.type === "fixed" &&
       `${job.price.currency} ${job.price.value}`}
     {job.price.type === "hourly" &&

@@ -510,12 +510,12 @@ useEffect(() => {
 const sendMedia = async () => {
   let finalFile = currentFile; // fallback if no edits
 
-  if ((textBoxes && textBoxes.length > 0) || (paths && paths.length > 0)) {
+  if (textBoxes.length > 0 || paths.length > 0) {
     const img = imgRef.current;
     const container = containerRef.current;
     if (!img || !container) return;
 
-    // 1️⃣ Create base canvas matching original image pixels
+    // 1️⃣ Create canvas matching original image pixels (base layer)
     const canvas = document.createElement("canvas");
     canvas.width = img.naturalWidth;
     canvas.height = img.naturalHeight;
@@ -524,7 +524,7 @@ const sendMedia = async () => {
     // Draw original image
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-    // 2️⃣ Create temporary canvas for drawings (paths & text)
+    // 2️⃣ Create temporary canvas for drawings (pen & eraser)
     const drawCanvas = document.createElement("canvas");
     drawCanvas.width = canvas.width;
     drawCanvas.height = canvas.height;
@@ -538,7 +538,7 @@ const sendMedia = async () => {
     const scaleX = canvas.width / displayedWidth;
     const scaleY = canvas.height / displayedHeight;
 
-    // Draw pen/eraser paths
+    // Draw pen/eraser paths on drawCanvas only
     paths.forEach(path => {
       if (!path.points || path.points.length === 0) return;
 
@@ -557,7 +557,7 @@ const sendMedia = async () => {
       drawCtx.globalCompositeOperation = "source-over";
     });
 
-    // Draw text boxes (fixed for multi-line)
+    // Draw text boxes on drawCanvas
     textBoxes.forEach(box => {
       if (!box.text) return;
 
@@ -567,20 +567,15 @@ const sendMedia = async () => {
 
       const realX = relX * canvas.width;
       const realY = relY * canvas.height;
-      const realWidth = relWidth * canvas.width - 10; // padding adjustment
+      const realWidth = relWidth * canvas.width;
 
       drawCtx.fillStyle = box.color || "#fff";
-
-      // Correctly handle bold & italic
-      const fontWeight = box.fontStyle === "bold" ? "bold" : "normal";
-      const fontStyle = box.fontStyle === "italic" ? "italic" : "normal";
-      drawCtx.font = `${fontStyle} ${fontWeight} ${box.fontSize * scaleX}px sans-serif`;
+      drawCtx.font = `${box.fontStyle === "italic" ? "italic " : ""}${box.fontStyle === "bold" ? "bold " : ""}${box.fontSize * scaleX}px sans-serif`;
       drawCtx.textAlign = "left";
       drawCtx.textBaseline = "top";
 
-      const inputLines = box.text.split("\n"); // split by new line
+      const inputLines = box.text.split("\n");
       const lines = [];
-
       inputLines.forEach(rawLine => {
         let currentLine = "";
         rawLine.split(" ").forEach(word => {
@@ -588,9 +583,7 @@ const sendMedia = async () => {
           if (drawCtx.measureText(testLine).width > realWidth && currentLine !== "") {
             lines.push(currentLine);
             currentLine = word;
-          } else {
-            currentLine = testLine;
-          }
+          } else currentLine = testLine;
         });
         lines.push(currentLine);
       });
@@ -600,7 +593,7 @@ const sendMedia = async () => {
       const startY = realY + padding;
 
       lines.forEach((line, i) => {
-        drawCtx.fillText(line, realX + padding, startY + i * lineHeight);
+        drawCtx.fillText(line.trim(), realX + padding, startY + i * lineHeight);
       });
     });
 

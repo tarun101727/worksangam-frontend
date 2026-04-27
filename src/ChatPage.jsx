@@ -370,25 +370,25 @@ className="w-8 h-8 rounded-full object-cover"
 ) : (
   m.message && (
     <div
-      className={`px-3 py-2 rounded-xl max-w-xs break-words ${
-        isSender
-          ? "bg-indigo-500 text-white"
-          : "bg-gray-700 text-white"
-      }`}
+  className={`px-3 py-2 rounded-xl max-w-xs break-words whitespace-normal ${
+    isSender
+      ? "bg-indigo-500 text-white"
+      : "bg-gray-700 text-white"
+  }`}
+>
+  {m.message.startsWith("📍 Location:") ? (
+    <a
+      href={m.message.replace("📍 Location:", "").trim()}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="underline"
     >
-      {m.message.startsWith("📍 Location:") ? (
-        <a
-          href={m.message.replace("📍 Location:", "").trim()}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline"
-        >
-          {t("Shared a location(click to see location)")}
-        </a>
-      ) : (
-        m.message
-      )}
-    </div>
+      {t("Shared a location(click to see location)")}
+    </a>
+  ) : (
+    m.message.trimEnd()
+  )}
+</div>
   )
 )}
 
@@ -439,25 +439,25 @@ className="w-8 h-8 rounded-full object-cover"
 ) : (
   m.message && (
     <div
-      className={`px-3 py-2 rounded-xl max-w-xs break-words ${
-        isSender
-          ? "bg-indigo-500 text-white"
-          : "bg-gray-700 text-white"
-      }`}
+  className={`px-3 py-2 rounded-xl max-w-xs break-words whitespace-normal ${
+    isSender
+      ? "bg-indigo-500 text-white"
+      : "bg-gray-700 text-white"
+  }`}
+>
+  {m.message.startsWith("📍 Location:") ? (
+    <a
+      href={m.message.replace("📍 Location:", "").trim()}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="underline"
     >
-      {m.message.startsWith("📍 Location:") ? (
-        <a
-          href={m.message.replace("📍 Location:", "").trim()}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline"
-        >
-          {t("Shared a location(click to see location)")}
-        </a>
-      ) : (
-        m.message
-      )}
-    </div>
+      {t("Shared a location(click to see location)")}
+    </a>
+  ) : (
+    m.message.trimEnd()
+  )}
+</div>
   )
 )}
 

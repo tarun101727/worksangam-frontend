@@ -313,7 +313,7 @@ export default function EditJob() {
           disabled={saving}
           className="w-full py-3 rounded-xl bg-indigo-600"
         >
-          {saving ? "Updating..." : "Update Job"}
+          {saving ? t("Updating...") : t("Update Job")}
         </button>
       </div>
     </div>

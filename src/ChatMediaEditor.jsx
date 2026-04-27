@@ -771,6 +771,39 @@ const moveDrawing = (clientX, clientY) => {
   drawPaths();
 };
 
+const handleTextKeyDown = (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault(); // prevent default behavior
+
+    if (e.shiftKey) {
+      // ✅ Insert newline at cursor position
+      const textarea = e.target;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+
+      const newValue = text.substring(0, start) + "\n" + text.substring(end);
+      setText(newValue);
+
+      // Update the textBoxes state
+      setTextBoxes(prev =>
+        prev.map(b =>
+          b.id === currentBoxId ? { ...b, text: newValue } : b
+        )
+      );
+
+      // Move cursor after inserted newline
+      setTimeout(() => {
+        textarea.selectionStart = textarea.selectionEnd = start + 1;
+      }, 0);
+
+    } else {
+      // Optional: send media if Enter without Shift
+      // handleButtonClick(); // uncomment if you want Enter to send
+    }
+  }
+};
+
+
 
 return(
 
@@ -1040,6 +1073,7 @@ objectFit:"contain"
     if (!text) e.target.placeholder = "Enter text...";
   }}
         onChange={handleTextChange}
+        onKeyDown={handleTextKeyDown}
         onMouseDown={(e) => e.stopPropagation()}
 onClick={(e) => e.stopPropagation()}
           style={{

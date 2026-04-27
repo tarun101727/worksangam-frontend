@@ -6,7 +6,6 @@ import { BASE_URL } from "./config";
 import ReactCrop from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 import getCroppedImg from "./utils/cropImage";
-import { flushSync } from "react-dom";
 
 // Paint brush style cursor
 const BRUSH_CURSOR = `url('data:image/svg+xml;base64,${btoa(`
@@ -637,52 +636,32 @@ const sendMedia = async () => {
 
 const previewHeight = "70vh"; // keep constant
 
+const handleButtonClick = async () => {
+  try {
+    // If a text box is currently being edited, close it first
+    if (isEditingText && currentBoxId !== null) {
+      const currentBox = textBoxes.find(b => b.id === currentBoxId);
 
-const closeAllActiveTools = async () => {
-  // Close toolbar
-  flushSync(() => setToolbarVisible(false));
-
-  // Finish text editing
-  if (currentBoxId !== null) {
-    const activeBox = textBoxes.find(b => b.id === currentBoxId);
-
-    flushSync(() => {
-      // Remove empty text boxes
-      if (activeBox && (!activeBox.text || activeBox.text.trim() === "")) {
+      // Delete if empty
+      if (!currentBox?.text || currentBox.text.trim() === "") {
         setTextBoxes(prev => prev.filter(b => b.id !== currentBoxId));
       }
 
+      // Stop editing
       setIsEditingText(false);
       setCurrentBoxId(null);
       setTextActive(false);
-    });
-  }
 
-  // Disable pen/eraser
-  flushSync(() => {
-    setPenMode(false);
-    setEraserMode(false);
-  });
+      // Wait a tick to ensure UI updates before sending
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
 
-  // Stop any ongoing drawing
-  endDrawing();
-
-  // Give a tiny delay to ensure DOM updates before sending
-  await new Promise(resolve => setTimeout(resolve, 10));
-};
-
-
-const handleButtonClick = async () => {
-  try {
     setIsSending(true); // start loading
 
-    // ❗ Close all active inputs/tools first
-    await closeAllActiveTools();
-
-    // Now the text box is definitely closed
-    if (buttonLabel === "Save" && cropMode) {
+    if(buttonLabel === "Save" && cropMode){
+      // --- Save the cropped image ---
       const image = imgRef.current;
-      if (image && crop.width && crop.height) {
+      if(image && crop.width && crop.height){
         const scaleX = image.naturalWidth / image.width;
         const scaleY = image.naturalHeight / image.height;
 
@@ -705,7 +684,6 @@ const handleButtonClick = async () => {
     } else {
       await sendMedia();
     }
-
   } catch (err) {
     console.error("Failed to send media:", err);
   } finally {
@@ -812,6 +790,7 @@ const moveDrawing = (clientX, clientY) => {
   drawPaths();
 };
 
+
 return(
 
 <div className="flex flex-col h-screen text-white backdrop-blur-md">
@@ -897,7 +876,7 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
 <button
   onClick={handleButtonClick}
   className="bg-indigo-500 hover:bg-indigo-600 px-4 py-2 rounded-lg flex items-center justify-center gap-2"
-  disabled={isSending} // disable while sending
+  disabled={isSending || isEditingText} // ✅ disable while sending or editing text
 >
   {isSending ? (
     <>

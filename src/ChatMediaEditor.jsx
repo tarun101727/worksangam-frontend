@@ -39,7 +39,6 @@ const [editMode,setEditMode] = useState(false);
 const [text,setText] = useState("");
 const [isEditingText,setIsEditingText] = useState(false);
 
-const [color,setColor] = useState("#ffffff");
 const [fontSize,setFontSize] = useState(16);
 const [fontStyle,setFontStyle] = useState("normal");
 
@@ -92,6 +91,8 @@ const [currentBoxId, setCurrentBoxId] = useState(null); // current editing box
 const [toolbarVisible, setToolbarVisible] = useState(false);
 const [undoStack, setUndoStack] = useState([]);
 const [redoStack, setRedoStack] = useState([]);
+const [textColor, setTextColor] = useState("#000000"); // text color
+const [penColor, setPenColor] = useState("#ff0000");   // pen color
 
 
 const closeToolbar = () => {
@@ -396,14 +397,13 @@ const handleTextChange = (e) => {
 
   setText(el.value);
 
-  // Update text box including color
   setTextBoxes(prev =>
     prev.map(b => {
       if (b.id !== currentBoxId) return b;
       return {
         ...b,
         text: el.value,
-        color: color,       // ✅ Apply current color
+        color: textColor, // ✅ use textColor state
       };
     })
   );
@@ -424,30 +424,26 @@ const drawPaths = () => {
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
 
-  // Draw saved paths
-  paths
-    .filter(p => p.points.length > 0)
-    .forEach((p) => {
-      ctx.beginPath();
-      p.points.forEach((pt, i) => {
-        if (i === 0) ctx.moveTo(pt.x, pt.y);
-        else ctx.lineTo(pt.x, pt.y);
-      });
-      ctx.strokeStyle = p.type === "eraser" ? "rgba(0,0,0,1)" : (p.color || color); // ✅ dynamic color
-      ctx.lineWidth = p.type === "eraser" ? 15 : 3;
-      ctx.globalCompositeOperation = p.type === "eraser" ? "destination-out" : "source-over";
-      ctx.stroke();
-      ctx.globalCompositeOperation = "source-over";
+  paths.forEach((p) => {
+    ctx.beginPath();
+    p.points.forEach((pt, i) => {
+      if (i === 0) ctx.moveTo(pt.x, pt.y);
+      else ctx.lineTo(pt.x, pt.y);
     });
+    ctx.strokeStyle = p.type === "eraser" ? "rgba(0,0,0,1)" : (p.color || penColor); // ✅ dynamic pen color
+    ctx.lineWidth = p.type === "eraser" ? 15 : 3;
+    ctx.globalCompositeOperation = p.type === "eraser" ? "destination-out" : "source-over";
+    ctx.stroke();
+    ctx.globalCompositeOperation = "source-over";
+  });
 
-  // Draw current path while drawing
   if (currentPath.current.length > 0) {
     ctx.beginPath();
     currentPath.current.forEach((pt, i) => {
       if (i === 0) ctx.moveTo(pt.x, pt.y);
       else ctx.lineTo(pt.x, pt.y);
     });
-    ctx.strokeStyle = currentPathType.current === "eraser" ? "rgba(0,0,0,1)" : color; // ✅ dynamic color
+    ctx.strokeStyle = currentPathType.current === "eraser" ? "rgba(0,0,0,1)" : penColor;
     ctx.lineWidth = currentPathType.current === "eraser" ? 15 : 3;
     ctx.globalCompositeOperation = currentPathType.current === "eraser" ? "destination-out" : "source-over";
     ctx.stroke();
@@ -629,7 +625,7 @@ const endDrawing = () => {
   const newPath = {
     points: currentPath.current.map(p => ({ ...p })),
     type: currentPathType.current,
-    color: color, // ✅ store current color
+    color: penColor, // ✅ save current pen color
   };
 
   setPaths(prev => [...prev, newPath]);
@@ -852,14 +848,14 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
       <option value={64}>64</option>
     </select>
 
-    <input
+    {/* Text Color Picker */}
+<input
   type="color"
-  value={color}
+  value={textColor}
   onChange={(e) => {
     const newColor = e.target.value;
-    setColor(newColor);
-
-    // Apply to current text box if editing
+    setTextColor(newColor);
+    // update selected text box immediately
     if (currentBoxId !== null) {
       setTextBoxes(prev =>
         prev.map(b =>
@@ -868,7 +864,15 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
       );
     }
   }}
-  className="w-10 h-8 p-0 border-none rounded-lg cursor-pointer"
+  className="w-8 h-8 border-none rounded-lg cursor-pointer"
+/>
+
+{/* Pen Color Picker */}
+<input
+  type="color"
+  value={penColor}
+  onChange={(e) => setPenColor(e.target.value)}
+  className="w-8 h-8 border-none rounded-lg cursor-pointer"
 />
 
     {/* Font style */}

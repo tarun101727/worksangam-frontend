@@ -886,38 +886,6 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
       {t("Text")}
     </button>
 
-    {/* Font size */}
-    <select
-      value={fontSize}
-      onChange={(e) => setFontSize(Number(e.target.value))}
-      className="bg-[#020617]/90 border border-white/20 rounded-lg px-2 py-1 text-sm hover:border-white/40 transition"
-    >
-      <option value={16}>16</option>
-      <option value={24}>24</option>
-      <option value={32}>32</option>
-      <option value={48}>48</option>
-      <option value={64}>64</option>
-    </select>
-
-    {/* Text Color Picker */}
-<input
-  type="color"
-  value={textColor}
-  onChange={(e) => {
-    const newColor = e.target.value;
-    setTextColor(newColor);
-    // update selected text box immediately
-    if (currentBoxId !== null) {
-      setTextBoxes(prev =>
-        prev.map(b =>
-          b.id === currentBoxId ? { ...b, color: newColor } : b
-        )
-      );
-    }
-  }}
-  className="w-8 h-8 border-none rounded-lg cursor-pointer"
-/>
-
 {/* Pen Color Picker */}
 <input
   type="color"
@@ -925,17 +893,6 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
   onChange={(e) => setPenColor(e.target.value)}
   className="w-8 h-8 border-none rounded-lg cursor-pointer"
 />
-
-    {/* Font style */}
-    <select
-      value={fontStyle}
-      onChange={(e) => setFontStyle(e.target.value)}
-      className="bg-[#020617]/90 border border-white/20 rounded-lg px-2 py-1 text-sm hover:border-white/40 transition"
-    >
-      <option value="normal">{t("Normal")}</option>
-      <option value="bold">{t("Bold")}</option>
-      <option value="italic">{t("Italic")}</option>
-    </select>
 
     {/* Pen */}
     <button

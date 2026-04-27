@@ -665,7 +665,7 @@ const filtered = professions.filter((p) =>
               </p>
               {selectedTab === "online-jobs" && job.languages?.length > 0 && (
                 <p className="text-white/50 text-sm font-semibold">
-                  {t("Language Required")}: {job.languages.join(" , ")}
+                  {t("Languages")}: {job.languages.join(" , ")}
                 </p>
               )}
               <p className="text-yellow-400 font-semibold">

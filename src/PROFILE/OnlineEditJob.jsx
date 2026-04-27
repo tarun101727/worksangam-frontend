@@ -17,9 +17,10 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
     { label: t("Negotiable"), value: "negotiable" },
   ];
 
-  const inputBase = "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500";
+  const inputBase =
+    "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-white/20 placeholder-white/50";
 
-  /* ================= CLICK OUTSIDE ================= */
+  // ===== CLICK OUTSIDE =====
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (
@@ -29,12 +30,12 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
         setLanguageSuggestions([]);
       }
     };
-
     document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
+    return () =>
+      document.removeEventListener("click", handleClickOutside);
   }, []);
 
-  /* ================= LOAD LANGUAGES ================= */
+  // ===== LOAD LANGUAGES =====
   useEffect(() => {
     axios
       .get(`${BASE_URL}/api/languages`)
@@ -45,7 +46,7 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
       .catch(() => setAllLanguages([]));
   }, []);
 
-  /* ================= ADD LANGUAGE ================= */
+  // ===== ADD LANGUAGE =====
   const addLanguage = (lang) => {
     if (!lang.trim()) return;
 
@@ -60,7 +61,7 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
     setLanguageSuggestions([]);
   };
 
-  /* ================= REMOVE LANGUAGE ================= */
+  // ===== REMOVE LANGUAGE =====
   const removeLanguage = (lang) => {
     setForm((prev) => ({
       ...prev,
@@ -69,35 +70,42 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
   };
 
   return (
-    <div className="space-y-6 text-white">
+    <div className="max-w-3xl mx-auto px-4 py-8 text-white space-y-6">
       {/* PROFESSION */}
-      <input
-        className={inputBase}
-        placeholder={t("Profession")}
-        value={form.profession}
-        onChange={(e) => handleChange("profession", e.target.value)}
-      />
+      <div className="flex flex-col gap-1">
+        <label className="text-sm text-white/50">{t("Profession")}</label>
+        <input
+          className={inputBase}
+          placeholder={t("Profession")}
+          value={form.profession}
+          onChange={(e) => handleChange("profession", e.target.value)}
+        />
+      </div>
 
       {/* DESCRIPTION */}
-      <textarea
-        className={`${inputBase} h-28 resize-none`}
-        placeholder={t("Work description")}
-        value={form.description}
-        onChange={(e) => handleChange("description", e.target.value)}
-      />
+      <div className="flex flex-col gap-1">
+        <label className="text-sm text-white/50">{t("Description")}</label>
+        <textarea
+          className={`${inputBase} h-28 resize-none`}
+          placeholder={t("Work description")}
+          value={form.description}
+          onChange={(e) => handleChange("description", e.target.value)}
+        />
+      </div>
 
-      {/* ================= PRICE ================= */}
+      {/* PRICE */}
       <div className="space-y-3">
+        <label className="text-sm text-white/50">{t("Price Type")}</label>
         <div className="flex gap-3 flex-wrap">
           {urgentPriceOptions.map((opt) => (
             <button
               key={opt.value}
               type="button"
               onClick={() => handleChange("priceType", opt.value)}
-              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 ${
+              className={`flex-1 py-2 rounded-lg text-sm font-semibold ${
                 form.priceType === opt.value
                   ? "bg-indigo-600 text-white"
-                  : "bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700"
+                  : "bg-slate-800 text-white/50 border border-white/20"
               }`}
             >
               {opt.label}
@@ -125,13 +133,15 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
                 className={inputBase}
                 placeholder={t("Fixed price")}
                 value={form.expectedPrice}
-                onChange={(e) => handleChange("expectedPrice", e.target.value)}
+                onChange={(e) =>
+                  handleChange("expectedPrice", e.target.value)
+                }
                 onWheel={(e) => e.target.blur()}
               />
             )}
 
             {form.priceType === "negotiable" && (
-              <div className="flex gap-3 flex-wrap">
+              <div className="flex gap-3">
                 <input
                   type="number"
                   className={inputBase}
@@ -154,18 +164,21 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
         )}
       </div>
 
-      {/* ================= LANGUAGES ================= */}
+      {/* LANGUAGES */}
       <div className="space-y-2 relative" ref={languageContainerRef}>
-        {/* SELECTED LANGUAGES */}
+        <label className="text-sm text-white/50">{t("Languages")}</label>
+
+        {/* SELECTED */}
         <div className="flex flex-wrap gap-2">
           {form.languages.map((lang, i) => (
             <span
               key={i}
-              className="bg-indigo-600 px-3 py-1 rounded-full flex items-center gap-2 text-sm"
+              className="bg-indigo-600/20 text-indigo-300 px-3 py-1 rounded-full flex items-center gap-2"
             >
               {lang}
               <button
-                className="text-white/70 hover:text-white"
+                type="button"
+                className="text-white/50 hover:text-white"
                 onClick={() => removeLanguage(lang)}
               >
                 ✕
@@ -191,11 +204,15 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
             if (val.trim()) {
               setLanguageSuggestions(
                 allLanguages.filter(
-                  (l) => l.toLowerCase().includes(val.toLowerCase()) && !form.languages.includes(l)
+                  (l) =>
+                    l.toLowerCase().includes(val.toLowerCase()) &&
+                    !form.languages.includes(l)
                 )
               );
             } else {
-              setLanguageSuggestions(allLanguages.filter((l) => !form.languages.includes(l)));
+              setLanguageSuggestions(
+                allLanguages.filter((l) => !form.languages.includes(l))
+              );
             }
           }}
           onKeyDown={(e) => {
@@ -208,11 +225,11 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
 
         {/* SUGGESTIONS */}
         {languageSuggestions.length > 0 && (
-          <div className="absolute z-50 mt-1 w-full max-h-64 overflow-auto rounded-xl bg-slate-800 border border-white/10 shadow-lg">
+          <div className="absolute z-50 mt-1 w-full max-h-64 overflow-auto rounded-xl bg-slate-900 border border-white/10 shadow-xl">
             {languageSuggestions.map((lang) => (
               <div
                 key={lang}
-                className="px-4 py-2 text-white hover:bg-slate-700 cursor-pointer rounded-lg"
+                className="px-4 py-2 text-white hover:bg-slate-700 cursor-pointer"
                 onClick={() => addLanguage(lang)}
               >
                 {lang}

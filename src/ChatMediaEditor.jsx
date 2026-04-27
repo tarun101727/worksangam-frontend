@@ -1328,11 +1328,11 @@ onClick={(e) => e.stopPropagation()}
 
 <div className="border-t border-white/10 p-4">
 
-<input
-placeholder="Add a caption..."
-value={caption}
-onChange={(e)=>setCaption(e.target.value)}
-className="w-full p-3 bg-white/10 border border-white/20 rounded-xl outline-none"
+<textarea
+  placeholder="Add a caption..."
+  value={caption}
+  onChange={(e) => setCaption(e.target.value)}
+  className="w-full p-3 bg-white/10 border border-white/20 rounded-xl outline-none resize-none"
 />
 
 </div>

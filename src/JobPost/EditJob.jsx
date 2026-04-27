@@ -6,6 +6,7 @@ import CreateOfflineWorkerPostPage from "../PROFILE/CreateOfflineWorkerPostPage"
 import L from "leaflet";
 import { useRef } from "react";
 import OnlineEditJob from "../PROFILE/OnlineEditJob"
+import { useTranslation } from "react-i18next";
 
 
 const emptyForm = {
@@ -39,6 +40,7 @@ export default function EditJob() {
   const markerRef = useRef(null);
   const [locationLoading, setLocationLoading] = useState(false);
   const [jobType, setJobType] = useState("offline");
+  const { t } = useTranslation();
 
   const inputBase =
     "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700";
@@ -220,11 +222,11 @@ export default function EditJob() {
       getTodayDate={() => new Date().toISOString().split("T")[0]}
       openNativePicker={() => {}}
       standardPriceOptions={[
-        { label: "No Budget", value: null },
-        { label: "Fixed Price", value: "fixed" },
-        { label: "Hourly", value: "hourly" },
-        { label: "Negotiable", value: "negotiable" },
-        { label: "Inspect first", value: "inspect_quote" },
+        { label: t("No Budget"), value: null },
+        { label: t("Fixed Price"), value: "fixed" },
+        { label: t("Hourly"), value: "hourly" },
+        { label: t("Negotiable"), value: "negotiable" },
+        { label: t("Inspect first"), value: "inspect_quote" },
       ]}
     />
 

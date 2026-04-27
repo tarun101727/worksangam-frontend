@@ -146,7 +146,7 @@ export default function OnlineJobDetails() {
 {/* Languages */}
 {job.languages && job.languages.length > 0 && (
   <div className="mt-4 flex items-center gap-2">
-    <span className="text-sm text-white/60">{t("Language")}:</span>
+    <span className="text-sm text-white/60">{t("Languages")}:</span>
     <div className="flex flex-wrap gap-2">
       {job.languages.map((lang, i) => (
         <span

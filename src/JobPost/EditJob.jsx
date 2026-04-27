@@ -7,7 +7,7 @@ import L from "leaflet";
 import { useRef } from "react";
 import OnlineEditJob from "../PROFILE/OnlineEditJob"
 import { useTranslation } from "react-i18next";
-
+import i18n from "../i18n";
 
 const emptyForm = {
   profession: "",
@@ -41,6 +41,8 @@ export default function EditJob() {
   const [locationLoading, setLocationLoading] = useState(false);
   const [jobType, setJobType] = useState("offline");
   const { t } = useTranslation();
+  const translateTimer = useRef(null);
+  const latestTypedValue = useRef({});
 
   const inputBase =
     "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700";
@@ -189,6 +191,52 @@ export default function EditJob() {
     }
   };
 
+  const translateText = async (text, field) => {
+    const lang = i18n.language || "en";
+    if (lang === "en") return;
+  
+    try {
+      const res = await fetch(
+        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${lang}&dt=t&q=${encodeURIComponent(text)}`
+      );
+  
+      const data = await res.json();
+  
+      let translated = data[0].map((item) => item[0]).join("");
+  
+      // preserve trailing spaces
+      const trailingSpaces = text.match(/\s+$/);
+      if (trailingSpaces) {
+        translated += trailingSpaces[0];
+      }
+  
+      // prevent overwrite
+      if (latestTypedValue.current[field] !== text) return;
+  
+      handleChange(field, translated);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleSentenceChange = (value, field) => {
+    latestTypedValue.current[field] = value;
+  
+    // update UI immediately
+    handleChange(field, value);
+  
+    const lang = i18n.language || "en";
+    if (lang === "en") return;
+  
+    clearTimeout(translateTimer.current);
+  
+    translateTimer.current = setTimeout(() => {
+      if (latestTypedValue.current[field] !== value) return;
+  
+      translateText(value, field);
+    }, 800);
+  };
+
  if (loading) {
   return (
     <div className="min-h-screen flex justify-center items-center">
@@ -230,15 +278,14 @@ export default function EditJob() {
       ]}
     />
 
-    {/* ADDRESS */}
     <textarea
-      className={inputBase}
-      placeholder="Address"
-      value={form.addressDetails}
-      onChange={(e) =>
-        handleChange("addressDetails", e.target.value)
-      }
-    />
+  className={inputBase}
+  placeholder={t("Address")}
+  value={form.addressDetails}
+  onChange={(e) =>
+    handleSentenceChange(e.target.value, "addressDetails")
+  }
+/>
 
     {/* LOCATION INPUT */}
     <input

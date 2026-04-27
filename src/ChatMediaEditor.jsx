@@ -835,19 +835,6 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
       {t("Text")}
     </button>
 
-    {/* Font size */}
-    <select
-      value={fontSize}
-      onChange={(e) => setFontSize(Number(e.target.value))}
-      className="bg-[#020617]/90 border border-white/20 rounded-lg px-2 py-1 text-sm hover:border-white/40 transition"
-    >
-      <option value={16}>16</option>
-      <option value={24}>24</option>
-      <option value={32}>32</option>
-      <option value={48}>48</option>
-      <option value={64}>64</option>
-    </select>
-
     {/* Text Color Picker */}
 <input
   type="color"
@@ -867,24 +854,56 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
   className="w-8 h-8 border-none rounded-lg cursor-pointer"
 />
 
-{/* Pen Color Picker */}
-<input
-  type="color"
-  value={penColor}
-  onChange={(e) => setPenColor(e.target.value)}
-  className="w-8 h-8 border-none rounded-lg cursor-pointer"
-/>
-
-    {/* Font style */}
-    <select
-      value={fontStyle}
-      onChange={(e) => setFontStyle(e.target.value)}
-      className="bg-[#020617]/90 border border-white/20 rounded-lg px-2 py-1 text-sm hover:border-white/40 transition"
+{/* TOOLBAR */}
+{editMode && toolbarVisible && !isVideo && (
+  <div
+   id="editor-toolbar" 
+    className="absolute z-[9999] flex flex-wrap gap-3 items-center bg-black/30 p-3 rounded-xl shadow-lg backdrop-blur-sm"
+        onMouseDown={(e)=>e.stopPropagation()}
+    style={{
+      top: "10%",
+      left: "50%",
+      transform: "translateX(-50%)",
+    }}
+  >
+    {/* Text */}
+    <button
+      onClick={() => {
+        addText();
+        closeToolbar();
+        setPenMode(false); 
+      }}
+      className="px-4 py-1 bg-[#020617]/90 rounded-lg transition"
     >
-      <option value="normal">{t("Normal")}</option>
-      <option value="bold">{t("Bold")}</option>
-      <option value="italic">{t("Italic")}</option>
-    </select>
+      {t("Text")}
+    </button>
+
+    {/* Pen */}
+    <button
+      onClick={() => {
+        setPenMode(true);
+        setEraserMode(false);
+        closeToolbar();
+      }}
+      className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
+    >
+      ✏️
+    </button>
+
+    {/* Eraser */}
+    <button
+      onClick={() => {
+        setPenMode(true);
+        setEraserMode(true);
+        closeToolbar();
+      }}
+      className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
+    >
+      🧽
+    </button>
+  </div>
+)}
+
 
     {/* Pen */}
     <button

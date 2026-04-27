@@ -557,45 +557,52 @@ const sendMedia = async () => {
       drawCtx.globalCompositeOperation = "source-over";
     });
 
-    // Draw text boxes on drawCanvas
-    textBoxes.forEach(box => {
-      if (!box.text) return;
+    // Draw text boxes on drawCanvas (multi-line fix)
+textBoxes.forEach(box => {
+  if (!box.text) return;
 
-      const relX = (box.x - offsetX - box.width / 2) / displayedWidth;
-      const relY = (box.y - offsetY - box.height / 2) / displayedHeight;
-      const relWidth = box.width / displayedWidth;
+  const relX = (box.x - offsetX - box.width / 2) / displayedWidth;
+  const relY = (box.y - offsetY - box.height / 2) / displayedHeight;
+  const relWidth = box.width / displayedWidth;
 
-      const realX = relX * canvas.width;
-      const realY = relY * canvas.height;
-      const realWidth = relWidth * canvas.width;
+  const realX = relX * canvas.width;
+  const realY = relY * canvas.height;
+  const realWidth = relWidth * canvas.width;
 
-      drawCtx.fillStyle = box.color || "#fff";
-      drawCtx.font = `${box.fontStyle === "italic" ? "italic " : ""}${box.fontStyle === "bold" ? "bold " : ""}${box.fontSize * scaleX}px sans-serif`;
-      drawCtx.textAlign = "left";
-      drawCtx.textBaseline = "top";
+  drawCtx.fillStyle = box.color || "#fff";
+  drawCtx.font = `${box.fontStyle === "italic" ? "italic " : ""}${box.fontStyle === "bold" ? "bold " : ""}${box.fontSize * scaleX}px sans-serif`;
+  drawCtx.textAlign = "left";
+  drawCtx.textBaseline = "top";
 
-      const inputLines = box.text.split("\n");
-      const lines = [];
-      inputLines.forEach(rawLine => {
-        let currentLine = "";
-        rawLine.split(" ").forEach(word => {
-          const testLine = currentLine ? currentLine + " " + word : word;
-          if (drawCtx.measureText(testLine).width > realWidth && currentLine !== "") {
-            lines.push(currentLine);
-            currentLine = word;
-          } else currentLine = testLine;
-        });
-        lines.push(currentLine);
-      });
+  const lineHeight = box.fontSize * 1.2 * scaleY;
+  const padding = 5 * scaleX;
+  let drawY = realY + padding;
 
-      const lineHeight = box.fontSize * 1.2 * scaleY;
-      const padding = 5 * scaleX;
-      const startY = realY + padding;
+  // Split by user-entered newlines first
+  const inputLines = box.text.split("\n");
 
-      lines.forEach((line, i) => {
-        drawCtx.fillText(line.trim(), realX + padding, startY + i * lineHeight);
-      });
+  inputLines.forEach(rawLine => {
+    let words = rawLine.split(" ");
+    let currentLine = "";
+
+    words.forEach(word => {
+      const testLine = currentLine ? currentLine + " " + word : word;
+      if (drawCtx.measureText(testLine).width > realWidth && currentLine !== "") {
+        drawCtx.fillText(currentLine, realX + padding, drawY);
+        drawY += lineHeight;
+        currentLine = word;
+      } else {
+        currentLine = testLine;
+      }
     });
+
+    // Draw the remaining part of the line
+    if (currentLine) {
+      drawCtx.fillText(currentLine, realX + padding, drawY);
+      drawY += lineHeight;
+    }
+  });
+});
 
     // 3️⃣ Merge drawing layer onto base image
     ctx.drawImage(drawCanvas, 0, 0, canvas.width, canvas.height);

@@ -652,7 +652,7 @@ const filtered = professions.filter((p) =>
                   <p className="text-sm font-semibold text-white">
                     {job.hirer?.firstName} {job.hirer?.lastName}
                   </p>
-                  <p className="text-xs text-white/50">Job Poster</p>
+                  <p className="text-xs text-white/50">{t("Job Poster")}</p>
                 </div>
               </div>
 

@@ -17,6 +17,7 @@ export default function JobDetails() {
 
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedMedia, setSelectedMedia] = useState(null);
 
   // 🔥 TRANSLATION STATE
   const [translated, setTranslated] = useState({
@@ -101,7 +102,7 @@ export default function JobDetails() {
   const isOnline = job.professionType === "online";
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 p-5 bg-[#0F172A] rounded-2xl border border-white/10">
+    <div className="max-w-3xl mx-auto mt-10 p-5   rounded-2xl border border-white/10">
 
       {/* HEADER */}
       <div className="flex items-center gap-5 pb-6 border-b border-white/10 mb-8">
@@ -131,7 +132,7 @@ export default function JobDetails() {
       </div>
 
       {/* JOB CARD */}
-      <div className="bg-white/5 rounded-2xl p-6 space-y-6">
+      <div className="rounded-2xl p-6 space-y-6">
 
         {/* 🔵 PROFESSION */}
         <div className="flex items-center gap-3">
@@ -188,13 +189,14 @@ export default function JobDetails() {
                 <img
                   key={i}
                   src={getImageUrl(m.url)}
-                  className="h-24 w-full object-cover rounded-lg"
+                  onClick={() => setSelectedMedia(m)}
+                  className="h-24 w-full object-cover rounded-lg cursor-pointer"
                 />
               ) : (
                 <video
                   key={i}
-                  className="h-24 w-full object-cover rounded-lg"
-                  controls
+                  onClick={() => setSelectedMedia(m)}
+                  className="h-24 w-full object-cover rounded-lg cursor-pointer"
                 >
                   <source src={getImageUrl(m.url)} />
                 </video>
@@ -206,6 +208,7 @@ export default function JobDetails() {
 
       {/* 🔥 ACTION BUTTONS */}
       <div className="mt-6 flex gap-4 flex-wrap">
+
         <button
           onClick={() => navigate(`/edit-job/${job._id}`)}
           className="px-5 py-2 rounded-xl bg-blue-500"
@@ -220,6 +223,25 @@ export default function JobDetails() {
           {t("Delete")}
         </button>
       </div>
+
+      {/* FULLSCREEN MEDIA */}
+      {selectedMedia && (
+        <div
+          className="fixed inset-0 bg-black/80 flex items-center justify-center"
+          onClick={() => setSelectedMedia(null)}
+        >
+          {selectedMedia.type === "image" ? (
+            <img
+              src={getImageUrl(selectedMedia.url)}
+              className="max-h-[90vh]"
+            />
+          ) : (
+            <video controls className="max-h-[90vh]">
+              <source src={getImageUrl(selectedMedia.url)} />
+            </video>
+          )}
+        </div>
+      )}
     </div>
   );
 }

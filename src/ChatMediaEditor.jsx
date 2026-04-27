@@ -93,6 +93,7 @@ const [undoStack, setUndoStack] = useState([]);
 const [redoStack, setRedoStack] = useState([]);
 const [textColor, setTextColor] = useState("#000000"); // text color
 const [penColor, setPenColor] = useState("#ff0000");   // pen color
+const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
 
 
 const closeToolbar = () => {
@@ -672,10 +673,19 @@ const handleBoxClick = (id) => {
   setText(box.text);         // load saved text
   setIsEditingText(true);    // show border
   setTextActive(true);       // mark text active
+  setToolbarVisible(true);   // show toolbar
 
   originalBox.current = { ...box }; // keep expansion logic intact
 
-  // Use requestAnimationFrame to ensure textarea is focused after render
+  // Calculate toolbar position relative to container
+  const container = containerRef.current;
+  if (container) {
+    const containerRect = container.getBoundingClientRect();
+    const top = box.y - box.height / 2 - 50; // 50px above the box
+    const left = box.x - box.width / 2;
+    setToolbarPosition({ top, left });
+  }
+
   requestAnimationFrame(() => textRef.current?.focus());
 };
 
@@ -988,31 +998,19 @@ objectFit:"contain"
 
 )}
 
-{/* TOOLBAR */}
-{editMode && toolbarVisible && !isVideo && (
+
+{editMode && toolbarVisible && currentBoxId !== null && !isVideo && (
   <div
-    id="editor-toolbar" 
+    id="editor-toolbar"
     className="absolute z-[9999] flex flex-wrap gap-3 items-center bg-black/30 p-3 rounded-xl shadow-lg backdrop-blur-sm"
     style={{
-      top: "10%",
-      left: "50%",
-      transform: "translateX(-50%)",
+      top: toolbarPosition.top,
+      left: toolbarPosition.left,
+      transform: "translateX(0%)",
     }}
     onMouseDown={(e)=>e.stopPropagation()}
   >
-    {/* Text */}
-    <button
-      onClick={() => {
-        addText();
-        closeToolbar();
-        setPenMode(false);
-      }}
-      className="px-4 py-1 bg-[#020617]/90  rounded-lg transition"
-    >
-      {t("Text")}
-    </button>
-
-    {/* ------------------- TEXT FORMATTING ------------------- */}
+    {/* Font Size */}
     <select
       value={fontSize}
       onChange={(e) => setFontSize(Number(e.target.value))}
@@ -1025,6 +1023,7 @@ objectFit:"contain"
       <option value={64}>64</option>
     </select>
 
+    {/* Font Style */}
     <select
       value={fontStyle}
       onChange={(e) => setFontStyle(e.target.value)}
@@ -1035,6 +1034,7 @@ objectFit:"contain"
       <option value="italic">{t("Italic")}</option>
     </select>
 
+    {/* Text Color */}
     <input
       type="color"
       value={textColor}
@@ -1051,31 +1051,6 @@ objectFit:"contain"
       }}
       className="w-8 h-8 border-none rounded-lg cursor-pointer"
     />
-    {/* ---------------- END TEXT FORMATTING ---------------- */}
-
-    {/* Pen */}
-    <button
-      onClick={() => {
-        setPenMode(true);
-        setEraserMode(false);
-        closeToolbar();
-      }}
-      className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
-    >
-      ✏️
-    </button>
-
-    {/* Eraser */}
-    <button
-      onClick={() => {
-        setPenMode(true);
-        setEraserMode(true);
-        closeToolbar();
-      }}
-      className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
-    >
-      🧽
-    </button>
   </div>
 )}
 

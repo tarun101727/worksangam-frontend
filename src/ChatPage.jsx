@@ -370,7 +370,7 @@ className="w-8 h-8 rounded-full object-cover"
 ) : (
   m.message && (
     <div
-  className={`px-3 py-2 rounded-xl max-w-xs break-words whitespace-normal ${
+  className={`px-3 py-2 rounded-xl max-w-xs break-words ${
     isSender
       ? "bg-indigo-500 text-white"
       : "bg-gray-700 text-white"
@@ -386,7 +386,7 @@ className="w-8 h-8 rounded-full object-cover"
       {t("Shared a location(click to see location)")}
     </a>
   ) : (
-    m.message.trimEnd()
+    m.message
   )}
 </div>
   )
@@ -439,7 +439,7 @@ className="w-8 h-8 rounded-full object-cover"
 ) : (
   m.message && (
     <div
-  className={`px-3 py-2 rounded-xl max-w-xs break-words whitespace-normal ${
+  className={`px-3 py-2 rounded-xl max-w-xs break-words ${
     isSender
       ? "bg-indigo-500 text-white"
       : "bg-gray-700 text-white"
@@ -455,7 +455,7 @@ className="w-8 h-8 rounded-full object-cover"
       {t("Shared a location(click to see location)")}
     </a>
   ) : (
-    m.message.trimEnd()
+    m.message
   )}
 </div>
   )

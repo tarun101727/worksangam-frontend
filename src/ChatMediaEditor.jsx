@@ -1227,7 +1227,7 @@ onClick={(e) => e.stopPropagation()}
     style={{
       position: "absolute",
       top: textBoxes.find(b => b.id === currentBoxId).y - textBoxes.find(b => b.id === currentBoxId).height / 2 - 50,
-      left: textBoxes.find(b => b.id === currentBoxId).x - 150, // adjust width
+      left: textBoxes.find(b => b.id === currentBoxId).x - 150,
       display: "flex",
       gap: "8px",
       background: "rgba(0,0,0,0.7)",
@@ -1237,7 +1237,7 @@ onClick={(e) => e.stopPropagation()}
     }}
     onMouseDown={(e) => e.stopPropagation()}
   >
-    {/* Text Color */}
+    {/* Text Color Picker */}
     <input
       type="color"
       value={textColor}
@@ -1251,6 +1251,26 @@ onClick={(e) => e.stopPropagation()}
         );
       }}
       className="w-8 h-8 border-none rounded-lg cursor-pointer"
+    />
+
+    {/* Text Color Hex Input */}
+    <input
+      type="text"
+      value={textColor}
+      onChange={(e) => {
+        let val = e.target.value;
+        if (!val.startsWith("#")) val = "#" + val;
+        if (/^#[0-9A-Fa-f]{0,6}$/.test(val)) {
+          setTextColor(val);
+          setTextBoxes(prev =>
+            prev.map(b =>
+              b.id === currentBoxId ? { ...b, color: val } : b
+            )
+          );
+        }
+      }}
+      placeholder="#000000"
+      className="w-16 px-1 text-black rounded-md"
     />
 
     {/* Font Size */}

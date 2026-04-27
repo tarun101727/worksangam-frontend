@@ -675,9 +675,6 @@ const handleBoxClick = (id) => {
 
   originalBox.current = { ...box }; // keep expansion logic intact
 
-  // Close main toolbar when editing text
-  setToolbarVisible(false);
-
   // Use requestAnimationFrame to ensure textarea is focused after render
   requestAnimationFrame(() => textRef.current?.focus());
 };
@@ -1216,30 +1213,48 @@ onClick={(e) => e.stopPropagation()}
 )}
 </div>
 
-{/* FLOATING TEXT TOOLBAR */}
-{currentBoxId !== null && (
+{/* Text formatting controls above active text box */}
+{currentBoxId !== null && isEditingText && (
   <div
-    className="absolute z-[9999] flex gap-2 items-center bg-black/60 p-2 rounded-lg shadow-lg backdrop-blur-sm"
     style={{
-      top: Math.max(
-        0,
-        textBoxes.find(b => b.id === currentBoxId)?.y - (textBoxes.find(b => b.id === currentBoxId)?.height / 2) - 50
-      ),
-      left: Math.max(
-        0,
-        textBoxes.find(b => b.id === currentBoxId)?.x - 100
-      ),
-      transform: "translateX(-50%)",
+      position: "absolute",
+      top: textBoxes.find(b => b.id === currentBoxId).y - textBoxes.find(b => b.id === currentBoxId).height / 2 - 50,
+      left: textBoxes.find(b => b.id === currentBoxId).x - 150, // adjust width
+      display: "flex",
+      gap: "8px",
+      background: "rgba(0,0,0,0.7)",
+      padding: "6px 10px",
+      borderRadius: "8px",
+      zIndex: 100,
     }}
+    onMouseDown={(e) => e.stopPropagation()}
   >
-    {/* Font size */}
+    {/* Text Color */}
+    <input
+      type="color"
+      value={textColor}
+      onChange={(e) => {
+        const newColor = e.target.value;
+        setTextColor(newColor);
+        setTextBoxes(prev =>
+          prev.map(b =>
+            b.id === currentBoxId ? { ...b, color: newColor } : b
+          )
+        );
+      }}
+      className="w-8 h-8 border-none rounded-lg cursor-pointer"
+    />
+
+    {/* Font Size */}
     <select
       value={fontSize}
       onChange={(e) => {
         const newSize = Number(e.target.value);
         setFontSize(newSize);
         setTextBoxes(prev =>
-          prev.map(b => b.id === currentBoxId ? { ...b, fontSize: newSize } : b)
+          prev.map(b =>
+            b.id === currentBoxId ? { ...b, fontSize: newSize } : b
+          )
         );
       }}
       className="bg-[#020617]/90 border border-white/20 rounded-lg px-2 py-1 text-sm hover:border-white/40 transition"
@@ -1251,14 +1266,16 @@ onClick={(e) => e.stopPropagation()}
       <option value={64}>64</option>
     </select>
 
-    {/* Font style */}
+    {/* Font Style */}
     <select
       value={fontStyle}
       onChange={(e) => {
         const newStyle = e.target.value;
         setFontStyle(newStyle);
         setTextBoxes(prev =>
-          prev.map(b => b.id === currentBoxId ? { ...b, fontStyle: newStyle } : b)
+          prev.map(b =>
+            b.id === currentBoxId ? { ...b, fontStyle: newStyle } : b
+          )
         );
       }}
       className="bg-[#020617]/90 border border-white/20 rounded-lg px-2 py-1 text-sm hover:border-white/40 transition"
@@ -1267,20 +1284,6 @@ onClick={(e) => e.stopPropagation()}
       <option value="bold">Bold</option>
       <option value="italic">Italic</option>
     </select>
-
-    {/* Text color */}
-    <input
-      type="color"
-      value={textColor}
-      onChange={(e) => {
-        const newColor = e.target.value;
-        setTextColor(newColor);
-        setTextBoxes(prev =>
-          prev.map(b => b.id === currentBoxId ? { ...b, color: newColor } : b)
-        );
-      }}
-      className="w-8 h-8 border-none rounded-lg cursor-pointer"
-    />
   </div>
 )}
 

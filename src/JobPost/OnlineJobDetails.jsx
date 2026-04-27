@@ -160,17 +160,17 @@ export default function OnlineJobDetails() {
   </div>
 )}
 
-
-{/* Price */}
+{/* 🔵 PRICE */}
 {job.price && (
-  <div className="mt-2">
-    <span className="text-sm text-white/60">{t("Price")}:</span>{" "}
-    <span className="text-lg font-semibold text-indigo-300">
-      ${job.price}
-    </span>
-  </div>
+  <p className="text-xl font-bold text-yellow-400 mt-4">
+    {job.price.type === "fixed" &&
+      `${job.price.currency} ${job.price.value}`}
+    {job.price.type === "hourly" &&
+      `${job.price.currency} ${job.price.value}/hr`}
+    {job.price.type === "negotiable" &&
+      `${job.price.currency} ${job.price.min} – ${job.price.max}`}
+  </p>
 )}
-
       {/* Back & Chat / Apply */}
 <div className="mt-6 flex gap-4">
   <button 

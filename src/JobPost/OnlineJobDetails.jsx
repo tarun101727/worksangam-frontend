@@ -156,7 +156,8 @@ export default function OnlineJobDetails() {
           key={i}
           className="px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-full text-xs"
         >
-          {lang}
+          {/* Updated format */}
+          {`${t("language")} : ${lang} :-`}
         </span>
       ))}
     </div>

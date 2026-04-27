@@ -160,6 +160,17 @@ export default function OnlineJobDetails() {
   </div>
 )}
 
+
+{/* Price */}
+{job.price && (
+  <div className="mt-2">
+    <span className="text-sm text-white/60">{t("Price")}:</span>{" "}
+    <span className="text-lg font-semibold text-indigo-300">
+      ${job.price}
+    </span>
+  </div>
+)}
+
       {/* Back & Chat / Apply */}
 <div className="mt-6 flex gap-4">
   <button 

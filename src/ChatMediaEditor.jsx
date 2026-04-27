@@ -579,18 +579,18 @@ const lines = [];
 
 inputLines.forEach(rawLine => {
   let currentLine = "";
-  // Split by space, but ignore empty strings (caused by trailing spaces)
   rawLine.split(" ").forEach(word => {
-    if (!word) return; // skip empty strings
     const testLine = currentLine ? currentLine + " " + word : word;
+
     if (drawCtx.measureText(testLine).width > realWidth && currentLine !== "") {
-      lines.push(currentLine);
+      lines.push(currentLine.trimEnd()); // 🔹 trim trailing spaces
       currentLine = word;
     } else {
       currentLine = testLine;
     }
   });
-  if (currentLine) lines.push(currentLine); // push last line if not empty
+
+  if (currentLine) lines.push(currentLine.trimEnd()); // 🔹 also trim last line
 });
 
       const lineHeight = box.fontSize * 1.2 * scaleY;

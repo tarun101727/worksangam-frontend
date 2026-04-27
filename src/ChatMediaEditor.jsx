@@ -390,7 +390,6 @@ if (resizeRef.current && currentBoxId !== null) {
 
 };
 
-// UPDATE BOX DURING TYPING - auto expand
 const handleTextChange = (e) => {
   saveState();
   const el = e.target;
@@ -398,59 +397,66 @@ const handleTextChange = (e) => {
   const img = imgRef.current;
   if (!el || !container || !img || currentBoxId === null) return;
 
-  setText(el.value);
+  let value = el.value; // raw input
+  setText(value);
 
-  // Existing expansion logic
+  // Measure text for line wrapping
   el.style.height = "auto";
-  const imgRect = img.getBoundingClientRect();
-  const maxWidth = imgRect.width - 10;
-  const maxHeight = imgRect.height - 10;
-
-  const ctx = document.createElement("canvas").getContext("2d");
   const activeBox = textBoxes.find(b => b.id === currentBoxId);
   if (!activeBox) return;
 
-  ctx.font = `${activeBox.fontStyle === "italic" ? "italic" : ""} ${activeBox.fontStyle === "bold" ? "bold" : ""} ${activeBox.fontSize}px sans-serif`;
+  const ctx = document.createElement("canvas").getContext("2d");
+  ctx.font = `${activeBox.fontStyle === "italic" ? "italic " : ""}${activeBox.fontStyle === "bold" ? "bold " : ""}${activeBox.fontSize}px sans-serif`;
 
-  const words = el.value.split(" ");
+  const words = value.split(" ");
   let lines = [];
   let currentLine = "";
 
-  words.forEach(word => {
-    const testLine = currentLine ? currentLine + " " + word : word;
+  const imgRect = img.getBoundingClientRect();
+  const maxWidth = imgRect.width - 10;
+  const buffer = 10;
+
+  words.forEach((word, idx) => {
+    let testLine = currentLine ? currentLine + " " + word : word;
+
     if (ctx.measureText(testLine).width > maxWidth) {
-      if (currentLine) lines.push(currentLine);
+      if (currentLine) {
+        // Ensure line ends with a space (soft space) if missing
+        if (!currentLine.endsWith(" ")) currentLine += " ";
+        lines.push(currentLine);
+      }
       currentLine = word;
     } else {
       currentLine = testLine;
     }
-  });
-  if (currentLine) lines.push(currentLine);
 
-  const buffer = 10;
+    // Last word edge case
+    if (idx === words.length - 1) {
+      if (!currentLine.endsWith(" ")) currentLine += " ";
+      lines.push(currentLine);
+    }
+  });
+
+  // Compute width and height
   let widest = 0;
   lines.forEach(line => {
     const w = ctx.measureText(line).width + 2 * buffer;
     if (w > widest) widest = w;
   });
+
   const newWidth = Math.min(Math.max(originalBox.current.width, widest), maxWidth);
   const lineHeight = activeBox.fontSize * 1.2;
-  let contentHeight = lineHeight * lines.length + 2 * buffer;
-  let newHeight = Math.min(Math.max(originalBox.current.height, contentHeight, el.scrollHeight), maxHeight);
+  const contentHeight = lineHeight * lines.length + 2 * buffer;
+  const newHeight = Math.min(Math.max(originalBox.current.height, contentHeight, el.scrollHeight), imgRect.height - 10);
 
-  setBox(prev => ({
-    ...prev,
-    width: newWidth,
-    height: newHeight,
-  }));
+  // Update textarea height and box size
   el.style.height = `${newHeight}px`;
-
   setTextBoxes(prev =>
     prev.map(b => {
       if (b.id !== currentBoxId) return b;
       return {
         ...b,
-        text: el.value,
+        text: lines.join("\n"), // update text with soft spaces
         width: newWidth,
         height: newHeight,
         x: b.x,

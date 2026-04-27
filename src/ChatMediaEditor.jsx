@@ -412,20 +412,37 @@ const handleTextChange = (e) => {
 
   ctx.font = `${activeBox.fontStyle === "italic" ? "italic" : ""} ${activeBox.fontStyle === "bold" ? "bold" : ""} ${activeBox.fontSize}px sans-serif`;
 
-  const words = el.value.split(" ");
-  let lines = [];
-  let currentLine = "";
+  const words = el.value.split(/\s+/); // split on spaces/newlines
+let lines = [];
+let currentLine = "";
 
-  words.forEach(word => {
-    const testLine = currentLine ? currentLine + " " + word : word;
-    if (ctx.measureText(testLine).width > maxWidth) {
-      if (currentLine) lines.push(currentLine);
-      currentLine = word;
-    } else {
-      currentLine = testLine;
+words.forEach(word => {
+  let testLine = currentLine ? currentLine + " " + word : word;
+
+  // If the word is too long to fit on a single line
+  if (ctx.measureText(testLine).width > maxWidth && currentLine === "") {
+    // Break the word into characters
+    let subWord = "";
+    for (let char of word) {
+      const testSub = subWord + char;
+      if (ctx.measureText(testSub).width > maxWidth) {
+        lines.push(subWord);
+        subWord = char;
+      } else {
+        subWord = testSub;
+      }
     }
-  });
-  if (currentLine) lines.push(currentLine);
+    if (subWord) lines.push(subWord);
+    currentLine = "";
+  } else if (ctx.measureText(testLine).width > maxWidth) {
+    if (currentLine) lines.push(currentLine);
+    currentLine = word;
+  } else {
+    currentLine = testLine;
+  }
+});
+
+if (currentLine) lines.push(currentLine);
 
   const buffer = 10;
   let widest = 0;
@@ -771,39 +788,6 @@ const moveDrawing = (clientX, clientY) => {
   drawPaths();
 };
 
-const handleTextKeyDown = (e) => {
-  if (e.key === "Enter") {
-    e.preventDefault(); // prevent default behavior
-
-    if (e.shiftKey) {
-      // ✅ Insert newline at cursor position
-      const textarea = e.target;
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-
-      const newValue = text.substring(0, start) + "\n" + text.substring(end);
-      setText(newValue);
-
-      // Update the textBoxes state
-      setTextBoxes(prev =>
-        prev.map(b =>
-          b.id === currentBoxId ? { ...b, text: newValue } : b
-        )
-      );
-
-      // Move cursor after inserted newline
-      setTimeout(() => {
-        textarea.selectionStart = textarea.selectionEnd = start + 1;
-      }, 0);
-
-    } else {
-      // Optional: send media if Enter without Shift
-      // handleButtonClick(); // uncomment if you want Enter to send
-    }
-  }
-};
-
-
 
 return(
 
@@ -1073,7 +1057,6 @@ objectFit:"contain"
     if (!text) e.target.placeholder = "Enter text...";
   }}
         onChange={handleTextChange}
-        onKeyDown={handleTextKeyDown}
         onMouseDown={(e) => e.stopPropagation()}
 onClick={(e) => e.stopPropagation()}
           style={{

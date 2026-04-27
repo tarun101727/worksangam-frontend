@@ -413,19 +413,19 @@ const handleTextChange = (e) => {
   ctx.font = `${activeBox.fontStyle === "italic" ? "italic" : ""} ${activeBox.fontStyle === "bold" ? "bold" : ""} ${activeBox.fontSize}px sans-serif`;
 
   const words = el.value.split(" ");
-  let lines = [];
-  let currentLine = "";
+let lines = [];
+let currentLine = "";
 
-  words.forEach(word => {
-    const testLine = currentLine ? currentLine + " " + word : word;
-    if (ctx.measureText(testLine).width > maxWidth) {
-      if (currentLine) lines.push(currentLine);
-      currentLine = word;
-    } else {
-      currentLine = testLine;
-    }
-  });
-  if (currentLine) lines.push(currentLine);
+words.forEach(word => {
+  const testLine = currentLine ? currentLine + " " + word : word;
+  if (ctx.measureText(testLine).width > maxWidth && currentLine !== "") {
+    lines.push(currentLine.trimEnd()); // 🔹 trim trailing spaces
+    currentLine = word;
+  } else {
+    currentLine = testLine;
+  }
+});
+if (currentLine) lines.push(currentLine.trimEnd()); // 🔹 trim last line
 
   const buffer = 10;
   let widest = 0;
@@ -574,7 +574,7 @@ const sendMedia = async () => {
       drawCtx.textAlign = "left";
       drawCtx.textBaseline = "top";
 
-      const inputLines = box.text.split("\n");
+     const inputLines = box.text.split("\n");
 const lines = [];
 
 inputLines.forEach(rawLine => {

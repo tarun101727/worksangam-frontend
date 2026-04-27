@@ -117,21 +117,25 @@ useEffect(() => {
 
       textBoxes.forEach(box => {
         const el = document.getElementById(`textbox-${box.id}`);
+
         if (el && (el === e.target || el.contains(e.target))) {
           clickedInsideBox = true;
         }
       });
 
+      // ❌ Clicked outside
       if (!clickedInsideBox) {
-        // clicked outside: close text editing
         const currentBox = textBoxes.find(b => b.id === currentBoxId);
+
+        // 🔥 DELETE if empty
         if (currentBox && (!currentBox.text || currentBox.text.trim() === "")) {
           setTextBoxes(prev => prev.filter(b => b.id !== currentBoxId));
         }
+
+        // ✅ Stop editing
         setIsEditingText(false);
         setCurrentBoxId(null);
         setTextActive(false);
-        setToolbarVisible(false); // close toolbar when clicked outside
       }
     }
   };
@@ -201,25 +205,29 @@ const addText = () => {
 
   const newId = textBoxes.length + 1;
 
+  // Reset text styles
   const initialBox = {
-  id: newId,
-  x: container.clientWidth / 2,
-  y: container.clientHeight / 2,
-  width: 260,
-  height: 120,
-  text: "",
-  color: textColor,  // start with toolbar color
-  fontSize: fontSize, // start with toolbar size
-  fontStyle: "normal", // plain
-};
+    id: newId,
+    x: container.clientWidth / 2,
+    y: container.clientHeight / 2,
+    width: 260,
+    height: 120,
+    text: "",
+    color: "#000000",    // default black
+    fontSize: 16,        // default size
+    fontStyle: "normal"  // default style
+  };
 
   setTextBoxes(prev => [...prev, initialBox]);
   setCurrentBoxId(newId);
   setIsEditingText(true);
   setTextActive(true);
-  setText(initialBox.text); // current text value
+  setText(initialBox.text);
 
-  originalBox.current = { ...initialBox }; // store original size
+  originalBox.current = { ...initialBox };
+
+  // ✅ Show toolbar immediately
+  setToolbarVisible(true);
 
   setTimeout(() => textRef.current?.focus(), 100);
 };
@@ -664,17 +672,14 @@ const handleBoxClick = (id) => {
   const box = textBoxes.find(b => b.id === id);
   if (!box) return;
 
-  setCurrentBoxId(id);
-  setText(box.text);
-  setIsEditingText(true);
-  setTextActive(true);
+  setCurrentBoxId(id);       // make this box active
+  setText(box.text);         // load saved text
+  setIsEditingText(true);    // show border
+  setTextActive(true);       // mark text active
 
-  // Show toolbar above the text box
-  setToolbarVisible(true);
+  originalBox.current = { ...box }; // keep expansion logic intact
 
-  // Save original box for resizing
-  originalBox.current = { ...box };
-
+  // Use requestAnimationFrame to ensure textarea is focused after render
   requestAnimationFrame(() => textRef.current?.focus());
 };
 
@@ -837,7 +842,15 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Font size */}
     <select
       value={fontSize}
-      onChange={(e) => setFontSize(Number(e.target.value))}
+      onChange={(e) => {
+    const size = Number(e.target.value);
+    setFontSize(size);
+    if (currentBoxId !== null) {
+      setTextBoxes(prev =>
+        prev.map(b => b.id === currentBoxId ? { ...b, fontSize: size } : b)
+      );
+    }
+  }}
       className="bg-[#020617]/90 border border-white/20 rounded-lg px-2 py-1 text-sm hover:border-white/40 transition"
     >
       <option value={16}>16</option>
@@ -854,12 +867,9 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
   onChange={(e) => {
     const newColor = e.target.value;
     setTextColor(newColor);
-    // update selected text box immediately
     if (currentBoxId !== null) {
       setTextBoxes(prev =>
-        prev.map(b =>
-          b.id === currentBoxId ? { ...b, color: newColor } : b
-        )
+        prev.map(b => b.id === currentBoxId ? { ...b, color: newColor } : b)
       );
     }
   }}
@@ -877,7 +887,15 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Font style */}
     <select
       value={fontStyle}
-      onChange={(e) => setFontStyle(e.target.value)}
+      onChange={(e) => {
+    const style = e.target.value;
+    setFontStyle(style);
+    if (currentBoxId !== null) {
+      setTextBoxes(prev =>
+        prev.map(b => b.id === currentBoxId ? { ...b, fontStyle: style } : b)
+      );
+    }
+  }}
       className="bg-[#020617]/90 border border-white/20 rounded-lg px-2 py-1 text-sm hover:border-white/40 transition"
     >
       <option value="normal">{t("Normal")}</option>
@@ -930,6 +948,17 @@ onTouchMove={(e)=>{
 }}
 
 onTouchEnd={stopAll}
+
+onClick={(e) => {
+  if (!editMode) return;
+
+  const containerTop = containerRef.current.getBoundingClientRect().top;
+
+  // If user clicks above the text boxes (e.g., top 50px of container)
+  if (e.clientY < containerTop + 50) {
+    setToolbarVisible(true);
+  }
+}}
 >
 
 {isVideo ? (
@@ -1008,48 +1037,57 @@ objectFit:"contain"
 }}
   >
     {currentBoxId === boxItem.id ? (
-  <textarea
-    ref={textRef}
-    value={text}
-    placeholder="Enter text..."
-    onChange={handleTextChange}
-    onMouseDown={(e) => e.stopPropagation()}
-    onClick={(e) => e.stopPropagation()}
-    style={{
-      width: "100%",
-      height: "100%",
-      background: "transparent",
-      border: "none",
-      outline: "none",
-      color: textColor, // use current toolbar text color
-      fontSize: fontSize, // default 16, no initial styling
-      fontWeight: "normal",
-      fontStyle: "normal",
-      resize: "none",
-      overflow: "hidden",
-      textAlign: "left",
-      whiteSpace: "pre-wrap",
-      verticalAlign: "top",
-      padding: "5px",
-      pointerEvents: "auto",
-      boxSizing: "border-box",
-      borderBottom: "2px solid white", // 🔥 horizontal line under text
-    }}
-  />
-) : (
-  <div
-    style={{
-      width: "100%",
-      height: "100%",
-      padding: "5px",
-      whiteSpace: "pre-wrap",
-      wordBreak: "break-word",
-      pointerEvents: "none", 
-    }}
-  >
-    {boxItem.text}
-  </div>
-)}
+      <textarea
+        ref={textRef}
+        value={text}
+          placeholder="Enter text..."
+  onFocus={(e) => {
+    if (!text) e.target.placeholder = "";
+  }}
+  onBlur={(e) => {
+    if (!text) e.target.placeholder = "Enter text...";
+  }}
+        onChange={handleTextChange}
+        onMouseDown={(e) => e.stopPropagation()}
+onClick={(e) => e.stopPropagation()}
+          style={{
+    width: "100%",
+    height: "100%",
+    background: "transparent",
+    border: "none",
+    outline: "none",
+    color: textBoxes.find(b => b.id === currentBoxId)?.color || "#000000", // ✅ dynamic color
+    fontSize: boxItem.fontSize,
+    fontWeight: boxItem.fontStyle === "bold" ? "bold" : "normal",
+    fontStyle: boxItem.fontStyle === "italic" ? "italic" : "normal",
+    resize: "none",
+    overflow: "hidden",
+    textAlign: "left",
+    whiteSpace: "pre-wrap",
+    verticalAlign: "top",
+    padding: "5px",
+    pointerEvents: "auto",
+    boxSizing: "border-box"
+  }}
+      />
+    ) : (
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          padding: "5px",
+          whiteSpace: "pre-wrap",
+          wordBreak: "break-word",
+          color: boxItem.color,
+          fontSize: boxItem.fontSize,
+          fontWeight: boxItem.fontStyle === "bold" ? "bold" : "normal",
+          fontStyle: boxItem.fontStyle === "italic" ? "italic" : "normal",
+          pointerEvents: "none", // important: allow clicks to pass to parent div
+        }}
+      >
+        {boxItem.text}
+      </div>
+    )}
 
     {/* Resize handles */}
     {currentBoxId === boxItem.id && ["top", "right", "bottom", "left"].map(dir => (

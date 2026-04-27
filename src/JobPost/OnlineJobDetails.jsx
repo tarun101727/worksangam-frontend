@@ -145,19 +145,15 @@ export default function OnlineJobDetails() {
 
 {/* Languages */}
 {job.languages && job.languages.length > 0 && (
-  <div className="mt-4">
-    <p className="text-sm text-white/60 mb-1">
-      {t("Languages")}:
-    </p>
-
+  <div className="mt-4 flex items-center gap-2">
+    <span className="text-sm text-white/60">{t("Language")}:</span>
     <div className="flex flex-wrap gap-2">
       {job.languages.map((lang, i) => (
         <span
           key={i}
           className="px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-full text-xs"
         >
-          {/* Updated format */}
-          {`${t("language")} : ${lang} :-`}
+          {lang}
         </span>
       ))}
     </div>

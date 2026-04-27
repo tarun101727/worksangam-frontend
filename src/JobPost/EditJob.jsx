@@ -247,7 +247,7 @@ export default function EditJob() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
-      <div className="p-6 rounded-3xl bg-slate-900 space-y-6">
+      <div >
 
         <h1 className="text-xl font-bold">✏️ Edit Job</h1>
 

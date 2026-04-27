@@ -249,7 +249,9 @@ export default function EditJob() {
     <div className="max-w-2xl mx-auto px-4 py-10">
       <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/90 border border-slate-700/50 shadow-xl space-y-6">
 
-        <h1 className="text-xl font-bold">✏️ Edit Job</h1>
+       <h1 className="text-xl font-bold">
+  ✏️ {jobType === "online" ? t("EditOnlineJob") : t("EditOfflineJob")}
+</h1>
 
         {jobType === "online" ? (
   <OnlineEditJob

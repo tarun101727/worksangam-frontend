@@ -92,6 +92,7 @@ const [undoStack, setUndoStack] = useState([]);
 const [redoStack, setRedoStack] = useState([]);
 const [textColor, setTextColor] = useState("#000000"); // text color
 const [penColor, setPenColor] = useState("#ff0000");   // pen color
+const [isSending, setIsSending] = useState(false);
 
 
 const closeToolbar = () => {
@@ -636,35 +637,38 @@ const sendMedia = async () => {
 const previewHeight = "70vh"; // keep constant
 
 const handleButtonClick = async () => {
-  if(buttonLabel === "Save" && cropMode){
-    // --- Save the cropped image ---
-    const image = imgRef.current;
-    if(image && crop.width && crop.height){
-      const scaleX = image.naturalWidth / image.width;
-      const scaleY = image.naturalHeight / image.height;
+  try {
+    setIsSending(true); // start loading
+    if(buttonLabel === "Save" && cropMode){
+      // --- Save the cropped image ---
+      const image = imgRef.current;
+      if(image && crop.width && crop.height){
+        const scaleX = image.naturalWidth / image.width;
+        const scaleY = image.naturalHeight / image.height;
 
-      const croppedBlob = await getCroppedImg(image, {
-        x: crop.x * scaleX,
-        y: crop.y * scaleY,
-        width: crop.width * scaleX,
-        height: crop.height * scaleY
-      });
+        const croppedBlob = await getCroppedImg(image, {
+          x: crop.x * scaleX,
+          y: crop.y * scaleY,
+          width: crop.width * scaleX,
+          height: crop.height * scaleY
+        });
 
-      // Replace original image with cropped one
-      const croppedFile = new File([croppedBlob], "cropped.jpg", { type: "image/jpeg" });
-      const newUrl = URL.createObjectURL(croppedFile);
-      imgRef.current.src = newUrl; // update preview
+        const croppedFile = new File([croppedBlob], "cropped.jpg", { type: "image/jpeg" });
+        const newUrl = URL.createObjectURL(croppedFile);
+        imgRef.current.src = newUrl;
 
-      // Reset crop mode and button
-      setCropMode(false);
-      setButtonLabel("Send");
-
-      setCurrentFile(croppedFile);
-setCurrentImageUrl(newUrl);
+        setCropMode(false);
+        setButtonLabel("Send");
+        setCurrentFile(croppedFile);
+        setCurrentImageUrl(newUrl);
+      }
+    } else {
+      await sendMedia();
     }
-  } else {
-    // Normal send
-    await sendMedia();
+  } catch (err) {
+    console.error("Failed to send media:", err);
+  } finally {
+    setIsSending(false); // stop loading
   }
 };
 
@@ -852,9 +856,18 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
 
 <button
   onClick={handleButtonClick}
-  className="bg-indigo-500 hover:bg-indigo-600 px-4 py-2 rounded-lg"
+  className="bg-indigo-500 hover:bg-indigo-600 px-4 py-2 rounded-lg flex items-center justify-center gap-2"
+  disabled={isSending} // disable while sending
 >
-  {t(buttonLabel)}
+  {isSending ? (
+    <>
+      <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+      </svg>
+      {t("Sending...")}
+    </>
+  ) : t(buttonLabel)}
 </button>
 
 </div>

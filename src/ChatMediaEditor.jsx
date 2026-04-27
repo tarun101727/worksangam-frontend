@@ -39,6 +39,7 @@ const [editMode,setEditMode] = useState(false);
 const [text,setText] = useState("");
 const [isEditingText,setIsEditingText] = useState(false);
 
+const [color,setColor] = useState("#ffffff");
 const [fontSize,setFontSize] = useState(16);
 const [fontStyle,setFontStyle] = useState("normal");
 
@@ -91,8 +92,6 @@ const [currentBoxId, setCurrentBoxId] = useState(null); // current editing box
 const [toolbarVisible, setToolbarVisible] = useState(false);
 const [undoStack, setUndoStack] = useState([]);
 const [redoStack, setRedoStack] = useState([]);
-const [textColor, setTextColor] = useState("#000000"); // text color
-const [penColor, setPenColor] = useState("#ff0000");   // pen color
 
 
 const closeToolbar = () => {
@@ -390,23 +389,72 @@ if (resizeRef.current && currentBoxId !== null) {
 
 };
 
+// UPDATE BOX DURING TYPING
 const handleTextChange = (e) => {
   saveState();
   const el = e.target;
-  if (!el || currentBoxId === null) return;
+  const container = containerRef.current;
+  const img = imgRef.current;
+  if (!el || !container || !img || currentBoxId === null) return;
 
   setText(el.value);
 
+  // Existing expansion logic (do not change)
+  el.style.height = "auto";
+  const imgRect = img.getBoundingClientRect();
+  const maxWidth = imgRect.width - 10;
+  const maxHeight = imgRect.height - 10;
+
+  const ctx = document.createElement("canvas").getContext("2d");
+  ctx.font = `${fontStyle === "italic" ? "italic" : ""} ${fontStyle === "bold" ? "bold" : ""} ${fontSize}px sans-serif`;
+
+  const words = el.value.split(" ");
+  let lines = [];
+  let currentLine = "";
+
+  words.forEach(word => {
+    const testLine = currentLine ? currentLine + " " + word : word;
+    if (ctx.measureText(testLine).width > maxWidth) {
+      if (currentLine) lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  });
+  if (currentLine) lines.push(currentLine);
+
+  const buffer = 10;
+  let widest = 0;
+  lines.forEach(line => {
+    const w = ctx.measureText(line).width + 2 * buffer;
+    if (w > widest) widest = w;
+  });
+  const newWidth = Math.min(Math.max(originalBox.current.width, widest), maxWidth);
+  const lineHeight = fontSize * 1.2;
+  let contentHeight = lineHeight * lines.length + 2 * buffer;
+  let newHeight = Math.min(Math.max(originalBox.current.height, contentHeight, el.scrollHeight), maxHeight);
+
+  setBox(prev => ({
+    ...prev,
+    width: newWidth,
+    height: newHeight,
+  }));
+  el.style.height = `${newHeight}px`;
+
   setTextBoxes(prev =>
-    prev.map(b => {
-      if (b.id !== currentBoxId) return b;
-      return {
-        ...b,
-        text: el.value,
-        color: textColor, // ✅ use textColor state
-      };
-    })
-  );
+  prev.map(b => {
+    if (b.id !== currentBoxId) return b;
+
+    return {
+      ...b,
+      text: el.value,
+      width: newWidth,
+      height: newHeight,
+      x: b.x, // keep same position
+      y: b.y
+    };
+  })
+);
 };
 
 
@@ -424,26 +472,30 @@ const drawPaths = () => {
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
 
-  paths.forEach((p) => {
-    ctx.beginPath();
-    p.points.forEach((pt, i) => {
-      if (i === 0) ctx.moveTo(pt.x, pt.y);
-      else ctx.lineTo(pt.x, pt.y);
+  // Draw saved paths
+  paths
+    .filter(p => p.points.length > 0)
+    .forEach((p, idx) => {
+      ctx.beginPath();
+      p.points.forEach((pt, i) => {
+        if (i === 0) ctx.moveTo(pt.x, pt.y);
+        else ctx.lineTo(pt.x, pt.y);
+      });
+      ctx.strokeStyle = p.type === "eraser" ? "rgba(0,0,0,1)" : "#ff0000";
+      ctx.lineWidth = p.type === "eraser" ? 15 : 3;
+      ctx.globalCompositeOperation = p.type === "eraser" ? "destination-out" : "source-over";
+      ctx.stroke();
+      ctx.globalCompositeOperation = "source-over";
     });
-    ctx.strokeStyle = p.type === "eraser" ? "rgba(0,0,0,1)" : (p.color || penColor); // ✅ dynamic pen color
-    ctx.lineWidth = p.type === "eraser" ? 15 : 3;
-    ctx.globalCompositeOperation = p.type === "eraser" ? "destination-out" : "source-over";
-    ctx.stroke();
-    ctx.globalCompositeOperation = "source-over";
-  });
 
+  // Draw current path while drawing
   if (currentPath.current.length > 0) {
     ctx.beginPath();
     currentPath.current.forEach((pt, i) => {
       if (i === 0) ctx.moveTo(pt.x, pt.y);
       else ctx.lineTo(pt.x, pt.y);
     });
-    ctx.strokeStyle = currentPathType.current === "eraser" ? "rgba(0,0,0,1)" : penColor;
+    ctx.strokeStyle = currentPathType.current === "eraser" ? "rgba(0,0,0,1)" : "#ff0000";
     ctx.lineWidth = currentPathType.current === "eraser" ? 15 : 3;
     ctx.globalCompositeOperation = currentPathType.current === "eraser" ? "destination-out" : "source-over";
     ctx.stroke();
@@ -621,14 +673,15 @@ setCurrentImageUrl(newUrl);
 const endDrawing = () => {
   if (currentPath.current.length === 0) return;
   saveState();
-
   const newPath = {
     points: currentPath.current.map(p => ({ ...p })),
-    type: currentPathType.current,
-    color: penColor, // ✅ save current pen color
+    type: currentPathType.current
   };
 
-  setPaths(prev => [...prev, newPath]);
+  setPaths(prev => {
+    const updated = [...prev, newPath];
+    return updated;
+  });
 
   currentPath.current = [];
   setDrawing(false);
@@ -848,32 +901,13 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
       <option value={64}>64</option>
     </select>
 
-    {/* Text Color Picker */}
-<input
-  type="color"
-  value={textColor}
-  onChange={(e) => {
-    const newColor = e.target.value;
-    setTextColor(newColor);
-    // update selected text box immediately
-    if (currentBoxId !== null) {
-      setTextBoxes(prev =>
-        prev.map(b =>
-          b.id === currentBoxId ? { ...b, color: newColor } : b
-        )
-      );
-    }
-  }}
-  className="w-8 h-8 border-none rounded-lg cursor-pointer"
-/>
-
-{/* Pen Color Picker */}
-<input
-  type="color"
-  value={penColor}
-  onChange={(e) => setPenColor(e.target.value)}
-  className="w-8 h-8 border-none rounded-lg cursor-pointer"
-/>
+    {/* Color */}
+    <input
+      type="color"
+      value={color}
+      onChange={(e) => setColor(e.target.value)}
+      className="w-10 h-8 p-0 border-none rounded-lg cursor-pointer"
+    />
 
     {/* Font style */}
     <select
@@ -1022,25 +1056,25 @@ objectFit:"contain"
         onChange={handleTextChange}
         onMouseDown={(e) => e.stopPropagation()}
 onClick={(e) => e.stopPropagation()}
-          style={{
-    width: "100%",
-    height: "100%",
-    background: "transparent",
-    border: "none",
-    outline: "none",
-    color: textBoxes.find(b => b.id === currentBoxId)?.color || "#000000", // ✅ dynamic color
-    fontSize: boxItem.fontSize,
-    fontWeight: boxItem.fontStyle === "bold" ? "bold" : "normal",
-    fontStyle: boxItem.fontStyle === "italic" ? "italic" : "normal",
-    resize: "none",
-    overflow: "hidden",
-    textAlign: "left",
-    whiteSpace: "pre-wrap",
-    verticalAlign: "top",
-    padding: "5px",
-    pointerEvents: "auto",
-    boxSizing: "border-box"
-  }}
+        style={{
+          width: "100%",
+          height: "100%",
+          background: "transparent",
+          border: "none",
+          outline: "none",
+          color: "#000000",
+          fontSize: boxItem.fontSize,
+          fontWeight: boxItem.fontStyle === "bold" ? "bold" : "normal",
+          fontStyle: boxItem.fontStyle === "italic" ? "italic" : "normal",
+          resize: "none",
+          overflow: "hidden",
+          textAlign: "left",
+          whiteSpace: "pre-wrap",
+          verticalAlign: "top",
+          padding: "5px",
+          pointerEvents: "auto",
+          boxSizing: "border-box"
+        }}
       />
     ) : (
       <div
@@ -1213,79 +1247,6 @@ onClick={(e) => e.stopPropagation()}
 )}
 </div>
 
-{/* Text formatting controls above active text box */}
-{currentBoxId !== null && isEditingText && (
-  <div
-    style={{
-      position: "absolute",
-      top: textBoxes.find(b => b.id === currentBoxId).y - textBoxes.find(b => b.id === currentBoxId).height / 2 - 50,
-      left: textBoxes.find(b => b.id === currentBoxId).x - 150, // adjust width
-      display: "flex",
-      gap: "8px",
-      background: "rgba(0,0,0,0.7)",
-      padding: "6px 10px",
-      borderRadius: "8px",
-      zIndex: 100,
-    }}
-    onMouseDown={(e) => e.stopPropagation()}
-  >
-    {/* Text Color */}
-    <input
-      type="color"
-      value={textColor}
-      onChange={(e) => {
-        const newColor = e.target.value;
-        setTextColor(newColor);
-        setTextBoxes(prev =>
-          prev.map(b =>
-            b.id === currentBoxId ? { ...b, color: newColor } : b
-          )
-        );
-      }}
-      className="w-8 h-8 border-none rounded-lg cursor-pointer"
-    />
-
-    {/* Font Size */}
-    <select
-      value={fontSize}
-      onChange={(e) => {
-        const newSize = Number(e.target.value);
-        setFontSize(newSize);
-        setTextBoxes(prev =>
-          prev.map(b =>
-            b.id === currentBoxId ? { ...b, fontSize: newSize } : b
-          )
-        );
-      }}
-      className="bg-[#020617]/90 border border-white/20 rounded-lg px-2 py-1 text-sm hover:border-white/40 transition"
-    >
-      <option value={16}>16</option>
-      <option value={24}>24</option>
-      <option value={32}>32</option>
-      <option value={48}>48</option>
-      <option value={64}>64</option>
-    </select>
-
-    {/* Font Style */}
-    <select
-      value={fontStyle}
-      onChange={(e) => {
-        const newStyle = e.target.value;
-        setFontStyle(newStyle);
-        setTextBoxes(prev =>
-          prev.map(b =>
-            b.id === currentBoxId ? { ...b, fontStyle: newStyle } : b
-          )
-        );
-      }}
-      className="bg-[#020617]/90 border border-white/20 rounded-lg px-2 py-1 text-sm hover:border-white/40 transition"
-    >
-      <option value="normal">Normal</option>
-      <option value="bold">Bold</option>
-      <option value="italic">Italic</option>
-    </select>
-  </div>
-)}
 
 {/* CAPTION */}
 

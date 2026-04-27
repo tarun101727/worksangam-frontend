@@ -102,146 +102,139 @@ export default function JobDetails() {
   const isOnline = job.professionType === "online";
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 p-5   rounded-2xl">
+    <div className="max-w-3xl mx-auto mt-10 p-6 rounded-2xl">
 
-      {/* HEADER */}
-      <div className="flex items-center gap-5 pb-6 border-b border-white/10 mb-8">
-        {job.hirer?.profileImage ? (
-          <img
-            src={getImageUrl(job.hirer.profileImage)}
-            alt={job.hirer.firstName}
-            className="w-16 h-16 rounded-full object-cover ring-2 ring-white/10"
-          />
-        ) : (
-          <div
-            className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold"
-            style={{ backgroundColor: job.hirer?.avatarColor || "#334155" }}
-          >
-            {job.hirer?.avatarInitial || "H"}
-          </div>
-        )}
-
-        <div>
-          <p className="text-lg font-semibold">
-            {job.hirer?.firstName} {job.hirer?.lastName}
-          </p>
-          <p className="text-xs text-white/50">
-            {t("job_posted_by", { name: job.hirer?.firstName })}
-          </p>
-        </div>
+  {/* HEADER */}
+  <div className="flex items-center gap-5 pb-6 border-b border-white/10 mb-8">
+    {job.hirer?.profileImage ? (
+      <img
+        src={getImageUrl(job.hirer.profileImage)}
+        alt={job.hirer.firstName}
+        className="w-16 h-16 rounded-full object-cover ring-2 ring-white/10"
+      />
+    ) : (
+      <div
+        className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold"
+        style={{ backgroundColor: job.hirer?.avatarColor || "#334155" }}
+      >
+        {job.hirer?.avatarInitial || "H"}
       </div>
+    )}
 
-      {/* JOB CARD */}
-      <div className="flex items-center gap-3">
+    <div className="flex flex-col justify-center">
+      <p className="text-lg font-semibold">
+        {job.hirer?.firstName} {job.hirer?.lastName}
+      </p>
+      <p className="text-xs text-white/50">
+        {t("job_posted_by", { name: job.hirer?.firstName })}
+      </p>
+    </div>
+  </div>
 
-        {/* 🔵 PROFESSION */}
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold">
-            {translated.profession || job.profession}
-          </h1>
+  {/* JOB CARD */}
+  <div className="flex flex-col gap-6">
 
-          <button
-            onClick={() => handleTranslate("profession", job.profession)}
-            className="text-sm text-indigo-400 underline"
-          >
-            {loadingTranslate === "profession" ? "..." : t("Translate")}
-          </button>
-        </div>
+    {/* PROFESSION */}
+    <div className="flex items-center justify-between flex-wrap gap-3">
+      <h1 className="text-2xl font-bold">{translated.profession || job.profession}</h1>
+      <button
+        onClick={() => handleTranslate("profession", job.profession)}
+        className="text-sm text-indigo-400 underline"
+      >
+        {loadingTranslate === "profession" ? "..." : t("Translate")}
+      </button>
+    </div>
 
-        {/* 🔵 DESCRIPTION */}
-        <div className="flex items-center gap-3">
-          <p className="text-white/70">
-            {translated.description || job.description}
-          </p>
+    {/* DESCRIPTION */}
+    <div className="flex items-start justify-between flex-wrap gap-3">
+      <p className="text-white/70">{translated.description || job.description}</p>
+      <button
+        onClick={() => handleTranslate("description", job.description)}
+        className="text-sm text-indigo-400 underline"
+      >
+        {loadingTranslate === "description" ? "..." : t("Translate")}
+      </button>
+    </div>
 
-          <button
-            onClick={() => handleTranslate("description", job.description)}
-            className="text-sm text-indigo-400 underline"
-          >
-            {loadingTranslate === "description" ? "..." : t("Translate")}
-          </button>
-        </div>
+    {/* ONLINE INFO */}
+    {isOnline && job.languages?.length > 0 && (
+      <p className="text-white/60">
+        {t("Languages")}: {job.languages.join(", ")}
+      </p>
+    )}
 
-        {/* 🔵 ONLINE */}
-        {isOnline && job.languages?.length > 0 && (
-          <p className="text-white/60">
-            {t("Languages")}: {job.languages.join(", ")}
-          </p>
-        )}
+    {/* PRICE */}
+    {job.price && (
+      <p className="text-xl font-bold text-yellow-400">
+        {job.price.type === "fixed" &&
+          `${job.price.currency} ${job.price.value}`}
+        {job.price.type === "hourly" &&
+          `${job.price.currency} ${job.price.value}/hr`}
+        {job.price.type === "negotiable" &&
+          `${job.price.currency} ${job.price.min} – ${job.price.max}`}
+      </p>
+    )}
 
-        {/* 🔵 PRICE */}
-        {job.price && (
-          <p className="text-xl font-bold text-yellow-400">
-            {job.price.type === "fixed" &&
-              `${job.price.currency} ${job.price.value}`}
-            {job.price.type === "hourly" &&
-              `${job.price.currency} ${job.price.value}/hr`}
-            {job.price.type === "negotiable" &&
-              `${job.price.currency} ${job.price.min} – ${job.price.max}`}
-          </p>
-        )}
-
-        {/* 🔵 MEDIA (OFFLINE ONLY) */}
-        {!isOnline && job.media?.length > 0 && (
-          <div className="grid grid-cols-3 gap-3">
-            {job.media.map((m, i) =>
-              m.type === "image" ? (
-                <img
-                  key={i}
-                  src={getImageUrl(m.url)}
-                  onClick={() => setSelectedMedia(m)}
-                  className="h-24 w-full object-cover rounded-lg cursor-pointer"
-                />
-              ) : (
-                <video
-                  key={i}
-                  onClick={() => setSelectedMedia(m)}
-                  className="h-24 w-full object-cover rounded-lg cursor-pointer"
-                >
-                  <source src={getImageUrl(m.url)} />
-                </video>
-              )
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* 🔥 ACTION BUTTONS */}
-      <div className="mt-6 flex gap-4 flex-wrap">
-
-        <button
-          onClick={() => navigate(`/edit-job/${job._id}`)}
-          className="px-5 py-2 rounded-xl bg-blue-500"
-        >
-          {t("Edit")}
-        </button>
-
-        <button
-          onClick={handleDelete}
-          className="px-5 py-2 rounded-xl bg-red-500"
-        >
-          {t("Delete")}
-        </button>
-      </div>
-
-      {/* FULLSCREEN MEDIA */}
-      {selectedMedia && (
-        <div
-          className="fixed inset-0 bg-black/80 flex items-center justify-center"
-          onClick={() => setSelectedMedia(null)}
-        >
-          {selectedMedia.type === "image" ? (
+    {/* MEDIA (OFFLINE) */}
+    {!isOnline && job.media?.length > 0 && (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+        {job.media.map((m, i) =>
+          m.type === "image" ? (
             <img
-              src={getImageUrl(selectedMedia.url)}
-              className="max-h-[90vh]"
+              key={i}
+              src={getImageUrl(m.url)}
+              onClick={() => setSelectedMedia(m)}
+              className="h-32 w-full object-cover rounded-lg cursor-pointer"
             />
           ) : (
-            <video controls className="max-h-[90vh]">
-              <source src={getImageUrl(selectedMedia.url)} />
+            <video
+              key={i}
+              onClick={() => setSelectedMedia(m)}
+              className="h-32 w-full object-cover rounded-lg cursor-pointer"
+            >
+              <source src={getImageUrl(m.url)} />
             </video>
-          )}
-        </div>
+          )
+        )}
+      </div>
+    )}
+  </div>
+
+  {/* ACTION BUTTONS */}
+  <div className="mt-6 flex gap-4 flex-wrap">
+    <button
+      onClick={() => navigate(`/edit-job/${job._id}`)}
+      className="px-5 py-2 rounded-xl bg-blue-500"
+    >
+      {t("Edit")}
+    </button>
+
+    <button
+      onClick={handleDelete}
+      className="px-5 py-2 rounded-xl bg-red-500"
+    >
+      {t("Delete")}
+    </button>
+  </div>
+
+  {/* FULLSCREEN MEDIA */}
+  {selectedMedia && (
+    <div
+      className="fixed inset-0 flex items-center justify-center z-50"
+      onClick={() => setSelectedMedia(null)}
+    >
+      {selectedMedia.type === "image" ? (
+        <img
+          src={getImageUrl(selectedMedia.url)}
+          className="max-h-[90vh] max-w-[95vw] object-contain"
+        />
+      ) : (
+        <video controls className="max-h-[90vh] max-w-[95vw] object-contain">
+          <source src={getImageUrl(selectedMedia.url)} />
+        </video>
       )}
     </div>
+  )}
+</div>
   );
 }

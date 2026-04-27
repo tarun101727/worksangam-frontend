@@ -510,15 +510,6 @@ useEffect(() => {
 const sendMedia = async () => {
   let finalFile = currentFile; // fallback if no edits
 
-  // ✅ Commit active text from textarea to textBoxes
-  if (currentBoxId !== null) {
-    setTextBoxes(prev =>
-      prev.map(b =>
-        b.id === currentBoxId ? { ...b, text: text } : b
-      )
-    );
-  }
-
   if (textBoxes.length > 0 || paths.length > 0) {
     const img = imgRef.current;
     const container = containerRef.current;
@@ -547,7 +538,7 @@ const sendMedia = async () => {
     const scaleX = canvas.width / displayedWidth;
     const scaleY = canvas.height / displayedHeight;
 
-    // Draw pen/eraser paths
+    // Draw pen/eraser paths on drawCanvas only
     paths.forEach(path => {
       if (!path.points || path.points.length === 0) return;
 
@@ -566,7 +557,7 @@ const sendMedia = async () => {
       drawCtx.globalCompositeOperation = "source-over";
     });
 
-    // Draw text boxes (now including flushed active text)
+    // Draw text boxes on drawCanvas
     textBoxes.forEach(box => {
       if (!box.text) return;
 
@@ -614,7 +605,7 @@ const sendMedia = async () => {
     finalFile = new File([blob], "edited.jpg", { type: "image/jpeg" });
   }
 
-  // Crop logic stays the same
+  // 5️⃣ Apply crop if needed
   if (cropMode && crop.width && crop.height) {
     const scaleX = imgRef.current.naturalWidth / imgRef.current.width;
     const scaleY = imgRef.current.naturalHeight / imgRef.current.height;
@@ -629,7 +620,7 @@ const sendMedia = async () => {
     finalFile = new File([croppedBlob], "cropped.jpg", { type: "image/jpeg" });
   }
 
-  // Send to backend
+  // 6️⃣ Send to backend
   const formData = new FormData();
   formData.append("image", finalFile);
   formData.append("caption", caption);

@@ -1028,58 +1028,56 @@ objectFit:"contain"
   if (editMode) handleBoxClick(boxItem.id);
 }}
   >
-    {currentBoxId === boxItem.id ? (
-      <textarea
-        ref={textRef}
-        value={text}
-          placeholder="Enter text..."
-  onFocus={(e) => {
-    if (!text) e.target.placeholder = "";
-  }}
-  onBlur={(e) => {
-    if (!text) e.target.placeholder = "Enter text...";
-  }}
-        onChange={handleTextChange}
-        onMouseDown={(e) => e.stopPropagation()}
-onClick={(e) => e.stopPropagation()}
-          style={{
-    width: "100%",
-    height: "100%",
-    background: "transparent",
-    border: "none",
-    outline: "none",
-    color: textBoxes.find(b => b.id === currentBoxId)?.color || "#000000", // ✅ dynamic color
-    fontSize: boxItem.fontSize,
-    fontWeight: boxItem.fontStyle === "bold" ? "bold" : "normal",
-    fontStyle: boxItem.fontStyle === "italic" ? "italic" : "normal",
-    resize: "none",
-    overflow: "hidden",
-    textAlign: "left",
-    whiteSpace: "pre-wrap",
-    verticalAlign: "top",
-    padding: "5px",
-    pointerEvents: "auto",
-    boxSizing: "border-box"
-  }}
-      />
-    ) : (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          padding: "5px",
-          whiteSpace: "pre-wrap",
-          wordBreak: "break-word",
-          color: boxItem.color,
-          fontSize: boxItem.fontSize,
-          fontWeight: boxItem.fontStyle === "bold" ? "bold" : "normal",
-          fontStyle: boxItem.fontStyle === "italic" ? "italic" : "normal",
-          pointerEvents: "none", // important: allow clicks to pass to parent div
-        }}
-      >
-        {boxItem.text}
-      </div>
-    )}
+   {currentBoxId === boxItem.id ? (
+  <textarea
+    ref={textRef}
+    value={text}
+    placeholder="Enter text..."
+    onFocus={(e) => { if (!text) e.target.placeholder = ""; }}
+    onBlur={(e) => { if (!text) e.target.placeholder = "Enter text..."; }}
+    onChange={handleTextChange}
+    onMouseDown={(e) => e.stopPropagation()}
+    onClick={(e) => e.stopPropagation()}
+    style={{
+      width: "100%",
+      height: "100%",
+      background: "transparent",
+      border: "none",
+      outline: "none",
+      color: textBoxes.find(b => b.id === currentBoxId)?.color || "#000000",
+      fontSize: boxItem.fontSize,
+      fontWeight: boxItem.fontStyle === "bold" ? "bold" : "normal",
+      fontStyle: boxItem.fontStyle === "italic" ? "italic" : "normal",
+      resize: "none",
+      overflow: "hidden",
+      textAlign: "left",
+      whiteSpace: "pre-wrap",
+      verticalAlign: "top",
+      padding: "5px",        // keep top, left, bottom
+      paddingRight: "7px",   // add extra 2px to right
+      pointerEvents: "auto",
+      boxSizing: "border-box"
+    }}
+  />
+) : (
+  <div
+    style={{
+      width: "100%",
+      height: "100%",
+      padding: "5px",
+      paddingRight: "7px",   // add extra right padding
+      whiteSpace: "pre-wrap",
+      wordBreak: "break-word",
+      color: boxItem.color,
+      fontSize: boxItem.fontSize,
+      fontWeight: boxItem.fontStyle === "bold" ? "bold" : "normal",
+      fontStyle: boxItem.fontStyle === "italic" ? "italic" : "normal",
+      pointerEvents: "none",
+    }}
+  >
+    {boxItem.text}
+  </div>
+)}
 
     {/* Resize handles */}
     {currentBoxId === boxItem.id && ["top", "right", "bottom", "left"].map(dir => (

@@ -557,43 +557,45 @@ const sendMedia = async () => {
       drawCtx.globalCompositeOperation = "source-over";
     });
 
+    // Draw text boxes on drawCanvas
     textBoxes.forEach(box => {
-  if (!box.text) return;
+      if (!box.text) return;
 
-  const relX = (box.x - offsetX - box.width / 2) / displayedWidth;
-  const relY = (box.y - offsetY - box.height / 2) / displayedHeight;
-  const relWidth = box.width / displayedWidth;
+      const relX = (box.x - offsetX - box.width / 2) / displayedWidth;
+      const relY = (box.y - offsetY - box.height / 2) / displayedHeight;
+      const relWidth = box.width / displayedWidth;
 
-  const realX = relX * canvas.width;
-  const realY = relY * canvas.height;
-  const realWidth = relWidth * canvas.width;
+      const realX = relX * canvas.width;
+      const realY = relY * canvas.height;
+      const realWidth = relWidth * canvas.width;
 
-  drawCtx.fillStyle = box.color || "#fff";
-  drawCtx.font = `${box.fontStyle === "italic" ? "italic " : ""}${box.fontStyle === "bold" ? "bold " : ""}${box.fontSize * scaleX}px sans-serif`;
-  drawCtx.textAlign = "left";
-  drawCtx.textBaseline = "top";
+      drawCtx.fillStyle = box.color || "#fff";
+      drawCtx.font = `${box.fontStyle === "italic" ? "italic " : ""}${box.fontStyle === "bold" ? "bold " : ""}${box.fontSize * scaleX}px sans-serif`;
+      drawCtx.textAlign = "left";
+      drawCtx.textBaseline = "top";
 
-  const inputLines = box.text.split("\n");
+      const inputLines = box.text.split("\n");
+      const lines = [];
+      inputLines.forEach(rawLine => {
+        let currentLine = "";
+        rawLine.split(" ").forEach(word => {
+          const testLine = currentLine ? currentLine + " " + word : word;
+          if (drawCtx.measureText(testLine).width > realWidth && currentLine !== "") {
+            lines.push(currentLine);
+            currentLine = word;
+          } else currentLine = testLine;
+        });
+        lines.push(currentLine);
+      });
 
-  inputLines.forEach(rawLine => {
-    let currentLine = "";
-    const words = rawLine.match(/\S+\s*/g) || []; // preserves spaces after words
+      const lineHeight = box.fontSize * 1.2 * scaleY;
+      const padding = 5 * scaleX;
+      const startY = realY + padding;
 
-    words.forEach(word => {
-      const testLine = currentLine + word;
-      if (drawCtx.measureText(testLine).width > realWidth && currentLine !== "") {
-        drawCtx.fillText(currentLine, realX + 5 * scaleX, realY + 5 * scaleY);
-        currentLine = word;
-      } else {
-        currentLine = testLine;
-      }
+      lines.forEach((line, i) => {
+        drawCtx.fillText(line.trim(), realX + padding, startY + i * lineHeight);
+      });
     });
-
-    if (currentLine) {
-      drawCtx.fillText(currentLine, realX + 5 * scaleX, realY + 5 * scaleY + (box.fontSize * 1.2 * scaleY) * (inputLines.indexOf(rawLine)));
-    }
-  });
-});
 
     // 3️⃣ Merge drawing layer onto base image
     ctx.drawImage(drawCanvas, 0, 0, canvas.width, canvas.height);

@@ -205,7 +205,6 @@ const addText = () => {
 
   const newId = textBoxes.length + 1;
 
-  // Reset text styles
   const initialBox = {
     id: newId,
     x: container.clientWidth / 2,
@@ -213,21 +212,18 @@ const addText = () => {
     width: 260,
     height: 120,
     text: "",
-    color: "#000000",    // default black
-    fontSize: 16,        // default size
-    fontStyle: "normal"  // default style
+    color: "#000000",
+    fontSize: fontSize,
+    fontStyle: fontStyle
   };
 
   setTextBoxes(prev => [...prev, initialBox]);
   setCurrentBoxId(newId);
   setIsEditingText(true);
   setTextActive(true);
-  setText(initialBox.text);
+  setText(initialBox.text); // current text value
 
-  originalBox.current = { ...initialBox };
-
-  // ✅ Show toolbar immediately
-  setToolbarVisible(true);
+  originalBox.current = { ...initialBox }; // store original size
 
   setTimeout(() => textRef.current?.focus(), 100);
 };
@@ -842,15 +838,7 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Font size */}
     <select
       value={fontSize}
-      onChange={(e) => {
-    const size = Number(e.target.value);
-    setFontSize(size);
-    if (currentBoxId !== null) {
-      setTextBoxes(prev =>
-        prev.map(b => b.id === currentBoxId ? { ...b, fontSize: size } : b)
-      );
-    }
-  }}
+      onChange={(e) => setFontSize(Number(e.target.value))}
       className="bg-[#020617]/90 border border-white/20 rounded-lg px-2 py-1 text-sm hover:border-white/40 transition"
     >
       <option value={16}>16</option>
@@ -867,9 +855,12 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
   onChange={(e) => {
     const newColor = e.target.value;
     setTextColor(newColor);
+    // update selected text box immediately
     if (currentBoxId !== null) {
       setTextBoxes(prev =>
-        prev.map(b => b.id === currentBoxId ? { ...b, color: newColor } : b)
+        prev.map(b =>
+          b.id === currentBoxId ? { ...b, color: newColor } : b
+        )
       );
     }
   }}
@@ -887,15 +878,7 @@ className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20"
     {/* Font style */}
     <select
       value={fontStyle}
-      onChange={(e) => {
-    const style = e.target.value;
-    setFontStyle(style);
-    if (currentBoxId !== null) {
-      setTextBoxes(prev =>
-        prev.map(b => b.id === currentBoxId ? { ...b, fontStyle: style } : b)
-      );
-    }
-  }}
+      onChange={(e) => setFontStyle(e.target.value)}
       className="bg-[#020617]/90 border border-white/20 rounded-lg px-2 py-1 text-sm hover:border-white/40 transition"
     >
       <option value="normal">{t("Normal")}</option>
@@ -948,17 +931,6 @@ onTouchMove={(e)=>{
 }}
 
 onTouchEnd={stopAll}
-
-onClick={(e) => {
-  if (!editMode) return;
-
-  const containerTop = containerRef.current.getBoundingClientRect().top;
-
-  // If user clicks above the text boxes (e.g., top 50px of container)
-  if (e.clientY < containerTop + 50) {
-    setToolbarVisible(true);
-  }
-}}
 >
 
 {isVideo ? (
@@ -1014,6 +986,97 @@ objectFit:"contain"
 }}
 />
 
+)}
+
+{/* TOOLBAR */}
+{editMode && toolbarVisible && !isVideo && (
+  <div
+    id="editor-toolbar" 
+    className="absolute z-[9999] flex flex-wrap gap-3 items-center bg-black/30 p-3 rounded-xl shadow-lg backdrop-blur-sm"
+    style={{
+      top: "10%",
+      left: "50%",
+      transform: "translateX(-50%)",
+    }}
+    onMouseDown={(e)=>e.stopPropagation()}
+  >
+    {/* Text */}
+    <button
+      onClick={() => {
+        addText();
+        closeToolbar();
+        setPenMode(false);
+      }}
+      className="px-4 py-1 bg-[#020617]/90  rounded-lg transition"
+    >
+      {t("Text")}
+    </button>
+
+    {/* ------------------- TEXT FORMATTING ------------------- */}
+    <select
+      value={fontSize}
+      onChange={(e) => setFontSize(Number(e.target.value))}
+      className="bg-[#020617]/90 border border-white/20 rounded-lg px-2 py-1 text-sm hover:border-white/40 transition"
+    >
+      <option value={16}>16</option>
+      <option value={24}>24</option>
+      <option value={32}>32</option>
+      <option value={48}>48</option>
+      <option value={64}>64</option>
+    </select>
+
+    <select
+      value={fontStyle}
+      onChange={(e) => setFontStyle(e.target.value)}
+      className="bg-[#020617]/90 border border-white/20 rounded-lg px-2 py-1 text-sm hover:border-white/40 transition"
+    >
+      <option value="normal">{t("Normal")}</option>
+      <option value="bold">{t("Bold")}</option>
+      <option value="italic">{t("Italic")}</option>
+    </select>
+
+    <input
+      type="color"
+      value={textColor}
+      onChange={(e) => {
+        const newColor = e.target.value;
+        setTextColor(newColor);
+        if (currentBoxId !== null) {
+          setTextBoxes(prev =>
+            prev.map(b =>
+              b.id === currentBoxId ? { ...b, color: newColor } : b
+            )
+          );
+        }
+      }}
+      className="w-8 h-8 border-none rounded-lg cursor-pointer"
+    />
+    {/* ---------------- END TEXT FORMATTING ---------------- */}
+
+    {/* Pen */}
+    <button
+      onClick={() => {
+        setPenMode(true);
+        setEraserMode(false);
+        closeToolbar();
+      }}
+      className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
+    >
+      ✏️
+    </button>
+
+    {/* Eraser */}
+    <button
+      onClick={() => {
+        setPenMode(true);
+        setEraserMode(true);
+        closeToolbar();
+      }}
+      className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition"
+    >
+      🧽
+    </button>
+  </div>
 )}
 
 {textBoxes.map(boxItem => (

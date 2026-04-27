@@ -413,19 +413,19 @@ const handleTextChange = (e) => {
   ctx.font = `${activeBox.fontStyle === "italic" ? "italic" : ""} ${activeBox.fontStyle === "bold" ? "bold" : ""} ${activeBox.fontSize}px sans-serif`;
 
   const words = el.value.split(" ");
-let lines = [];
-let currentLine = "";
+  let lines = [];
+  let currentLine = "";
 
-words.forEach(word => {
-  const testLine = currentLine ? currentLine + " " + word : word;
-  if (ctx.measureText(testLine).width > maxWidth && currentLine !== "") {
-    lines.push(currentLine.trimEnd()); // 🔹 trim trailing spaces
-    currentLine = word;
-  } else {
-    currentLine = testLine;
-  }
-});
-if (currentLine) lines.push(currentLine.trimEnd()); // 🔹 trim last line
+  words.forEach(word => {
+    const testLine = currentLine ? currentLine + " " + word : word;
+    if (ctx.measureText(testLine).width > maxWidth) {
+      if (currentLine) lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  });
+  if (currentLine) lines.push(currentLine);
 
   const buffer = 10;
   let widest = 0;
@@ -557,50 +557,43 @@ const sendMedia = async () => {
       drawCtx.globalCompositeOperation = "source-over";
     });
 
-    // Draw text boxes on drawCanvas
     textBoxes.forEach(box => {
-      if (!box.text) return;
+  if (!box.text) return;
 
-      const relX = (box.x - offsetX - box.width / 2) / displayedWidth;
-      const relY = (box.y - offsetY - box.height / 2) / displayedHeight;
-      const relWidth = box.width / displayedWidth;
+  const relX = (box.x - offsetX - box.width / 2) / displayedWidth;
+  const relY = (box.y - offsetY - box.height / 2) / displayedHeight;
+  const relWidth = box.width / displayedWidth;
 
-      const realX = relX * canvas.width;
-      const realY = relY * canvas.height;
-      const realWidth = relWidth * canvas.width;
+  const realX = relX * canvas.width;
+  const realY = relY * canvas.height;
+  const realWidth = relWidth * canvas.width;
 
-      drawCtx.fillStyle = box.color || "#fff";
-      drawCtx.font = `${box.fontStyle === "italic" ? "italic " : ""}${box.fontStyle === "bold" ? "bold " : ""}${box.fontSize * scaleX}px sans-serif`;
-      drawCtx.textAlign = "left";
-      drawCtx.textBaseline = "top";
+  drawCtx.fillStyle = box.color || "#fff";
+  drawCtx.font = `${box.fontStyle === "italic" ? "italic " : ""}${box.fontStyle === "bold" ? "bold " : ""}${box.fontSize * scaleX}px sans-serif`;
+  drawCtx.textAlign = "left";
+  drawCtx.textBaseline = "top";
 
-     const inputLines = box.text.split("\n");
-const lines = [];
+  const inputLines = box.text.split("\n");
 
-inputLines.forEach(rawLine => {
-  let currentLine = "";
-  rawLine.split(" ").forEach(word => {
-    const testLine = currentLine ? currentLine + " " + word : word;
+  inputLines.forEach(rawLine => {
+    let currentLine = "";
+    const words = rawLine.match(/\S+\s*/g) || []; // preserves spaces after words
 
-    if (drawCtx.measureText(testLine).width > realWidth && currentLine !== "") {
-      lines.push(currentLine.trimEnd()); // 🔹 trim trailing spaces
-      currentLine = word;
-    } else {
-      currentLine = testLine;
+    words.forEach(word => {
+      const testLine = currentLine + word;
+      if (drawCtx.measureText(testLine).width > realWidth && currentLine !== "") {
+        drawCtx.fillText(currentLine, realX + 5 * scaleX, realY + 5 * scaleY);
+        currentLine = word;
+      } else {
+        currentLine = testLine;
+      }
+    });
+
+    if (currentLine) {
+      drawCtx.fillText(currentLine, realX + 5 * scaleX, realY + 5 * scaleY + (box.fontSize * 1.2 * scaleY) * (inputLines.indexOf(rawLine)));
     }
   });
-
-  if (currentLine) lines.push(currentLine.trimEnd()); // 🔹 also trim last line
 });
-
-      const lineHeight = box.fontSize * 1.2 * scaleY;
-      const padding = 5 * scaleX;
-      const startY = realY + padding;
-
-      lines.forEach((line, i) => {
-        drawCtx.fillText(line.trim(), realX + padding, startY + i * lineHeight);
-      });
-    });
 
     // 3️⃣ Merge drawing layer onto base image
     ctx.drawImage(drawCanvas, 0, 0, canvas.width, canvas.height);

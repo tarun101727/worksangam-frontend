@@ -510,12 +510,12 @@ useEffect(() => {
 const sendMedia = async () => {
   let finalFile = currentFile; // fallback if no edits
 
-  if (textBoxes.length > 0 || paths.length > 0) {
+  if ((textBoxes && textBoxes.length > 0) || (paths && paths.length > 0)) {
     const img = imgRef.current;
     const container = containerRef.current;
     if (!img || !container) return;
 
-    // 1️⃣ Create canvas matching original image pixels (base layer)
+    // 1️⃣ Create base canvas matching original image pixels
     const canvas = document.createElement("canvas");
     canvas.width = img.naturalWidth;
     canvas.height = img.naturalHeight;
@@ -524,7 +524,7 @@ const sendMedia = async () => {
     // Draw original image
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-    // 2️⃣ Create temporary canvas for drawings (pen & eraser)
+    // 2️⃣ Create temporary canvas for drawings (paths & text)
     const drawCanvas = document.createElement("canvas");
     drawCanvas.width = canvas.width;
     drawCanvas.height = canvas.height;
@@ -538,7 +538,7 @@ const sendMedia = async () => {
     const scaleX = canvas.width / displayedWidth;
     const scaleY = canvas.height / displayedHeight;
 
-    // Draw pen/eraser paths on drawCanvas only
+    // Draw pen/eraser paths
     paths.forEach(path => {
       if (!path.points || path.points.length === 0) return;
 
@@ -557,7 +557,7 @@ const sendMedia = async () => {
       drawCtx.globalCompositeOperation = "source-over";
     });
 
-    // Draw text boxes on drawCanvas
+    // Draw text boxes (fixed for multi-line)
     textBoxes.forEach(box => {
       if (!box.text) return;
 
@@ -567,15 +567,20 @@ const sendMedia = async () => {
 
       const realX = relX * canvas.width;
       const realY = relY * canvas.height;
-      const realWidth = relWidth * canvas.width;
+      const realWidth = relWidth * canvas.width - 10; // padding adjustment
 
       drawCtx.fillStyle = box.color || "#fff";
-      drawCtx.font = `${box.fontStyle === "italic" ? "italic " : ""}${box.fontStyle === "bold" ? "bold " : ""}${box.fontSize * scaleX}px sans-serif`;
+
+      // Correctly handle bold & italic
+      const fontWeight = box.fontStyle === "bold" ? "bold" : "normal";
+      const fontStyle = box.fontStyle === "italic" ? "italic" : "normal";
+      drawCtx.font = `${fontStyle} ${fontWeight} ${box.fontSize * scaleX}px sans-serif`;
       drawCtx.textAlign = "left";
       drawCtx.textBaseline = "top";
 
-      const inputLines = box.text.split("\n");
+      const inputLines = box.text.split("\n"); // split by new line
       const lines = [];
+
       inputLines.forEach(rawLine => {
         let currentLine = "";
         rawLine.split(" ").forEach(word => {
@@ -583,7 +588,9 @@ const sendMedia = async () => {
           if (drawCtx.measureText(testLine).width > realWidth && currentLine !== "") {
             lines.push(currentLine);
             currentLine = word;
-          } else currentLine = testLine;
+          } else {
+            currentLine = testLine;
+          }
         });
         lines.push(currentLine);
       });
@@ -593,7 +600,7 @@ const sendMedia = async () => {
       const startY = realY + padding;
 
       lines.forEach((line, i) => {
-        drawCtx.fillText(line.trim(), realX + padding, startY + i * lineHeight);
+        drawCtx.fillText(line, realX + padding, startY + i * lineHeight);
       });
     });
 
@@ -1328,11 +1335,11 @@ onClick={(e) => e.stopPropagation()}
 
 <div className="border-t border-white/10 p-4">
 
-<textarea
-  placeholder="Add a caption..."
-  value={caption}
-  onChange={(e) => setCaption(e.target.value)}
-  className="w-full p-3 bg-white/10 border border-white/20 rounded-xl outline-none resize-none"
+<input
+placeholder="Add a caption..."
+value={caption}
+onChange={(e)=>setCaption(e.target.value)}
+className="w-full p-3 bg-white/10 border border-white/20 rounded-xl outline-none"
 />
 
 </div>

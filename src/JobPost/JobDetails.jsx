@@ -102,7 +102,7 @@ export default function JobDetails() {
   const isOnline = job.professionType === "online";
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 p-5   rounded-2xl border border-white/10">
+    <div className="max-w-3xl mx-auto mt-10 p-5   rounded-2xl">
 
       {/* HEADER */}
       <div className="flex items-center gap-5 pb-6 border-b border-white/10 mb-8">
@@ -132,7 +132,7 @@ export default function JobDetails() {
       </div>
 
       {/* JOB CARD */}
-      <div className="rounded-2xl p-6 space-y-6">
+      <div className="rounded-2xl p-6">
 
         {/* 🔵 PROFESSION */}
         <div className="flex items-center gap-3">

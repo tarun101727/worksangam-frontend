@@ -427,13 +427,13 @@ const drawPaths = () => {
   // Draw saved paths
   paths
     .filter(p => p.points.length > 0)
-    .forEach((p, idx) => {
+    .forEach((p) => {
       ctx.beginPath();
       p.points.forEach((pt, i) => {
         if (i === 0) ctx.moveTo(pt.x, pt.y);
         else ctx.lineTo(pt.x, pt.y);
       });
-      ctx.strokeStyle = p.type === "eraser" ? "rgba(0,0,0,1)" : "#ff0000";
+      ctx.strokeStyle = p.type === "eraser" ? "rgba(0,0,0,1)" : (p.color || color); // ✅ dynamic color
       ctx.lineWidth = p.type === "eraser" ? 15 : 3;
       ctx.globalCompositeOperation = p.type === "eraser" ? "destination-out" : "source-over";
       ctx.stroke();
@@ -447,7 +447,7 @@ const drawPaths = () => {
       if (i === 0) ctx.moveTo(pt.x, pt.y);
       else ctx.lineTo(pt.x, pt.y);
     });
-    ctx.strokeStyle = currentPathType.current === "eraser" ? "rgba(0,0,0,1)" : "#ff0000";
+    ctx.strokeStyle = currentPathType.current === "eraser" ? "rgba(0,0,0,1)" : color; // ✅ dynamic color
     ctx.lineWidth = currentPathType.current === "eraser" ? 15 : 3;
     ctx.globalCompositeOperation = currentPathType.current === "eraser" ? "destination-out" : "source-over";
     ctx.stroke();
@@ -625,15 +625,14 @@ setCurrentImageUrl(newUrl);
 const endDrawing = () => {
   if (currentPath.current.length === 0) return;
   saveState();
+
   const newPath = {
     points: currentPath.current.map(p => ({ ...p })),
-    type: currentPathType.current
+    type: currentPathType.current,
+    color: color, // ✅ store current color
   };
 
-  setPaths(prev => {
-    const updated = [...prev, newPath];
-    return updated;
-  });
+  setPaths(prev => [...prev, newPath]);
 
   currentPath.current = [];
   setDrawing(false);

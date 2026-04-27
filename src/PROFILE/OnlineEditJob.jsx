@@ -17,8 +17,7 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
     { label: t("Negotiable"), value: "negotiable" },
   ];
 
-  const inputBase =
-    "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700";
+  const inputBase = "w-full rounded-xl bg-slate-900 text-white px-4 py-3 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500";
 
   /* ================= CLICK OUTSIDE ================= */
   useEffect(() => {
@@ -40,9 +39,7 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
     axios
       .get(`${BASE_URL}/api/languages`)
       .then((res) => {
-        const langs = res.data.map(
-          (l) => `${l.nativeName} (${l.name})`
-        );
+        const langs = res.data.map((l) => `${l.nativeName} (${l.name})`);
         setAllLanguages(langs);
       })
       .catch(() => setAllLanguages([]));
@@ -72,25 +69,21 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
   };
 
   return (
-    <>
+    <div className="space-y-6 text-white">
       {/* PROFESSION */}
       <input
         className={inputBase}
-        placeholder="Profession"
+        placeholder={t("Profession")}
         value={form.profession}
-        onChange={(e) =>
-          handleChange("profession", e.target.value)
-        }
+        onChange={(e) => handleChange("profession", e.target.value)}
       />
 
       {/* DESCRIPTION */}
       <textarea
-        className={`${inputBase} h-28`}
-        placeholder="Work description"
+        className={`${inputBase} h-28 resize-none`}
+        placeholder={t("Work description")}
         value={form.description}
-        onChange={(e) =>
-          handleChange("description", e.target.value)
-        }
+        onChange={(e) => handleChange("description", e.target.value)}
       />
 
       {/* ================= PRICE ================= */}
@@ -100,13 +93,11 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
             <button
               key={opt.value}
               type="button"
-              onClick={() =>
-                handleChange("priceType", opt.value)
-              }
-              className={`flex-1 py-2 rounded-lg text-sm font-semibold ${
+              onClick={() => handleChange("priceType", opt.value)}
+              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 ${
                 form.priceType === opt.value
                   ? "bg-indigo-600 text-white"
-                  : "bg-slate-800 text-slate-400 border border-slate-700"
+                  : "bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700"
               }`}
             >
               {opt.label}
@@ -119,9 +110,7 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
             <select
               className={inputBase}
               value={form.currency}
-              onChange={(e) =>
-                handleChange("currency", e.target.value)
-              }
+              onChange={(e) => handleChange("currency", e.target.value)}
             >
               {currencies.map((c) => (
                 <option key={c.code} value={c.code}>
@@ -132,39 +121,33 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
 
             {form.priceType === "fixed" && (
               <input
-  type="number"
-  className={inputBase}
-  placeholder="Fixed price"
-  value={form.expectedPrice}
-  onChange={(e) =>
-    handleChange("expectedPrice", e.target.value)
-  }
-  onWheel={(e) => e.target.blur()}   // ✅ ADD THIS
-/>
+                type="number"
+                className={inputBase}
+                placeholder={t("Fixed price")}
+                value={form.expectedPrice}
+                onChange={(e) => handleChange("expectedPrice", e.target.value)}
+                onWheel={(e) => e.target.blur()}
+              />
             )}
 
             {form.priceType === "negotiable" && (
-              <div className="flex gap-3">
+              <div className="flex gap-3 flex-wrap">
                 <input
-  type="number"
-  className={inputBase}
-  placeholder="Min"
-  value={form.minPrice}
-  onChange={(e) =>
-    handleChange("minPrice", e.target.value)
-  }
-  onWheel={(e) => e.target.blur()}   // ✅ ADD
-/>
-               <input
-  type="number"
-  className={inputBase}
-  placeholder="Max"
-  value={form.maxPrice}
-  onChange={(e) =>
-    handleChange("maxPrice", e.target.value)
-  }
-  onWheel={(e) => e.target.blur()}   // ✅ ADD
-/>
+                  type="number"
+                  className={inputBase}
+                  placeholder={t("Min")}
+                  value={form.minPrice}
+                  onChange={(e) => handleChange("minPrice", e.target.value)}
+                  onWheel={(e) => e.target.blur()}
+                />
+                <input
+                  type="number"
+                  className={inputBase}
+                  placeholder={t("Max")}
+                  value={form.maxPrice}
+                  onChange={(e) => handleChange("maxPrice", e.target.value)}
+                  onWheel={(e) => e.target.blur()}
+                />
               </div>
             )}
           </>
@@ -172,19 +155,19 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
       </div>
 
       {/* ================= LANGUAGES ================= */}
-      <div
-        className="space-y-2 relative"
-        ref={languageContainerRef}
-      >
+      <div className="space-y-2 relative" ref={languageContainerRef}>
         {/* SELECTED LANGUAGES */}
         <div className="flex flex-wrap gap-2">
           {form.languages.map((lang, i) => (
             <span
               key={i}
-              className="bg-indigo-600 px-3 py-1 rounded-full flex items-center gap-2"
+              className="bg-indigo-600 px-3 py-1 rounded-full flex items-center gap-2 text-sm"
             >
               {lang}
-              <button onClick={() => removeLanguage(lang)}>
+              <button
+                className="text-white/70 hover:text-white"
+                onClick={() => removeLanguage(lang)}
+              >
                 ✕
               </button>
             </span>
@@ -196,15 +179,11 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
           className={inputBase}
           placeholder={t("Add a language (English, Hindi...)")}
           value={languageInput}
-
           onFocus={() =>
             setLanguageSuggestions(
-              allLanguages.filter(
-                (l) => !form.languages.includes(l)
-              )
+              allLanguages.filter((l) => !form.languages.includes(l))
             )
           }
-
           onChange={(e) => {
             const val = e.target.value;
             setLanguageInput(val);
@@ -212,27 +191,15 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
             if (val.trim()) {
               setLanguageSuggestions(
                 allLanguages.filter(
-                  (l) =>
-                    l
-                      .toLowerCase()
-                      .includes(val.toLowerCase()) &&
-                    !form.languages.includes(l)
+                  (l) => l.toLowerCase().includes(val.toLowerCase()) && !form.languages.includes(l)
                 )
               );
             } else {
-              setLanguageSuggestions(
-                allLanguages.filter(
-                  (l) => !form.languages.includes(l)
-                )
-              );
+              setLanguageSuggestions(allLanguages.filter((l) => !form.languages.includes(l)));
             }
           }}
-
           onKeyDown={(e) => {
-            if (
-              (e.key === "Enter" || e.key === " ") &&
-              languageInput.trim()
-            ) {
+            if ((e.key === "Enter" || e.key === " ") && languageInput.trim()) {
               e.preventDefault();
               addLanguage(languageInput.trim());
             }
@@ -241,11 +208,11 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
 
         {/* SUGGESTIONS */}
         {languageSuggestions.length > 0 && (
-          <div className="absolute z-50 mt-1 w-full max-h-64 overflow-auto rounded-xl bg-[#0F172A] border border-white/10 shadow-xl">
+          <div className="absolute z-50 mt-1 w-full max-h-64 overflow-auto rounded-xl bg-slate-800 border border-white/10 shadow-lg">
             {languageSuggestions.map((lang) => (
               <div
                 key={lang}
-                className="px-4 py-2 text-white hover:bg-[#374151] cursor-pointer"
+                className="px-4 py-2 text-white hover:bg-slate-700 cursor-pointer rounded-lg"
                 onClick={() => addLanguage(lang)}
               >
                 {lang}
@@ -254,7 +221,7 @@ const OnlineEditJob = ({ form, setForm, handleChange }) => {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 };
 

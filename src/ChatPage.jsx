@@ -613,19 +613,24 @@ className="w-8 h-8 rounded-full object-cover"
 
 </div>
 
-{replyMessage && (
-  <div className="mb-2 bg-gray-800 p-2 rounded-lg border-l-4 border-indigo-500">
-    <div className="text-xs text-gray-400">Replying to</div>
-    <div className="text-sm truncate">{replyMessage.message}</div>
+<div className="min-h-[72px] px-4">
+  {replyMessage ? (
+    <div className="mb-2 bg-gray-800 p-2 rounded-lg border-l-4 border-indigo-500">
+      <div className="text-xs text-gray-400">Replying to</div>
 
-    <button
-      onClick={() => setReplyMessage(null)}
-      className="text-red-400 text-xs mt-1"
-    >
-      Cancel
-    </button>
-  </div>
-)}
+      <div className="text-sm truncate">
+        {replyMessage.message}
+      </div>
+
+      <button
+        onClick={() => setReplyMessage(null)}
+        className="text-red-400 text-xs mt-1"
+      >
+        Cancel
+      </button>
+    </div>
+  ) : null}
+</div>
 
 {/* MESSAGE INPUT */}
 

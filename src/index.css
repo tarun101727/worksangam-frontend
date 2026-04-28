@@ -196,3 +196,13 @@ group-hover:text-yellow-400
 .ReactCrop__crop-selection:active {
   cursor: grabbing !important;
 }
+
+/* Hide scrollbar but keep scrolling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

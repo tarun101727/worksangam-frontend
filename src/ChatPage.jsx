@@ -128,40 +128,27 @@ const sendMessage = () => {
 
   const messageText = text;
 
-  // TEMP MESSAGE for immediate UI
   const tempMessage = {
-    _id: "temp-" + Date.now(), // unique temporary ID
+    _id: "temp-" + Date.now(),
     message: messageText,
     sender: {
       _id: userId,
       profileImage: user?.profileImage,
       firstName: user?.firstName,
       lastName: user?.lastName
-    }
+    },
+    replyTo: replyMessage?._id || null,
+    replyText: replyMessage?.message || ""
   };
 
-  // Add to messages state immediately
   setMessages(prev => [...prev, tempMessage]);
 
-  // Clear input
   setText("");
-  setReplyMessage(null); // <-- added here
-  isTypingRef.current = false;
+  setReplyMessage(null);
 
-  // Stop typing
   socket.emit("stop-typing", { chatId, userId });
 
-  // ✅ SEND LIVE VIA SOCKET
-  socket.emit("send-message", {
-    chatId,
-    message: messageText,
-    sender: {
-      _id: userId,
-      profileImage: user?.profileImage,
-      firstName: user?.firstName,
-      lastName: user?.lastName
-    }
-  });
+  socket.emit("send-message", tempMessage);
 
   axios.post(
     `${BASE_URL}/api/chat/send/${chatId}`,
@@ -171,7 +158,7 @@ const sendMessage = () => {
       replyText: replyMessage?.message || ""
     },
     { withCredentials: true }
-  ).catch(console.error);
+  );
 };
 
 const openGallery = () => {

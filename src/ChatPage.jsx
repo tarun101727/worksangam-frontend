@@ -324,12 +324,11 @@ if (loading && messages.length === 0) {
 }
 
 return(
-
-<div className="flex flex-col h-screen">
+<div className="flex flex-col h-dvh overflow-hidden">
 
 {/* MESSAGE AREA */}
 <div
-  className="flex-1 p-4 overflow-y-auto"
+  className="flex-1 min-h-0 p-4 overflow-y-auto"
   ref={messagesContainerRef}
 >
   {/* CHAT START MESSAGE */}
@@ -630,7 +629,7 @@ className="w-8 h-8 rounded-full object-cover"
 )}
 
 {/* MESSAGE INPUT */}
-<div className="sticky bottom-0 bg-gradient-to-br from-[#020617] via-[#020617] to-[#020617] border-t border-white/10 p-4 flex gap-2 items-end">
+<div className="shrink-0 bg-gradient-to-br from-[#020617] via-[#020617] to-[#020617] border-t border-white/10 p-4 flex gap-2 items-end">
 
 {/* PLUS BUTTON */}
 

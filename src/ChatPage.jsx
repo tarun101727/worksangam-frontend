@@ -36,6 +36,7 @@ const [selectedMedia, setSelectedMedia] = useState(null);
 const messagesContainerRef = useRef(null);
 const [isTyping, setIsTyping] = useState(false);
 const [loading, setLoading] = useState(true);
+const [openMenuId, setOpenMenuId] = useState(null);
 const isTypingRef = useRef(false);
 const { t } = useTranslation();
 
@@ -277,6 +278,43 @@ const handleKeyDown = (e) => {
   }
 };
 
+const toggleMenu = (id) => {
+  setOpenMenuId(openMenuId === id ? null : id);
+};
+
+const deleteMessage = async (id) => {
+  try {
+    await axios.delete(`${BASE_URL}/api/chat/message/${id}`, {
+      withCredentials: true,
+    });
+
+    setMessages((prev) => prev.filter((m) => m._id !== id));
+    setOpenMenuId(null);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const reportMessage = async (id) => {
+  try {
+    await axios.post(
+      `${BASE_URL}/api/chat/report/${id}`,
+      {},
+      { withCredentials: true }
+    );
+
+    alert("Reported successfully");
+    setOpenMenuId(null);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const copyMessage = (text) => {
+  navigator.clipboard.writeText(text);
+  setOpenMenuId(null);
+};
+
 if (loading && messages.length === 0) {
   return (
     <div className="min-h-screen flex justify-center items-center">
@@ -340,7 +378,43 @@ src={getImageUrl(m.sender?.profileImage)}
 className="w-8 h-8 rounded-full object-cover"
 />
 
-<div className="flex flex-col max-w-xs">
+<div className="flex flex-col max-w-xs relative">
+
+  <button
+  onClick={() => toggleMenu(m._id)}
+  className="absolute top-0 right-0 p-1 text-gray-400 hover:text-white"
+>
+  ⋮
+</button>
+
+{openMenuId === m._id && (
+  <div className="absolute top-7 right-0 bg-[#0f172a] border border-white/10 rounded-lg shadow-xl z-50 min-w-[130px]">
+
+    <button
+      onClick={() => copyMessage(m.message)}
+      className="block w-full text-left px-4 py-2 hover:bg-white/10"
+    >
+      Copy
+    </button>
+
+    <button
+      onClick={() => reportMessage(m._id)}
+      className="block w-full text-left px-4 py-2 hover:bg-white/10"
+    >
+      Report
+    </button>
+
+    {m.sender?._id === userId && (
+      <button
+        onClick={() => deleteMessage(m._id)}
+        className="block w-full text-left px-4 py-2 text-red-400 hover:bg-white/10"
+      >
+        Delete
+      </button>
+    )}
+
+  </div>
+)}
 
 {m.image ? (
   <div
@@ -409,7 +483,43 @@ src={getImageUrl(m.sender?.profileImage)}
 className="w-8 h-8 rounded-full object-cover"
 />
 
-<div className="flex flex-col items-end max-w-xs">
+<div className="flex flex-col max-w-xs relative">
+
+  <button
+  onClick={() => toggleMenu(m._id)}
+  className="absolute top-0 right-0 p-1 text-gray-400 hover:text-white"
+>
+  ⋮
+</button>
+
+{openMenuId === m._id && (
+  <div className="absolute top-7 right-0 bg-[#0f172a] border border-white/10 rounded-lg shadow-xl z-50 min-w-[130px]">
+
+    <button
+      onClick={() => copyMessage(m.message)}
+      className="block w-full text-left px-4 py-2 hover:bg-white/10"
+    >
+      Copy
+    </button>
+
+    <button
+      onClick={() => reportMessage(m._id)}
+      className="block w-full text-left px-4 py-2 hover:bg-white/10"
+    >
+      Report
+    </button>
+
+    {m.sender?._id === userId && (
+      <button
+        onClick={() => deleteMessage(m._id)}
+        className="block w-full text-left px-4 py-2 text-red-400 hover:bg-white/10"
+      >
+        Delete
+      </button>
+    )}
+
+  </div>
+)}
 
 {m.image ? (
   <div

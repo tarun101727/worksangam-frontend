@@ -380,9 +380,9 @@ className="w-8 h-8 rounded-full object-cover"
 
 <div className="flex flex-col max-w-xs relative">
 
-  <button
+<button
   onClick={() => toggleMenu(m._id)}
-  className="absolute top-0 right-0 p-1 text-gray-400 hover:text-white"
+  className="absolute top-1 -right-7 p-1 text-gray-400 hover:text-white"
 >
   ⋮
 </button>
@@ -485,9 +485,9 @@ className="w-8 h-8 rounded-full object-cover"
 
 <div className="flex flex-col max-w-xs relative">
 
-  <button
+<button
   onClick={() => toggleMenu(m._id)}
-  className="absolute top-0 right-0 p-1 text-gray-400 hover:text-white"
+  className="absolute top-1 -left-7 p-1 text-gray-400 hover:text-white"
 >
   ⋮
 </button>

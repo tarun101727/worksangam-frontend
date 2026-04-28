@@ -41,6 +41,7 @@ const [loading, setLoading] = useState(true);
 const [openMenuId, setOpenMenuId] = useState(null);
 const [replyMessage, setReplyMessage] = useState(null);
 const isTypingRef = useRef(false);
+const previousMessagesLength = useRef(0);
 const { t } = useTranslation();
 
 const selectReply = (msg) => {
@@ -59,10 +60,20 @@ const closeMedia = () => {
 
 useLayoutEffect(() => {
   const container = messagesContainerRef.current;
+  if (!container) return;
 
-  if (container) {
-    container.scrollTop = container.scrollHeight;
+  const isNewMessage = messages.length > previousMessagesLength.current;
+
+  if (isNewMessage) {
+    const isNearBottom =
+      container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+
+    if (isNearBottom) {
+      container.scrollTop = container.scrollHeight;
+    }
   }
+
+  previousMessagesLength.current = messages.length;
 }, [messages]);
 
 useEffect(() => {
@@ -616,7 +627,7 @@ className="w-8 h-8 rounded-full object-cover"
 
 
 {replyMessage && (
-  <div className="relative w-full mb-2 bg-gray-800 p-2 rounded-lg border-l-4 border-indigo-500">
+  <div className="mb-2 bg-gray-800 p-2 rounded-lg border-l-4 border-indigo-500">
     <div className="text-xs text-gray-400">Replying to</div>
     <div className="text-sm truncate">{replyMessage.message}</div>
 

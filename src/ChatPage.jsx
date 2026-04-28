@@ -629,7 +629,7 @@ className="w-8 h-8 rounded-full object-cover"
 
 {/* MESSAGE INPUT */}
 
-<div className="bottom-0 bg-gradient-to-br from-[#020617] via-[#020617] to-[#020617] border-t border-white/10 p-4 flex gap-2 items-end">
+<div className="">
 
 {/* PLUS BUTTON */}
 

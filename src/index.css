@@ -196,27 +196,3 @@ group-hover:text-yellow-400
 .ReactCrop__crop-selection:active {
   cursor: grabbing !important;
 }
-
-
-textarea::-webkit-scrollbar {
-  width: 6px;
-}
-
-textarea::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-textarea::-webkit-scrollbar-thumb {
-  background: #555;
-  border-radius: 10px;
-}
-
-textarea::-webkit-scrollbar-thumb:hover {
-  background: #777;
-}
-
-/* Firefox */
-textarea {
-  scrollbar-width: thin;
-  scrollbar-color: #555 transparent;
-}

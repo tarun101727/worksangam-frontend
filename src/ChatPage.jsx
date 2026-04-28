@@ -322,11 +322,12 @@ if (loading && messages.length === 0) {
 }
 
 return(
-<div className="flex flex-col h-screen overflow-hidden">
+
+<div className="flex flex-col h-[100dvh]">
 
 {/* MESSAGE AREA */}
 <div
-  className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-gray-600"
+  className="flex-1 p-4 overflow-y-auto"
   ref={messagesContainerRef}
 >
   {/* CHAT START MESSAGE */}
@@ -754,9 +755,9 @@ ref={textareaRef}
 rows={1}
 value={text}
 onChange={handleTextChange}
-onKeyDown={handleKeyDown}
+ onKeyDown={handleKeyDown}
 placeholder="Type a message..."
-className="flex-1 p-2 bg-gradient-to-br from-[#020617] via-[#020617] to-[#020617] border border-white/20 rounded outline-none resize-none leading-6 overflow-y-auto"
+className="flex-1 p-2 bg-gradient-to-br from-[#020617] via-[#020617] to-[#020617] border border-white/20 rounded outline-none resize-none leading-6 scrollbar-dark "
 />
 
 <button

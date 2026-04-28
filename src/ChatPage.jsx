@@ -41,6 +41,7 @@ const [loading, setLoading] = useState(true);
 const [openMenuId, setOpenMenuId] = useState(null);
 const [replyMessage, setReplyMessage] = useState(null);
 const isTypingRef = useRef(false);
+const prevMessageCount = useRef(0);
 const { t } = useTranslation();
 
 const selectReply = (msg) => {
@@ -60,9 +61,14 @@ const closeMedia = () => {
 useLayoutEffect(() => {
   const container = messagesContainerRef.current;
 
-  if (container) {
+  if (!container) return;
+
+  // only when new message added
+  if (messages.length > prevMessageCount.current) {
     container.scrollTop = container.scrollHeight;
   }
+
+  prevMessageCount.current = messages.length;
 }, [messages]);
 
 useEffect(() => {

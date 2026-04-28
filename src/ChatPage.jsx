@@ -329,7 +329,7 @@ return(
 
 {/* MESSAGE AREA */}
 <div
-  className="flex-1 p-4 overflow-y-auto"
+  className="flex-1 p-4 overflow-y-auto no-scrollbar"
   ref={messagesContainerRef}
 >
   {/* CHAT START MESSAGE */}

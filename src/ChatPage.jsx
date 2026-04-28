@@ -325,7 +325,7 @@ if (loading && messages.length === 0) {
 
 return(
 
-<div className="flex flex-col min-h-screen">
+<div className="flex flex-col h-screen">
 
 {/* MESSAGE AREA */}
 <div

@@ -324,7 +324,7 @@ if (loading && messages.length === 0) {
 }
 
 return(
-<div className="flex flex-col h-dvh overflow-hidden">
+<div className="relative flex flex-col h-dvh overflow-hidden">
 
 {/* MESSAGE AREA */}
 <div

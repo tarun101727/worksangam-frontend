@@ -18,6 +18,8 @@ const getImageUrl = (img) => {
 
   return `${BASE_URL}${clean}`;
 };
+
+
 export default function ChatPage() {
 
 const { chatId } = useParams();
@@ -323,14 +325,13 @@ if (loading && messages.length === 0) {
 
 return(
 
-<div className="relative flex flex-col min-h-screen">
+<div className="flex flex-col min-h-screen">
 
 {/* MESSAGE AREA */}
 <div
-  className="flex-1 overflow-y-auto"
+  className="flex-1 p-4 overflow-y-auto"
   ref={messagesContainerRef}
 >
-  <div className="min-h-full flex flex-col justify-end p-4">
   {/* CHAT START MESSAGE */}
 
 {receiver && (
@@ -612,7 +613,7 @@ className="w-8 h-8 rounded-full object-cover"
 
 <div ref={messagesEndRef}></div>
 </div>
-</div>
+
 
 {replyMessage && (
   <div className="mb-2 bg-gray-800 p-2 rounded-lg border-l-4 border-indigo-500">

@@ -41,6 +41,8 @@ const [loading, setLoading] = useState(true);
 const [openMenuId, setOpenMenuId] = useState(null);
 const [replyMessage, setReplyMessage] = useState(null);
 const isTypingRef = useRef(false);
+const messageRefs = useRef({});
+const [highlightedId, setHighlightedId] = useState(null);
 const { t } = useTranslation();
 
 const selectReply = (msg) => {
@@ -315,6 +317,25 @@ const copyMessage = (text) => {
   setOpenMenuId(null);
 };
 
+const scrollToReplyMessage = (replyId) => {
+  if (!replyId) return;
+
+  const target = messageRefs.current[replyId];
+
+  if (target) {
+    target.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+
+    setHighlightedId(replyId);
+
+    setTimeout(() => {
+      setHighlightedId(null);
+    }, 2000);
+  }
+};
+
 if (loading && messages.length === 0) {
   return (
     <div className="min-h-screen flex justify-center items-center">
@@ -362,6 +383,7 @@ return(
 
 <div
 key={i}
+ref={(el) => (messageRefs.current[m._id] = el)}
 className={`flex mb-4 ${isSender ? "justify-end" : "justify-start"}`}
 >
 
@@ -448,15 +470,20 @@ className="w-8 h-8 rounded-full object-cover"
   </div>
 ) : (
   m.message && (
-    <div
-      className={`px-3 py-2 rounded-xl max-w-xs break-words ${
-        isSender
-          ? "bg-indigo-500 text-white"
-          : "bg-gray-700 text-white"
-      }`}
-    >
+   <div
+className={`px-3 py-2 rounded-xl max-w-xs break-words transition-all duration-500 ${
+  highlightedId === m._id
+    ? "bg-yellow-400 text-black shadow-lg scale-105"
+    : isSender
+    ? "bg-indigo-500 text-white"
+    : "bg-gray-700 text-white"
+}`}
+>
       {m.replyText && (
-  <div className="mb-2 px-2 py-1 bg-black/20 rounded text-xs text-gray-300 border-l-4 border-indigo-400">
+  <div
+    onClick={() => scrollToReplyMessage(m.replyTo)}
+    className="mb-2 px-2 py-1 bg-black/20 rounded text-xs text-gray-300 border-l-4 border-indigo-400 cursor-pointer hover:bg-black/30"
+  >
     {m.replyText}
   </div>
 )}
@@ -566,14 +593,19 @@ className="w-8 h-8 rounded-full object-cover"
 ) : (
   m.message && (
     <div
-      className={`px-3 py-2 rounded-xl max-w-xs break-words ${
-        isSender
-          ? "bg-indigo-500 text-white"
-          : "bg-gray-700 text-white"
-      }`}
-    >
+className={`px-3 py-2 rounded-xl max-w-xs break-words transition-all duration-500 ${
+  highlightedId === m._id
+    ? "bg-yellow-400 text-black shadow-lg scale-105"
+    : isSender
+    ? "bg-indigo-500 text-white"
+    : "bg-gray-700 text-white"
+}`}
+>
       {m.replyText && (
-  <div className="mb-2 px-2 py-1 bg-black/20 rounded text-xs text-gray-300 border-l-4 border-indigo-400">
+  <div
+    onClick={() => scrollToReplyMessage(m.replyTo)}
+    className="mb-2 px-2 py-1 bg-black/20 rounded text-xs text-gray-300 border-l-4 border-indigo-400 cursor-pointer hover:bg-black/30"
+  >
     {m.replyText}
   </div>
 )}

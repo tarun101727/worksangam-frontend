@@ -382,13 +382,13 @@ className="w-8 h-8 rounded-full object-cover"
 
 <button
   onClick={() => toggleMenu(m._id)}
-  className="absolute top-1 -right-7 p-1 text-gray-700 hover:text-white"
+  className="absolute top-1 -right-7 p-1 text-white hover:text-white"
 >
   ⋮
 </button>
 
 {openMenuId === m._id && (
-  <div className="absolute top-1 -left-7 bg-[#0f172a] border border-white/10 rounded-lg shadow-xl z-50 min-w-[130px]">
+  <div className="absolute top-1 -left-5 bg-[#0f172a] border border-white/10 rounded-lg shadow-xl z-50 min-w-[130px]">
 
     <button
       onClick={() => copyMessage(m.message)}
@@ -487,13 +487,13 @@ className="w-8 h-8 rounded-full object-cover"
 
 <button
   onClick={() => toggleMenu(m._id)}
-  className="absolute top-1 -left-7 p-1 text-gray-700 hover:text-white"
+  className="absolute top-1 -left-7 p-1 text-white hover:text-white"
 >
   ⋮
 </button>
 
 {openMenuId === m._id && (
-  <div className="absolute top-1 -left-7 bg-[#0f172a] border border-white/10 rounded-lg shadow-xl z-50 min-w-[130px]">
+  <div className="absolute top-1 -left-5 bg-[#0f172a] border border-white/10 rounded-lg shadow-xl z-50 min-w-[130px]">
 
     <button
       onClick={() => copyMessage(m.message)}

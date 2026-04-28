@@ -626,7 +626,19 @@ className="w-8 h-8 rounded-full object-cover"
 
 </div>
 
-{/* MESSAGE INPUT */}
+{replyMessage && (
+  <div className="mb-2 bg-gray-800 p-2 rounded-lg border-l-4 border-indigo-500">
+    <div className="text-xs text-gray-400">Replying to</div>
+    <div className="text-sm truncate">{replyMessage.message}</div>
+
+    <button
+      onClick={() => setReplyMessage(null)}
+      className="text-red-400 text-xs mt-1"
+    >
+      Cancel
+    </button>
+  </div>
+)}
 
 {/* MESSAGE INPUT */}
 
@@ -748,20 +760,6 @@ onChange={handleFile}
 className="hidden"
 />
 
-
-{replyMessage && (
-  <div className="mb-2 bg-gray-800 p-2 rounded-lg border-l-4 border-indigo-500">
-    <div className="text-xs text-gray-400">Replying to</div>
-    <div className="text-sm truncate">{replyMessage.message}</div>
-
-    <button
-      onClick={() => setReplyMessage(null)}
-      className="text-red-400 text-xs mt-1"
-    >
-      Cancel
-    </button>
-  </div>
-)}
 
 {/* TEXT INPUT */}
 

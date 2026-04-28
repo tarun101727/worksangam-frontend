@@ -328,10 +328,12 @@ return(
 <div className="flex flex-col min-h-screen">
 
 {/* MESSAGE AREA */}
+{/* MESSAGE AREA */}
 <div
-  className="flex-1 p-4 overflow-y-auto"
+  className="flex-1 p-4 overflow-y-auto flex flex-col"
   ref={messagesContainerRef}
 >
+  <div className="mt-auto">
   {/* CHAT START MESSAGE */}
 
 {receiver && (
@@ -613,7 +615,7 @@ className="w-8 h-8 rounded-full object-cover"
 
 <div ref={messagesEndRef}></div>
 </div>
-
+</div>
 
 {replyMessage && (
   <div className="mb-2 bg-gray-800 p-2 rounded-lg border-l-4 border-indigo-500">

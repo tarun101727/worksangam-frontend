@@ -47,10 +47,12 @@ const closeMedia = () => {
   setSelectedMedia(null);
 };
 
-/* AUTO SCROLL */
 useLayoutEffect(() => {
-  // Scroll instantly to bottom after messages render
-  messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+  const container = messagesContainerRef.current;
+
+  if (container) {
+    container.scrollTop = container.scrollHeight;
+  }
 }, [messages]);
 
 useEffect(() => {
@@ -289,12 +291,9 @@ return(
 
 {/* MESSAGE AREA */}
 <div
-  className="flex-1 p-4 overflow-y-auto flex flex-col"
+  className="flex-1 p-4 overflow-y-auto"
   ref={messagesContainerRef}
 >
-  <div className="mt-auto">
-
-
   {/* CHAT START MESSAGE */}
 
 {receiver && (
@@ -480,7 +479,6 @@ className="w-8 h-8 rounded-full object-cover"
 )}
 <div ref={messagesEndRef}></div>
 
-</div>
 </div>
 
 {/* MESSAGE INPUT */}

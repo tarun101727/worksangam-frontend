@@ -37,8 +37,15 @@ const messagesContainerRef = useRef(null);
 const [isTyping, setIsTyping] = useState(false);
 const [loading, setLoading] = useState(true);
 const [openMenuId, setOpenMenuId] = useState(null);
+const [replyMessage, setReplyMessage] = useState(null);
 const isTypingRef = useRef(false);
 const { t } = useTranslation();
+
+const selectReply = (msg) => {
+  setReplyMessage(msg);
+  setOpenMenuId(null);
+  textareaRef.current?.focus();
+};
 
 const openMedia = (mediaUrl) => {
   setSelectedMedia(mediaUrl);
@@ -138,6 +145,7 @@ const sendMessage = () => {
 
   // Clear input
   setText("");
+  setReplyMessage(null); // <-- added here
   isTypingRef.current = false;
 
   // Stop typing
@@ -155,10 +163,13 @@ const sendMessage = () => {
     }
   });
 
-  // Optional: still save to backend
   axios.post(
     `${BASE_URL}/api/chat/send/${chatId}`,
-    { message: messageText },
+    {
+      message: messageText,
+      replyTo: replyMessage?._id || null,
+      replyText: replyMessage?.message || ""
+    },
     { withCredentials: true }
   ).catch(console.error);
 };
@@ -413,6 +424,13 @@ className="w-8 h-8 rounded-full object-cover"
       </button>
     )}
 
+    <button
+  onClick={() => selectReply(m)}
+  className="block w-full text-left px-4 py-2 hover:bg-white/10"
+>
+  Reply
+</button>
+
   </div>
 )}
 
@@ -450,6 +468,11 @@ className="w-8 h-8 rounded-full object-cover"
           : "bg-gray-700 text-white"
       }`}
     >
+      {m.replyText && (
+  <div className="mb-2 px-2 py-1 bg-black/20 rounded text-xs text-gray-300 border-l-4 border-indigo-400">
+    {m.replyText}
+  </div>
+)}
       {m.message.startsWith("📍 Location:") ? (
         <a
           href={m.message.replace("📍 Location:", "").trim()}
@@ -518,6 +541,13 @@ className="w-8 h-8 rounded-full object-cover"
       </button>
     )}
 
+    <button
+  onClick={() => selectReply(m)}
+  className="block w-full text-left px-4 py-2 hover:bg-white/10"
+>
+  Reply
+</button>
+
   </div>
 )}
 
@@ -555,6 +585,11 @@ className="w-8 h-8 rounded-full object-cover"
           : "bg-gray-700 text-white"
       }`}
     >
+      {m.replyText && (
+  <div className="mb-2 px-2 py-1 bg-black/20 rounded text-xs text-gray-300 border-l-4 border-indigo-400">
+    {m.replyText}
+  </div>
+)}
       {m.message.startsWith("📍 Location:") ? (
         <a
           href={m.message.replace("📍 Location:", "").trim()}
@@ -712,6 +747,21 @@ ref={cameraInputRef}
 onChange={handleFile}
 className="hidden"
 />
+
+
+{replyMessage && (
+  <div className="mb-2 bg-gray-800 p-2 rounded-lg border-l-4 border-indigo-500">
+    <div className="text-xs text-gray-400">Replying to</div>
+    <div className="text-sm truncate">{replyMessage.message}</div>
+
+    <button
+      onClick={() => setReplyMessage(null)}
+      className="text-red-400 text-xs mt-1"
+    >
+      Cancel
+    </button>
+  </div>
+)}
 
 {/* TEXT INPUT */}
 

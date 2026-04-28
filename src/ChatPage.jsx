@@ -353,8 +353,6 @@ className="w-14 h-14 rounded-full object-cover mb-2"
 )}
 
 {/* NO CHAT MESSAGE */}
-
-
 {messages.map((m,i)=>{
 
 const isSender = m.sender?._id?.toString() === userId?.toString();
@@ -604,14 +602,16 @@ className="w-8 h-8 rounded-full object-cover"
 )
 
 })}
+
 {isTyping && (
   <div className="text-gray-400 text-sm px-2 mb-2">
     {t("Typing . . .")}
   </div>
 )}
-<div ref={messagesEndRef}></div>
 
+<div ref={messagesEndRef}></div>
 </div>
+
 
 {replyMessage && (
   <div className="mb-2 bg-gray-800 p-2 rounded-lg border-l-4 border-indigo-500">
@@ -628,8 +628,7 @@ className="w-8 h-8 rounded-full object-cover"
 )}
 
 {/* MESSAGE INPUT */}
-
-<div className="sticky bottom-0 bg-gradient-to-br from-[#020617] via-[#020617] to-[#020617] border-t border-white/10 p-4 flex gap-2 items-end">
+<div className="bottom-0 bg-gradient-to-br from-[#020617] via-[#020617] to-[#020617] border-t border-white/10 p-4 flex gap-2 items-end">
 
 {/* PLUS BUTTON */}
 

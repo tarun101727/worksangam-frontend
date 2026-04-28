@@ -613,30 +613,19 @@ className="w-8 h-8 rounded-full object-cover"
 
 </div>
 
-<div className="sticky bottom-0 bg-[#020617] border-t border-white/10 p-4">
+{replyMessage && (
+  <div className="mb-2 bg-gray-800 p-2 rounded-lg border-l-4 border-indigo-500">
+    <div className="text-xs text-gray-400">Replying to</div>
+    <div className="text-sm truncate">{replyMessage.message}</div>
 
-  {replyMessage && (
-    <div className="mb-3 w-full max-w-full bg-gray-800 px-3 py-2 rounded-xl border-l-4 border-indigo-500 flex justify-between items-start gap-3">
-      
-      <div className="min-w-0 flex-1">
-        <div className="text-xs text-gray-400">
-          Replying to
-        </div>
-
-        <div className="text-sm text-white truncate">
-          {replyMessage.message}
-        </div>
-      </div>
-
-      <button
-        onClick={() => setReplyMessage(null)}
-        className="text-red-400 text-xs shrink-0"
-      >
-        ✕
-      </button>
-
-    </div>
-  )}
+    <button
+      onClick={() => setReplyMessage(null)}
+      className="text-red-400 text-xs mt-1"
+    >
+      Cancel
+    </button>
+  </div>
+)}
 
 {/* MESSAGE INPUT */}
 
@@ -779,7 +768,7 @@ className="bg-indigo-500 px-4 h-10 flex items-center justify-center rounded hove
 </button> 
 
 </div>
-</div>
+
 
 
 

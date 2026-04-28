@@ -473,7 +473,7 @@ className="w-8 h-8 rounded-full object-cover"
    <div
 className={`px-3 py-2 rounded-xl max-w-xs break-words transition-all duration-500 ${
   highlightedId === m._id
-    ? "bg-yellow-400 text-black shadow-lg scale-105"
+    ? "shadow-[0_0_0_3px_rgba(255,255,255,0.9),0_0_25px_rgba(255,255,255,0.9)] animate-pulse scale-105"
     : isSender
     ? "bg-indigo-500 text-white"
     : "bg-gray-700 text-white"
@@ -592,15 +592,13 @@ className="w-8 h-8 rounded-full object-cover"
   </div>
 ) : (
   m.message && (
-    <div
-className={`px-3 py-2 rounded-xl max-w-xs break-words transition-all duration-500 ${
+    <div className={`px-3 py-2 rounded-xl max-w-xs break-words transition-all duration-500 ${
   highlightedId === m._id
-    ? "bg-yellow-400 text-black shadow-lg scale-105"
+    ? "shadow-[0_0_0_3px_rgba(255,255,255,0.9),0_0_25px_rgba(255,255,255,0.9)] animate-pulse scale-105"
     : isSender
     ? "bg-indigo-500 text-white"
     : "bg-gray-700 text-white"
-}`}
->
+}`}>
       {m.replyText && (
   <div
     onClick={() => scrollToReplyMessage(m.replyTo)}

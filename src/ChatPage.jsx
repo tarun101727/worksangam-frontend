@@ -616,7 +616,7 @@ className="w-8 h-8 rounded-full object-cover"
 
 
 {replyMessage && (
-  <div className="relative mb-2 bg-gray-800 p-2 rounded-lg border-l-4 border-indigo-500">
+  <div className="relative w-full mb-2 bg-gray-800 p-2 rounded-lg border-l-4 border-indigo-500">
     <div className="text-xs text-gray-400">Replying to</div>
     <div className="text-sm truncate">{replyMessage.message}</div>
 

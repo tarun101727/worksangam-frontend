@@ -41,7 +41,6 @@ const [loading, setLoading] = useState(true);
 const [openMenuId, setOpenMenuId] = useState(null);
 const [replyMessage, setReplyMessage] = useState(null);
 const isTypingRef = useRef(false);
-const previousMessagesLength = useRef(0);
 const { t } = useTranslation();
 
 const selectReply = (msg) => {
@@ -60,20 +59,10 @@ const closeMedia = () => {
 
 useLayoutEffect(() => {
   const container = messagesContainerRef.current;
-  if (!container) return;
 
-  const isNewMessage = messages.length > previousMessagesLength.current;
-
-  if (isNewMessage) {
-    const isNearBottom =
-      container.scrollHeight - container.scrollTop - container.clientHeight < 100;
-
-    if (isNearBottom) {
-      container.scrollTop = container.scrollHeight;
-    }
+  if (container) {
+    container.scrollTop = container.scrollHeight;
   }
-
-  previousMessagesLength.current = messages.length;
 }, [messages]);
 
 useEffect(() => {

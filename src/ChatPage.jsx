@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useLayoutEffect } from "react";
+import { useEffect, useState, useRef ,useLayoutEffect  } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { socket } from "./utils/socket";
@@ -41,7 +41,6 @@ const [loading, setLoading] = useState(true);
 const [openMenuId, setOpenMenuId] = useState(null);
 const [replyMessage, setReplyMessage] = useState(null);
 const isTypingRef = useRef(false);
-const prevMessageCount = useRef(0);
 const { t } = useTranslation();
 
 const selectReply = (msg) => {
@@ -61,13 +60,9 @@ const closeMedia = () => {
 useLayoutEffect(() => {
   const container = messagesContainerRef.current;
 
-  if (!container) return;
-
-  if (messages.length > prevMessageCount.current) {
+  if (container) {
     container.scrollTop = container.scrollHeight;
   }
-
-  prevMessageCount.current = messages.length;
 }, [messages]);
 
 useEffect(() => {
@@ -621,7 +616,7 @@ className="w-8 h-8 rounded-full object-cover"
 
 
 {replyMessage && (
-  <div className="mb-2 bg-gray-800 p-2 rounded-lg border-l-4 border-indigo-500">
+  <div className="absolute mb-2 bg-gray-800 p-2 rounded-lg border-l-4 border-indigo-500">
     <div className="text-xs text-gray-400">Replying to</div>
     <div className="text-sm truncate">{replyMessage.message}</div>
 

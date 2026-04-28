@@ -322,12 +322,11 @@ if (loading && messages.length === 0) {
 }
 
 return(
-
-<div className="flex flex-col h-[100dvh]">
+<div className="flex flex-col h-screen overflow-hidden">
 
 {/* MESSAGE AREA */}
 <div
-  className="flex-1 p-4 overflow-y-auto"
+  className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-gray-600"
   ref={messagesContainerRef}
 >
   {/* CHAT START MESSAGE */}

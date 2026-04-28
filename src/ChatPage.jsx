@@ -323,7 +323,7 @@ if (loading && messages.length === 0) {
 
 return(
 
-<div className="flex flex-col h-[100dvh]">
+<div className="flex flex-col h-screen">
 
 {/* MESSAGE AREA */}
 <div
@@ -629,7 +629,7 @@ className="w-8 h-8 rounded-full object-cover"
 
 {/* MESSAGE INPUT */}
 
-<div className="">
+<div className="sticky bottom-0 bg-gradient-to-br from-[#020617] via-[#020617] to-[#020617] border-t border-white/10 p-4 flex gap-2 items-end">
 
 {/* PLUS BUTTON */}
 

@@ -289,9 +289,10 @@ return(
 
 {/* MESSAGE AREA */}
 <div
-  className="flex-1 p-4 overflow-y-auto"
+  className="flex-1 p-4 overflow-y-auto flex flex-col"
   ref={messagesContainerRef}
 >
+  <div className="mt-auto">
 
 
   {/* CHAT START MESSAGE */}
@@ -480,6 +481,7 @@ className="w-8 h-8 rounded-full object-cover"
 <div ref={messagesEndRef}></div>
 
 </div>
+</div>
 
 {/* MESSAGE INPUT */}
 
@@ -623,6 +625,10 @@ className="bg-indigo-500 px-4 h-10 flex items-center justify-center rounded hove
 </button> 
 
 </div>
+
+
+
+
 {selectedMedia && (
   <div
     className="fixed inset-0 bg-black/90 flex items-center justify-center z-50"

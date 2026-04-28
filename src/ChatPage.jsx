@@ -388,7 +388,7 @@ className="w-8 h-8 rounded-full object-cover"
 </button>
 
 {openMenuId === m._id && (
-  <div className="absolute top-3 -left-5 bg-[#0f172a] border border-white/10 rounded-lg shadow-xl z-50 min-w-[130px]">
+  <div className="absolute top-8 -right-1 bg-[#0f172a] border border-white/10 rounded-lg shadow-xl z-50 min-w-[130px]" >
 
     <button
       onClick={() => copyMessage(m.message)}
@@ -493,7 +493,7 @@ className="w-8 h-8 rounded-full object-cover"
 </button>
 
 {openMenuId === m._id && (
-  <div className="absolute top-3 -left-5 bg-[#0f172a] border border-white/10 rounded-lg shadow-xl z-50 min-w-[130px]">
+  <div className="absolute top-8 -right-1 bg-[#0f172a] border border-white/10 rounded-lg shadow-xl z-50 min-w-[130px]">
 
     <button
       onClick={() => copyMessage(m.message)}

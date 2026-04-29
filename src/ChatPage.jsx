@@ -385,10 +385,7 @@ if (loading && messages.length === 0) {
 }
 
 return(
-
 <div className="flex flex-col h-screen">
-
-<h1>kvhdbd</h1>
 {showScrollDown && (
   <button
     onClick={scrollToBottom}

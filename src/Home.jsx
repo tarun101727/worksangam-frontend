@@ -44,6 +44,9 @@ export default function Home() {
   const [selectedDistance, setSelectedDistance] = useState(null);
   const [loadingData, setLoadingData] = useState(false); // ✅ add this
   const [allJobs, setAllJobs] = useState([]);
+  const [showCreditPopup, setShowCreditPopup] = useState(false);
+const [claimingCredit, setClaimingCredit] = useState(false);
+
 
   useEffect(() => {
   return () => {
@@ -102,6 +105,13 @@ useEffect(() => {
         withCredentials: true,
       });
       setUser(res.data.user);
+
+if (
+  !res.data.user?.freeCreditClaimed &&
+  !localStorage.getItem("freeCreditPopupSeen")
+) {
+  setShowCreditPopup(true);
+}
 
       if (!window.location.pathname.includes("/urgent")) startLocationTracking();
     } catch (err) {
@@ -393,6 +403,30 @@ const filtered = professions.filter((p) =>
   );
 };
 
+
+const claimFreeCredits = async () => {
+  try {
+    setClaimingCredit(true);
+
+    await axios.post(
+      `${BASE_URL}/api/auth/claim-free-credits`,
+      {},
+      { withCredentials: true }
+    );
+
+    localStorage.setItem("freeCreditPopupSeen", "yes");
+
+    setShowCreditPopup(false);
+
+    alert("🎉 10 Free Credits Added Successfully!");
+  } catch (err) {
+    alert(err?.response?.data?.msg || "Failed to claim credits");
+    setShowCreditPopup(false);
+  } finally {
+    setClaimingCredit(false);
+  }
+};
+
   if (loading) {
   return (
     <div className="min-h-screen flex justify-center items-center">
@@ -403,6 +437,32 @@ const filtered = professions.filter((p) =>
 
   return (
     <div className="pt-16">
+
+      {showCreditPopup && (
+  <div className="fixed inset-0 bg-black/70 z-[999] flex items-center justify-center px-4">
+    <div className="bg-[#0F172A] w-full max-w-md rounded-2xl p-6 border border-indigo-500 text-center">
+      
+      <h2 className="text-2xl font-bold mb-3 text-white">
+        🎁 Welcome Bonus
+      </h2>
+
+      <p className="text-white/80 mb-6">
+        You got <span className="text-yellow-400 font-bold">10 FREE Credits</span> from Worksangam.
+        Click below to add them to your wallet.
+      </p>
+
+      <button
+        onClick={claimFreeCredits}
+        disabled={claimingCredit}
+        className="w-full bg-indigo-600 hover:bg-indigo-700 py-3 rounded-xl font-semibold"
+      >
+        {claimingCredit ? "Adding..." : "Claim 10 Credits"}
+      </button>
+    </div>
+  </div>
+)}
+
+
       {error && <p className="text-red-400 text-center mb-6">{error}</p>}
 
       {/* ======================= TABS ======================= */}

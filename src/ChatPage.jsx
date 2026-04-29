@@ -53,15 +53,21 @@ useEffect(() => {
   if (!container) return;
 
   const handleScroll = () => {
-    const isNearBottom =
-      container.scrollHeight - container.scrollTop - container.clientHeight < 150;
+    const distanceFromBottom =
+      container.scrollHeight -
+      container.scrollTop -
+      container.clientHeight;
 
-    setShowScrollDown(!isNearBottom);
+    setShowScrollDown(distanceFromBottom > 150);
   };
+
+  handleScroll();
 
   container.addEventListener("scroll", handleScroll);
 
-  return () => container.removeEventListener("scroll", handleScroll);
+  return () => {
+    container.removeEventListener("scroll", handleScroll);
+  };
 }, []);
 
 const scrollToBottom = () => {
@@ -104,8 +110,19 @@ const closeMedia = () => {
 useLayoutEffect(() => {
   const container = messagesContainerRef.current;
 
-  if (container) {
-    container.scrollTop = container.scrollHeight;
+  if (!container) return;
+
+  const isNearBottom =
+    container.scrollHeight -
+      container.scrollTop -
+      container.clientHeight <
+    150;
+
+  if (isNearBottom) {
+    container.scrollTo({
+      top: container.scrollHeight,
+      behavior: "smooth",
+    });
   }
 }, [messages]);
 

@@ -48,7 +48,19 @@ const { t } = useTranslation();
 const selectReply = (msg) => {
   setReplyMessage(msg);
   setOpenMenuId(null);
-  textareaRef.current?.focus();
+
+  setTimeout(() => {
+    textareaRef.current?.focus();
+
+    const container = messagesContainerRef.current;
+
+    if (container) {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, 150);
 };
 
 const openMedia = (mediaUrl) => {

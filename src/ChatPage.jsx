@@ -703,9 +703,8 @@ className={`px-3 py-2 rounded-xl max-w-xs break-words transition-all duration-50
 
 })}
 
-{/* Typing Indicator ABOVE input */}
 {isTyping && (
-  <div className="px-[40px] py-2 text-gray-400 text-sm bg-[#020617]">
+  <div className="px-4 pb-[50px] text-gray-400 text-sm">
     {receiver?.firstName} {t("Typing . . .")}
   </div>
 )}

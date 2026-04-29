@@ -51,17 +51,24 @@ useEffect(() => {
   if (!container) return;
 
   const handleScroll = () => {
-    const isNearBottom =
-      container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+    const distanceFromBottom =
+      container.scrollHeight -
+      container.scrollTop -
+      container.clientHeight;
 
-    // show button only when user scrolls upward from bottom
-    setShowScrollDown(!isNearBottom);
+    setShowScrollDown(distanceFromBottom > 150);
   };
+
+  handleScroll();
 
   container.addEventListener("scroll", handleScroll);
 
   return () => container.removeEventListener("scroll", handleScroll);
-}, []);
+}, [messages]);
+
+
+
+
 const scrollToBottom = () => {
   const container = messagesContainerRef.current;
 

@@ -396,7 +396,7 @@ return(
 {showScrollDown && (
   <button
     onClick={scrollToBottom}
-    className="fixed bottom-24 right-5 z-50 w-12 h-12 rounded-full bg-red-500 hover:bg-indigo-600 shadow-xl flex items-center justify-center animate-bounce"
+    className="fixed bottom-24 right-5 z-50 w-12 h-12 rounded-full bg-indigo-500 hover:bg-indigo-600 shadow-xl flex items-center justify-center transition-all duration-300"
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"

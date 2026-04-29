@@ -106,10 +106,9 @@ useEffect(() => {
       });
       setUser(res.data.user);
 
-if (
-  !res.data.user?.freeCreditClaimed &&
-  !localStorage.getItem("freeCreditPopupSeen")
-) {
+const currentUser = res.data.user;
+
+if (!currentUser?.freeCreditClaimed) {
   setShowCreditPopup(true);
 }
 
@@ -413,8 +412,6 @@ const claimFreeCredits = async () => {
       {},
       { withCredentials: true }
     );
-
-    localStorage.setItem("freeCreditPopupSeen", "yes");
 
     setShowCreditPopup(false);
 

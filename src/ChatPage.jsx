@@ -43,7 +43,37 @@ const [replyMessage, setReplyMessage] = useState(null);
 const isTypingRef = useRef(false);
 const messageRefs = useRef({});
 const [highlightedId, setHighlightedId] = useState(null);
+const [showScrollDown, setShowScrollDown] = useState(false);
 const { t } = useTranslation();
+
+
+useEffect(() => {
+  const container = messagesContainerRef.current;
+
+  if (!container) return;
+
+  const handleScroll = () => {
+    const isNearBottom =
+      container.scrollHeight - container.scrollTop - container.clientHeight < 150;
+
+    setShowScrollDown(!isNearBottom);
+  };
+
+  container.addEventListener("scroll", handleScroll);
+
+  return () => container.removeEventListener("scroll", handleScroll);
+}, []);
+
+const scrollToBottom = () => {
+  const container = messagesContainerRef.current;
+
+  if (container) {
+    container.scrollTo({
+      top: container.scrollHeight,
+      behavior: "smooth",
+    });
+  }
+};
 
 const selectReply = (msg) => {
   setReplyMessage(msg);
@@ -357,8 +387,16 @@ if (loading && messages.length === 0) {
 }
 
 return(
-
 <div className="flex flex-col h-screen">
+
+{showScrollDown && (
+  <button
+    onClick={scrollToBottom}
+    className="fixed bottom-24 right-5 z-50 bg-indigo-500 hover:bg-indigo-600 text-white w-12 h-12 rounded-full shadow-xl flex items-center justify-center animate-bounce"
+  >
+    ↓
+  </button>
+)}
 
 {/* MESSAGE AREA */}
 <div

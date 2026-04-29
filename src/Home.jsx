@@ -44,8 +44,9 @@ export default function Home() {
   const [selectedDistance, setSelectedDistance] = useState(null);
   const [loadingData, setLoadingData] = useState(false); // ✅ add this
   const [allJobs, setAllJobs] = useState([]);
-  const [showCreditPopup, setShowCreditPopup] = useState(false);
-const [claimingCredit, setClaimingCredit] = useState(false);
+  const [showBonusPopup, setShowBonusPopup] = useState(false);
+  const [claimingBonus, setClaimingBonus] = useState(false);
+
 
 
   useEffect(() => {
@@ -106,10 +107,13 @@ useEffect(() => {
       });
       setUser(res.data.user);
 
-const currentUser = res.data.user;
-
-if (!currentUser?.freeCreditClaimed) {
-  setShowCreditPopup(true);
+      if (
+  res.data.user &&
+  !res.data.user.welcomeBonusClaimed &&
+  !sessionStorage.getItem("welcomeShown")
+) {
+  setShowBonusPopup(true);
+  sessionStorage.setItem("welcomeShown", "yes");
 }
 
       if (!window.location.pathname.includes("/urgent")) startLocationTracking();
@@ -403,24 +407,22 @@ const filtered = professions.filter((p) =>
 };
 
 
-const claimFreeCredits = async () => {
+const claimBonus = async () => {
   try {
-    setClaimingCredit(true);
+    setClaimingBonus(true);
 
     await axios.post(
-      `${BASE_URL}/api/auth/claim-free-credits`,
+      `${BASE_URL}/api/auth/claim-welcome-bonus`,
       {},
       { withCredentials: true }
     );
 
-    setShowCreditPopup(false);
+    setShowBonusPopup(false);
 
-    alert("🎉 10 Free Credits Added Successfully!");
   } catch (err) {
-    alert(err?.response?.data?.msg || "Failed to claim credits");
-    setShowCreditPopup(false);
+    setShowBonusPopup(false , err );
   } finally {
-    setClaimingCredit(false);
+    setClaimingBonus(false);
   }
 };
 
@@ -435,31 +437,30 @@ const claimFreeCredits = async () => {
   return (
     <div className="pt-16">
 
-      {showCreditPopup && (
-  <div className="fixed inset-0 bg-black/70 z-[999] flex items-center justify-center px-4">
-    <div className="bg-[#0F172A] w-full max-w-md rounded-2xl p-6 border border-indigo-500 text-center">
-      
-      <h2 className="text-2xl font-bold mb-3 text-white">
-        🎁 Welcome Bonus
+
+      {showBonusPopup && (
+  <div className="fixed inset-0 bg-black/70 z-50 flex justify-center items-center px-4">
+    <div className="bg-[#0F172A] p-6 rounded-2xl max-w-sm w-full text-center border border-yellow-400">
+
+      <h2 className="text-2xl font-bold text-yellow-400 mb-3">
+        🎉 Welcome Bonus
       </h2>
 
-      <p className="text-white/80 mb-6">
-        You got <span className="text-yellow-400 font-bold">10 FREE Credits</span> from Worksangam.
-        Click below to add them to your wallet.
+      <p className="text-white/70 mb-5">
+        Claim your FREE 10 credits now.
       </p>
 
       <button
-        onClick={claimFreeCredits}
-        disabled={claimingCredit}
-        className="w-full bg-indigo-600 hover:bg-indigo-700 py-3 rounded-xl font-semibold"
+        onClick={claimBonus}
+        disabled={claimingBonus}
+        className="w-full py-3 rounded-xl bg-yellow-400 text-black font-bold"
       >
-        {claimingCredit ? "Adding..." : "Claim 10 Credits"}
+        {claimingBonus ? "Claiming..." : "Claim 10 Credits"}
       </button>
+
     </div>
   </div>
 )}
-
-
       {error && <p className="text-red-400 text-center mb-6">{error}</p>}
 
       {/* ======================= TABS ======================= */}

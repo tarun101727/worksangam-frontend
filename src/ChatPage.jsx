@@ -704,14 +704,13 @@ className={`px-3 py-2 rounded-xl max-w-xs break-words transition-all duration-50
 })}
 
 {isTyping && (
-  <div className="px-4 pb-9 text-gray-400 text-sm">
+  <div className="px-4 pb-[20px] text-gray-400 text-sm">
     {receiver?.firstName} {t("Typing . . .")}
   </div>
 )}
 
 <div ref={messagesEndRef}></div>
 </div>
-
 
 {replyMessage && (
   <div className="mb-2 bg-gray-800 p-2 rounded-lg border-l-4 border-indigo-500">

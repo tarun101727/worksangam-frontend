@@ -151,9 +151,15 @@ const SignupEmail = () => {
 
       localStorage.setItem("token", res.data.token);
 
-      navigate(role === "hirer" ? "/signup/hirer" : "/signup/employee", {
-        replace: true,
-      });
+navigate(
+  role === "hirer" ? "/signup/hirer" : "/signup/employee",
+  {
+    replace: true,
+    state: {
+      token: res.data.token
+    }
+  }
+);
     } catch (err) {
       setError(err.response?.data?.msg || "Invalid OTP");
     } finally {

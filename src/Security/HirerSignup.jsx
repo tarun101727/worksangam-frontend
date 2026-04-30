@@ -1,4 +1,3 @@
-import Sanscript from "sanscript";
 import React, { useState, Fragment } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
@@ -85,10 +84,15 @@ if (!form.lastName.trim()) {
       formData.append("profileImage", profileFile);
 
       const res = await axios.post(
-        `${BASE_URL}/api/auth/create-account`,
-        formData,
-        { withCredentials: true }
-      );
+  `${BASE_URL}/api/auth/create-account`,
+  formData,
+  {
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+  }
+);
 
       setIsAuthenticated(true);
       setUser(res.data.user);

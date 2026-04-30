@@ -83,15 +83,20 @@ if (!form.lastName.trim()) {
       formData.append("genderLabel", form.genderLabel);
       formData.append("profileImage", profileFile);
 
-      const res = await axios.post(
-        `${BASE_URL}/api/auth/create-account`,
-        formData,
-        { withCredentials: true ,
-        headers:{
-   Authorization:`Bearer ${localStorage.getItem("token")}`
-}
-        }
-      );
+      const token =
+  location.state?.token ||
+  localStorage.getItem("token");
+
+const res = await axios.post(
+  `${BASE_URL}/api/auth/create-account`,
+  formData,
+  {
+    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  }
+);
 
       setIsAuthenticated(true);
       setUser(res.data.user);

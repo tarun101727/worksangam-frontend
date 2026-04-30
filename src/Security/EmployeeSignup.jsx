@@ -395,14 +395,18 @@ const createEmployeeAccount = async () => {
       formData.append("profileImage", profileFile);
     }
 
-    const res = await axios.post(
+    const token =
+  location.state?.token ||
+  localStorage.getItem("token");
+
+const res = await axios.post(
   `${BASE_URL}/api/auth/create-employee-account`,
   formData,
   {
     withCredentials: true,
     headers: {
       "Content-Type": "multipart/form-data",
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      Authorization: `Bearer ${token}`,
     },
   }
 );

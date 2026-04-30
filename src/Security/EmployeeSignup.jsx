@@ -1,4 +1,3 @@
-
 import { useTranslation } from "react-i18next";
 import React, { useState, useRef, Fragment, useCallback, useEffect } from "react";
 import axios from "axios";
@@ -397,13 +396,16 @@ const createEmployeeAccount = async () => {
     }
 
     const res = await axios.post(
-      `${BASE_URL}/api/auth/create-employee-account`,
-      formData,
-      {
-        withCredentials: true,
-        headers: { "Content-Type": "multipart/form-data" },
-      }
-    );
+  `${BASE_URL}/api/auth/create-employee-account`,
+  formData,
+  {
+    withCredentials: true,
+    headers: {
+      "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+  }
+);
 
     setIsAuthenticated(true);
     setUser(res.data.user);

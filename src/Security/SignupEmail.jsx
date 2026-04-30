@@ -141,13 +141,21 @@ const SignupEmail = () => {
     try {
       setLoading(true);
       setError("");
-      await axios.post(`${BASE_URL}/api/auth/verify-otp`, {
-        email: form.email,
-        password: form.password,
-        otp: form.otp,
-        role,
-        preferredLanguage,
-      });
+      const res = await axios.post(`${BASE_URL}/api/auth/verify-otp`, {
+  email: form.email,
+  password: form.password,
+  otp: form.otp,
+  role,
+  preferredLanguage,
+}, {
+  withCredentials: true
+});
+
+localStorage.setItem("token", res.data.token);
+
+navigate(role === "hirer" ? "/signup/hirer" : "/signup/employee", {
+  replace: true,
+});
 
       navigate(role === "hirer" ? "/signup/hirer" : "/signup/employee", {
         replace: true,

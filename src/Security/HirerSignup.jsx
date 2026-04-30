@@ -84,15 +84,14 @@ if (!form.lastName.trim()) {
       formData.append("profileImage", profileFile);
 
       const res = await axios.post(
-  `${BASE_URL}/api/auth/create-account`,
-  formData,
-  {
-    withCredentials: true,
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`
-    }
-  }
-);
+        `${BASE_URL}/api/auth/create-account`,
+        formData,
+        { withCredentials: true ,
+        headers:{
+   Authorization:`Bearer ${localStorage.getItem("token")}`
+}
+        }
+      );
 
       setIsAuthenticated(true);
       setUser(res.data.user);
@@ -310,4 +309,3 @@ const handleChange = (value, field) => {
 };
 
 export default HirerSignup;
-
